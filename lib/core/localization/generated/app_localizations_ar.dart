@@ -27,16 +27,211 @@ class AppLocalizationsAr extends AppLocalizations {
   String get commonConfirm => 'تأكيد';
 
   @override
+  String get commonSkip => 'تخطي';
+
+  @override
+  String get commonNext => 'التالي';
+
+  @override
   String get authLoginTitle => 'تسجيل الدخول';
+
+  @override
+  String get authLoginSubtitle => 'أهلاً بعودتك! سجل دخولك للمتابعة';
 
   @override
   String get authEmailLabel => 'البريد الإلكتروني';
 
   @override
+  String get authEmailOrPhoneLabel => 'البريد الإلكتروني أو رقم الهاتف';
+
+  @override
   String get authPasswordLabel => 'كلمة المرور';
 
   @override
+  String get authPhoneLabel => 'رقم الهاتف';
+
+  @override
   String get authLoginSubmit => 'دخول';
+
+  @override
+  String get authForgotPassword => 'نسيت كلمة المرور؟';
+
+  @override
+  String get authNoAccount => 'ليس لديك حساب؟';
+
+  @override
+  String get authCreateAccount => 'إنشاء حساب جديد';
+
+  @override
+  String get authAlreadyHaveAccount => 'لديك حساب بالفعل؟';
+
+  @override
+  String get authRegisterTitle => 'إنشاء حساب جديد';
+
+  @override
+  String get authRegisterSubtitle => 'انضم إلينا وابدأ رحلتك القانونية';
+
+  @override
+  String get authRegisterSubmit => 'إنشاء الحساب';
+
+  @override
+  String get authAccountTypeIndividual => 'فرد';
+
+  @override
+  String get authAccountTypeCompany => 'شركة';
+
+  @override
+  String get authAccountTypeLawyer => 'محامٍ';
+
+  @override
+  String get authFullName => 'الاسم الكامل';
+
+  @override
+  String get authFullNameTriple => 'الاسم الثلاثي';
+
+  @override
+  String get authCompanyName => 'اسم المنشأة / الشركة';
+
+  @override
+  String get authCommercialRegistrationNumber => 'رقم السجل التجاري';
+
+  @override
+  String get authBarLicenseNumber => 'رقم إجازة المحاماة / القيد';
+
+  @override
+  String get authMainSpecialty => 'التخصص الرئيسي';
+
+  @override
+  String get authMainSpecialtyHint => 'مثال: قانون تجاري، أحوال شخصية';
+
+  @override
+  String get authTermsAgreementPrefix => 'بالتسجيل توافق على ';
+
+  @override
+  String get authTermsOfService => 'شروط الخدمة';
+
+  @override
+  String get authTermsAgreementJoiner => ' و';
+
+  @override
+  String get authPrivacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get authForgotPasswordTitle => 'نسيت كلمة المرور؟';
+
+  @override
+  String get authForgotPasswordSubtitle => 'اختر طريقة الاستعادة للمتابعة';
+
+  @override
+  String get authMethodSms => 'رسالة SMS';
+
+  @override
+  String get authMethodEmail => 'البريد الإلكتروني';
+
+  @override
+  String get authSmsInfo => 'سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور';
+
+  @override
+  String get authEmailInfo => 'سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور';
+
+  @override
+  String get authSendCode => 'إرسال رمز التحقق';
+
+  @override
+  String get authContactSupport => 'تواصل مع الدعم الفني';
+
+  @override
+  String get authRememberPassword => 'تذكرت كلمة المرور؟';
+
+  @override
+  String get authSentTitle => 'تم الإرسال!';
+
+  @override
+  String get authSentSubtitleSms => 'تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور';
+
+  @override
+  String get authSentSubtitleEmail => 'تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور';
+
+  @override
+  String get authEnterCode => 'إدخال رمز التحقق';
+
+  @override
+  String get authResend => 'إعادة الإرسال';
+
+  @override
+  String get authOtpTitle => 'أدخل رمز التحقق';
+
+  @override
+  String authOtpSubtitle(String destination) {
+    return 'أرسلنا رمزًا مكونًا من 6 أرقام إلى $destination';
+  }
+
+  @override
+  String get authOtpConfirm => 'تأكيد';
+
+  @override
+  String authOtpResendIn(String seconds) {
+    return 'إعادة الإرسال بعد $seconds';
+  }
+
+  @override
+  String get authOtpInvalidCode => 'رمز التحقق غير صحيح';
+
+  @override
+  String get authResetPasswordTitle => 'كلمة مرور جديدة';
+
+  @override
+  String get authResetPasswordSubtitle => 'أنشئ كلمة مرور قوية لحسابك';
+
+  @override
+  String get authNewPassword => 'كلمة المرور الجديدة';
+
+  @override
+  String get authConfirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get authResetPasswordSubmit => 'حفظ كلمة المرور';
+
+  @override
+  String get authResetPasswordSuccessTitle => 'تم تغيير كلمة المرور!';
+
+  @override
+  String get authResetPasswordSuccessSubtitle => 'يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة';
+
+  @override
+  String get authGoToLogin => 'الذهاب لتسجيل الدخول';
+
+  @override
+  String get validationPasswordMismatch => 'كلمتا المرور غير متطابقتين';
+
+  @override
+  String get onboardingSlide1Title => 'مساعدك القانوني في جيبك';
+
+  @override
+  String get onboardingSlide1Subtitle => 'استشارات أولية وشرح فوري للبنود القانونية بالذكاء الاصطناعي على مدار الساعة';
+
+  @override
+  String get onboardingSlide2Title => 'عقود ذكية بدقائق';
+
+  @override
+  String get onboardingSlide2Subtitle => 'أنشئ عقودًا قانونية موثوقة وحلل عقودك الحالية بالذكاء الاصطناعي';
+
+  @override
+  String get onboardingSlide3Title => 'تواصل مباشرة مع محامين موثوقين';
+
+  @override
+  String get onboardingSlide3Subtitle => 'احجز استشارة فيديو أو صوتية أو مكتوبة مع نخبة من المحامين المرخصين';
+
+  @override
+  String get onboardingGetStarted => 'ابدأ';
+
+  @override
+  String get devCredentialsTitle => 'بيانات تجريبية (بيئة التطوير فقط)';
+
+  @override
+  String devCredentialsPassword(String password) {
+    return 'كلمة المرور لجميع الحسابات: $password';
+  }
 
   @override
   String get errorGeneric => 'حدث خطأ غير متوقع';
@@ -64,6 +259,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get validationPasswordTooShort => 'كلمة المرور يجب ألا تقل عن 8 أحرف';
+
+  @override
+  String get validationInvalidPhone => 'رقم الهاتف غير صحيح';
 
   @override
   String homeWelcome(String name) {

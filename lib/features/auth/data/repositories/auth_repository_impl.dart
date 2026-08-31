@@ -8,6 +8,7 @@ import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/features/auth/data/datasources/auth_data_source_provider.dart';
 import 'package:aqd_ionbit/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
+import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -27,6 +28,17 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Result<({AuthUser user, AuthTokens tokens})>> login({required String email, required String password}) async {
     try {
       final result = await _remote.login(email: email, password: password);
+      await _tokenManager.save(result.tokens);
+      return Result.success(result);
+    } catch (e) {
+      return Result.failure(_errorMapper.map(e));
+    }
+  }
+
+  @override
+  Future<Result<({AuthUser user, AuthTokens tokens})>> register(RegisterRequest request) async {
+    try {
+      final result = await _remote.register(request);
       await _tokenManager.save(result.tokens);
       return Result.success(result);
     } catch (e) {
@@ -84,6 +96,11 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       return Result.failure(_errorMapper.map(e));
     }
+  }
+
+  @override
+  Future<Result<void>> resetPassword({required String destination, required String code, required String newPassword}) {
+    return _guard(() => _remote.resetPassword(destination: destination, code: code, newPassword: newPassword));
   }
 
   Future<Result<void>> _guard(Future<void> Function() action) async {

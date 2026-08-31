@@ -131,11 +131,29 @@ abstract class AppLocalizations {
   /// **'تأكيد'**
   String get commonConfirm;
 
+  /// No description provided for @commonSkip.
+  ///
+  /// In ar, this message translates to:
+  /// **'تخطي'**
+  String get commonSkip;
+
+  /// No description provided for @commonNext.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي'**
+  String get commonNext;
+
   /// No description provided for @authLoginTitle.
   ///
   /// In ar, this message translates to:
   /// **'تسجيل الدخول'**
   String get authLoginTitle;
+
+  /// No description provided for @authLoginSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أهلاً بعودتك! سجل دخولك للمتابعة'**
+  String get authLoginSubtitle;
 
   /// No description provided for @authEmailLabel.
   ///
@@ -143,17 +161,377 @@ abstract class AppLocalizations {
   /// **'البريد الإلكتروني'**
   String get authEmailLabel;
 
+  /// No description provided for @authEmailOrPhoneLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'البريد الإلكتروني أو رقم الهاتف'**
+  String get authEmailOrPhoneLabel;
+
   /// No description provided for @authPasswordLabel.
   ///
   /// In ar, this message translates to:
   /// **'كلمة المرور'**
   String get authPasswordLabel;
 
+  /// No description provided for @authPhoneLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم الهاتف'**
+  String get authPhoneLabel;
+
   /// No description provided for @authLoginSubmit.
   ///
   /// In ar, this message translates to:
   /// **'دخول'**
   String get authLoginSubmit;
+
+  /// No description provided for @authForgotPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسيت كلمة المرور؟'**
+  String get authForgotPassword;
+
+  /// No description provided for @authNoAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'ليس لديك حساب؟'**
+  String get authNoAccount;
+
+  /// No description provided for @authCreateAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء حساب جديد'**
+  String get authCreateAccount;
+
+  /// No description provided for @authAlreadyHaveAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'لديك حساب بالفعل؟'**
+  String get authAlreadyHaveAccount;
+
+  /// No description provided for @authRegisterTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء حساب جديد'**
+  String get authRegisterTitle;
+
+  /// No description provided for @authRegisterSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'انضم إلينا وابدأ رحلتك القانونية'**
+  String get authRegisterSubtitle;
+
+  /// No description provided for @authRegisterSubmit.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء الحساب'**
+  String get authRegisterSubmit;
+
+  /// No description provided for @authAccountTypeIndividual.
+  ///
+  /// In ar, this message translates to:
+  /// **'فرد'**
+  String get authAccountTypeIndividual;
+
+  /// No description provided for @authAccountTypeCompany.
+  ///
+  /// In ar, this message translates to:
+  /// **'شركة'**
+  String get authAccountTypeCompany;
+
+  /// No description provided for @authAccountTypeLawyer.
+  ///
+  /// In ar, this message translates to:
+  /// **'محامٍ'**
+  String get authAccountTypeLawyer;
+
+  /// No description provided for @authFullName.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم الكامل'**
+  String get authFullName;
+
+  /// No description provided for @authFullNameTriple.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم الثلاثي'**
+  String get authFullNameTriple;
+
+  /// No description provided for @authCompanyName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم المنشأة / الشركة'**
+  String get authCompanyName;
+
+  /// No description provided for @authCommercialRegistrationNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم السجل التجاري'**
+  String get authCommercialRegistrationNumber;
+
+  /// No description provided for @authBarLicenseNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم إجازة المحاماة / القيد'**
+  String get authBarLicenseNumber;
+
+  /// No description provided for @authMainSpecialty.
+  ///
+  /// In ar, this message translates to:
+  /// **'التخصص الرئيسي'**
+  String get authMainSpecialty;
+
+  /// No description provided for @authMainSpecialtyHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'مثال: قانون تجاري، أحوال شخصية'**
+  String get authMainSpecialtyHint;
+
+  /// No description provided for @authTermsAgreementPrefix.
+  ///
+  /// In ar, this message translates to:
+  /// **'بالتسجيل توافق على '**
+  String get authTermsAgreementPrefix;
+
+  /// No description provided for @authTermsOfService.
+  ///
+  /// In ar, this message translates to:
+  /// **'شروط الخدمة'**
+  String get authTermsOfService;
+
+  /// No description provided for @authTermsAgreementJoiner.
+  ///
+  /// In ar, this message translates to:
+  /// **' و'**
+  String get authTermsAgreementJoiner;
+
+  /// No description provided for @authPrivacyPolicy.
+  ///
+  /// In ar, this message translates to:
+  /// **'سياسة الخصوصية'**
+  String get authPrivacyPolicy;
+
+  /// No description provided for @authForgotPasswordTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسيت كلمة المرور؟'**
+  String get authForgotPasswordTitle;
+
+  /// No description provided for @authForgotPasswordSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر طريقة الاستعادة للمتابعة'**
+  String get authForgotPasswordSubtitle;
+
+  /// No description provided for @authMethodSms.
+  ///
+  /// In ar, this message translates to:
+  /// **'رسالة SMS'**
+  String get authMethodSms;
+
+  /// No description provided for @authMethodEmail.
+  ///
+  /// In ar, this message translates to:
+  /// **'البريد الإلكتروني'**
+  String get authMethodEmail;
+
+  /// No description provided for @authSmsInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور'**
+  String get authSmsInfo;
+
+  /// No description provided for @authEmailInfo.
+  ///
+  /// In ar, this message translates to:
+  /// **'سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور'**
+  String get authEmailInfo;
+
+  /// No description provided for @authSendCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'إرسال رمز التحقق'**
+  String get authSendCode;
+
+  /// No description provided for @authContactSupport.
+  ///
+  /// In ar, this message translates to:
+  /// **'تواصل مع الدعم الفني'**
+  String get authContactSupport;
+
+  /// No description provided for @authRememberPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكرت كلمة المرور؟'**
+  String get authRememberPassword;
+
+  /// No description provided for @authSentTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم الإرسال!'**
+  String get authSentTitle;
+
+  /// No description provided for @authSentSubtitleSms.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور'**
+  String get authSentSubtitleSms;
+
+  /// No description provided for @authSentSubtitleEmail.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور'**
+  String get authSentSubtitleEmail;
+
+  /// No description provided for @authEnterCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'إدخال رمز التحقق'**
+  String get authEnterCode;
+
+  /// No description provided for @authResend.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة الإرسال'**
+  String get authResend;
+
+  /// No description provided for @authOtpTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل رمز التحقق'**
+  String get authOtpTitle;
+
+  /// No description provided for @authOtpSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أرسلنا رمزًا مكونًا من 6 أرقام إلى {destination}'**
+  String authOtpSubtitle(String destination);
+
+  /// No description provided for @authOtpConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد'**
+  String get authOtpConfirm;
+
+  /// No description provided for @authOtpResendIn.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة الإرسال بعد {seconds}'**
+  String authOtpResendIn(String seconds);
+
+  /// No description provided for @authOtpInvalidCode.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمز التحقق غير صحيح'**
+  String get authOtpInvalidCode;
+
+  /// No description provided for @authResetPasswordTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة مرور جديدة'**
+  String get authResetPasswordTitle;
+
+  /// No description provided for @authResetPasswordSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنشئ كلمة مرور قوية لحسابك'**
+  String get authResetPasswordSubtitle;
+
+  /// No description provided for @authNewPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور الجديدة'**
+  String get authNewPassword;
+
+  /// No description provided for @authConfirmPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد كلمة المرور'**
+  String get authConfirmPassword;
+
+  /// No description provided for @authResetPasswordSubmit.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ كلمة المرور'**
+  String get authResetPasswordSubmit;
+
+  /// No description provided for @authResetPasswordSuccessTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تغيير كلمة المرور!'**
+  String get authResetPasswordSuccessTitle;
+
+  /// No description provided for @authResetPasswordSuccessSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة'**
+  String get authResetPasswordSuccessSubtitle;
+
+  /// No description provided for @authGoToLogin.
+  ///
+  /// In ar, this message translates to:
+  /// **'الذهاب لتسجيل الدخول'**
+  String get authGoToLogin;
+
+  /// No description provided for @validationPasswordMismatch.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمتا المرور غير متطابقتين'**
+  String get validationPasswordMismatch;
+
+  /// No description provided for @onboardingSlide1Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'مساعدك القانوني في جيبك'**
+  String get onboardingSlide1Title;
+
+  /// No description provided for @onboardingSlide1Subtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'استشارات أولية وشرح فوري للبنود القانونية بالذكاء الاصطناعي على مدار الساعة'**
+  String get onboardingSlide1Subtitle;
+
+  /// No description provided for @onboardingSlide2Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'عقود ذكية بدقائق'**
+  String get onboardingSlide2Title;
+
+  /// No description provided for @onboardingSlide2Subtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنشئ عقودًا قانونية موثوقة وحلل عقودك الحالية بالذكاء الاصطناعي'**
+  String get onboardingSlide2Subtitle;
+
+  /// No description provided for @onboardingSlide3Title.
+  ///
+  /// In ar, this message translates to:
+  /// **'تواصل مباشرة مع محامين موثوقين'**
+  String get onboardingSlide3Title;
+
+  /// No description provided for @onboardingSlide3Subtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'احجز استشارة فيديو أو صوتية أو مكتوبة مع نخبة من المحامين المرخصين'**
+  String get onboardingSlide3Subtitle;
+
+  /// No description provided for @onboardingGetStarted.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ'**
+  String get onboardingGetStarted;
+
+  /// No description provided for @devCredentialsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'بيانات تجريبية (بيئة التطوير فقط)'**
+  String get devCredentialsTitle;
+
+  /// No description provided for @devCredentialsPassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور لجميع الحسابات: {password}'**
+  String devCredentialsPassword(String password);
 
   /// No description provided for @errorGeneric.
   ///
@@ -208,6 +586,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'كلمة المرور يجب ألا تقل عن 8 أحرف'**
   String get validationPasswordTooShort;
+
+  /// No description provided for @validationInvalidPhone.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم الهاتف غير صحيح'**
+  String get validationInvalidPhone;
 
   /// Welcome message shown on home screen with the user's name
   ///

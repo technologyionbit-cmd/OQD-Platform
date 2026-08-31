@@ -10,11 +10,95 @@
   "commonLoading": "جارٍ التحميل...",
   "commonCancel": "إلغاء",
   "commonConfirm": "تأكيد",
+  "commonSkip": "تخطي",
+  "commonNext": "التالي",
 
   "authLoginTitle": "تسجيل الدخول",
+  "authLoginSubtitle": "أهلاً بعودتك! سجل دخولك للمتابعة",
   "authEmailLabel": "البريد الإلكتروني",
+  "authEmailOrPhoneLabel": "البريد الإلكتروني أو رقم الهاتف",
   "authPasswordLabel": "كلمة المرور",
+  "authPhoneLabel": "رقم الهاتف",
   "authLoginSubmit": "دخول",
+  "authForgotPassword": "نسيت كلمة المرور؟",
+  "authNoAccount": "ليس لديك حساب؟",
+  "authCreateAccount": "إنشاء حساب جديد",
+  "authAlreadyHaveAccount": "لديك حساب بالفعل؟",
+
+  "authRegisterTitle": "إنشاء حساب جديد",
+  "authRegisterSubtitle": "انضم إلينا وابدأ رحلتك القانونية",
+  "authRegisterSubmit": "إنشاء الحساب",
+  "authAccountTypeIndividual": "فرد",
+  "authAccountTypeCompany": "شركة",
+  "authAccountTypeLawyer": "محامٍ",
+  "authFullName": "الاسم الكامل",
+  "authFullNameTriple": "الاسم الثلاثي",
+  "authCompanyName": "اسم المنشأة / الشركة",
+  "authCommercialRegistrationNumber": "رقم السجل التجاري",
+  "authBarLicenseNumber": "رقم إجازة المحاماة / القيد",
+  "authMainSpecialty": "التخصص الرئيسي",
+  "authMainSpecialtyHint": "مثال: قانون تجاري، أحوال شخصية",
+  "authTermsAgreementPrefix": "بالتسجيل توافق على ",
+  "authTermsOfService": "شروط الخدمة",
+  "authTermsAgreementJoiner": " و",
+  "authPrivacyPolicy": "سياسة الخصوصية",
+
+  "authForgotPasswordTitle": "نسيت كلمة المرور؟",
+  "authForgotPasswordSubtitle": "اختر طريقة الاستعادة للمتابعة",
+  "authMethodSms": "رسالة SMS",
+  "authMethodEmail": "البريد الإلكتروني",
+  "authSmsInfo": "سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور",
+  "authEmailInfo": "سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور",
+  "authSendCode": "إرسال رمز التحقق",
+  "authContactSupport": "تواصل مع الدعم الفني",
+  "authRememberPassword": "تذكرت كلمة المرور؟",
+  "authSentTitle": "تم الإرسال!",
+  "authSentSubtitleSms": "تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور",
+  "authSentSubtitleEmail": "تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور",
+  "authEnterCode": "إدخال رمز التحقق",
+  "authResend": "إعادة الإرسال",
+
+  "authOtpTitle": "أدخل رمز التحقق",
+  "authOtpSubtitle": "أرسلنا رمزًا مكونًا من 6 أرقام إلى {destination}",
+  "@authOtpSubtitle": {
+    "placeholders": {
+      "destination": {"type": "String"}
+    }
+  },
+  "authOtpConfirm": "تأكيد",
+  "authOtpResendIn": "إعادة الإرسال بعد {seconds}",
+  "@authOtpResendIn": {
+    "placeholders": {
+      "seconds": {"type": "String"}
+    }
+  },
+  "authOtpInvalidCode": "رمز التحقق غير صحيح",
+
+  "authResetPasswordTitle": "كلمة مرور جديدة",
+  "authResetPasswordSubtitle": "أنشئ كلمة مرور قوية لحسابك",
+  "authNewPassword": "كلمة المرور الجديدة",
+  "authConfirmPassword": "تأكيد كلمة المرور",
+  "authResetPasswordSubmit": "حفظ كلمة المرور",
+  "authResetPasswordSuccessTitle": "تم تغيير كلمة المرور!",
+  "authResetPasswordSuccessSubtitle": "يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة",
+  "authGoToLogin": "الذهاب لتسجيل الدخول",
+  "validationPasswordMismatch": "كلمتا المرور غير متطابقتين",
+
+  "onboardingSlide1Title": "مساعدك القانوني في جيبك",
+  "onboardingSlide1Subtitle": "استشارات أولية وشرح فوري للبنود القانونية بالذكاء الاصطناعي على مدار الساعة",
+  "onboardingSlide2Title": "عقود ذكية بدقائق",
+  "onboardingSlide2Subtitle": "أنشئ عقودًا قانونية موثوقة وحلل عقودك الحالية بالذكاء الاصطناعي",
+  "onboardingSlide3Title": "تواصل مباشرة مع محامين موثوقين",
+  "onboardingSlide3Subtitle": "احجز استشارة فيديو أو صوتية أو مكتوبة مع نخبة من المحامين المرخصين",
+  "onboardingGetStarted": "ابدأ",
+
+  "devCredentialsTitle": "بيانات تجريبية (بيئة التطوير فقط)",
+  "devCredentialsPassword": "كلمة المرور لجميع الحسابات: {password}",
+  "@devCredentialsPassword": {
+    "placeholders": {
+      "password": {"type": "String"}
+    }
+  },
 
   "errorGeneric": "حدث خطأ غير متوقع",
   "errorNetwork": "تعذّر الاتصال بالشبكة، تحقق من الاتصال بالإنترنت",
@@ -26,6 +110,7 @@
   "validationRequired": "هذا الحقل مطلوب",
   "validationInvalidEmail": "صيغة البريد الإلكتروني غير صحيحة",
   "validationPasswordTooShort": "كلمة المرور يجب ألا تقل عن 8 أحرف",
+  "validationInvalidPhone": "رقم الهاتف غير صحيح",
 
   "homeWelcome": "مرحبًا، {name}",
   "@homeWelcome": {

@@ -6,6 +6,7 @@ import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
+import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
 
 /// App-wide session state: `AsyncLoading` while resolving the stored
@@ -45,6 +46,23 @@ class AuthController extends AsyncNotifier<AuthUser?> {
     state = const AsyncLoading();
 
     final result = await _repository.login(email: email, password: password);
+    return result.fold(
+      (failure) {
+        state = previous;
+        return Result.failure(failure);
+      },
+      (data) {
+        state = AsyncData(data.user);
+        return Result.success(data.user);
+      },
+    );
+  }
+
+  Future<Result<AuthUser>> register(RegisterRequest request) async {
+    final previous = state;
+    state = const AsyncLoading();
+
+    final result = await _repository.register(request);
     return result.fold(
       (failure) {
         state = previous;

@@ -7,6 +7,7 @@ class Validators {
   const Validators._();
 
   static final _emailRegExp = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+  static final _phoneRegExp = RegExp(r'^\+?[0-9]{8,15}$');
 
   /// Returns a validation message key (to be localized by the caller) or
   /// null if valid. Keeping this a pure function (no BuildContext) makes it
@@ -16,4 +17,6 @@ class Validators {
   static bool isValidEmail(String? value) => value != null && _emailRegExp.hasMatch(value.trim());
 
   static bool isPasswordLongEnough(String? value) => value != null && value.length >= 8;
+
+  static bool isValidPhone(String? value) => value != null && _phoneRegExp.hasMatch(value.trim().replaceAll(' ', ''));
 }

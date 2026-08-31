@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
+import 'package:aqd_ionbit/core/providers/core_providers.dart';
+import 'package:aqd_ionbit/core/routing/route_paths.dart';
+import 'package:aqd_ionbit/core/theme/app_colors.dart';
+import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
+import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+
+/// Demo accounts mirrored from AuthMockDataSource — kept here only for the
+/// dev-only quick-fill card below, never referenced by production logic.
+const _devPassword = 'Password123';
+const _devAccounts = [('client@aqd.test', 'عميل'), ('lawyer@aqd.test', 'محامٍ'), ('company@aqd.test', 'شركة')];
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -32,6 +43,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  void _fillDemoAccount(String email) {
+    _emailController.text = email;
+    _passwordController.text = _devPassword;
+  }
+
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -40,11 +56,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         : !Validators.isValidEmail(_emailController.text)
         ? l10n.validationInvalidEmail
         : null;
-    final passwordError = !Validators.isRequired(_passwordController.text)
-        ? l10n.validationRequired
-        : !Validators.isPasswordLongEnough(_passwordController.text)
-        ? l10n.validationPasswordTooShort
-        : null;
+    final passwordError = !Validators.isRequired(_passwordController.text) ? l10n.validationRequired : null;
 
     setState(() {
       _emailError = emailError;
@@ -79,6 +91,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isProduction = ref.watch(envConfigProvider).isProduction;
 
     return Scaffold(
       body: SafeArea(
@@ -91,13 +104,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(l10n.appName, textAlign: TextAlign.center, style: Theme.of(context).textTheme.displaySmall),
-                  const SizedBox(height: AppSpacing.xxl),
-                  Text(l10n.authLoginTitle, style: Theme.of(context).textTheme.headlineSmall),
+                  const Center(child: IconBadge(icon: Icons.gavel_rounded, backgroundColor: AppColors.navy, iconColor: Colors.white)),
                   const SizedBox(height: AppSpacing.lg),
+                  Text(l10n.authLoginTitle, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
+                  const SizedBox(height: AppSpacing.xxs),
+                  Text(
+                    l10n.authLoginSubtitle,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  if (!isProduction) ...[_DevCredentialsCard(l10n: l10n, onSelect: _fillDemoAccount), const SizedBox(height: AppSpacing.lg)],
                   AppTextField(
                     controller: _emailController,
-                    label: l10n.authEmailLabel,
+                    label: l10n.authEmailOrPhoneLabel,
                     errorText: _emailError,
                     keyboardType: TextInputType.emailAddress,
                     autofillHints: const [AutofillHints.email],
@@ -110,17 +130,77 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     obscureText: true,
                     autofillHints: const [AutofillHints.password],
                   ),
+                  Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: TextButton(
+                      onPressed: () => context.push(RoutePaths.forgotPassword),
+                      child: Text(l10n.authForgotPassword),
+                    ),
+                  ),
                   if (_formError != null) ...[
-                    const SizedBox(height: AppSpacing.sm),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(_formError!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ],
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.md),
                   AppButton(label: l10n.authLoginSubmit, isLoading: _isSubmitting, onPressed: _submit),
+                  const SizedBox(height: AppSpacing.lg),
+                  Center(
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      children: [
+                        Text(l10n.authNoAccount, style: Theme.of(context).textTheme.bodyMedium),
+                        TextButton(
+                          onPressed: () => context.push(RoutePaths.register),
+                          child: Text(l10n.authCreateAccount),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _DevCredentialsCard extends StatelessWidget {
+  const _DevCredentialsCard({required this.l10n, required this.onSelect});
+
+  final AppLocalizations l10n;
+  final ValueChanged<String> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: AppColors.secondaryBackground,
+        borderRadius: AppRadii.mdRadius,
+        border: const Border(left: BorderSide(color: AppColors.secondary, width: 3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.devCredentialsTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(l10n.devCredentialsPassword(_devPassword), style: const TextStyle(fontSize: 12)),
+          const SizedBox(height: AppSpacing.xs),
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: _devAccounts
+                .map(
+                  (account) => ActionChip(
+                    label: Text('${account.$2} — ${account.$1}', style: const TextStyle(fontSize: 11)),
+                    onPressed: () => onSelect(account.$1),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
       ),
     );
   }

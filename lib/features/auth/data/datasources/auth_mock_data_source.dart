@@ -2,6 +2,7 @@ import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
+import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 
 /// Temporary, isolated stand-in for the real backend (no Aqd API contract
@@ -49,6 +50,35 @@ class AuthMockDataSource implements AuthRemoteDataSource {
   }
 
   @override
+  Future<({AuthUser user, AuthTokens tokens})> register(RegisterRequest request) async {
+    await _simulateLatency();
+
+    final (email, fullName, role) = switch (request) {
+      IndividualRegisterRequest(:final email, :final fullName) => (email, fullName, UserRole.client),
+      CompanyRegisterRequest(:final email, :final companyName) => (email, companyName, UserRole.company),
+      LawyerRegisterRequest(:final email, :final fullName) => (email, fullName, UserRole.lawyer),
+    };
+    final password = switch (request) {
+      IndividualRegisterRequest(:final password) => password,
+      CompanyRegisterRequest(:final password) => password,
+      LawyerRegisterRequest(:final password) => password,
+    };
+
+    final normalizedEmail = email.trim().toLowerCase();
+    if (_accounts.containsKey(normalizedEmail)) {
+      throw const ValidationFailure(fieldErrors: {
+        'email': ['هذا البريد الإلكتروني مسجل بالفعل'],
+      });
+    }
+
+    final user = AuthUser(id: 'u_${DateTime.now().microsecondsSinceEpoch}', fullName: fullName, email: normalizedEmail, role: role);
+    _accounts[normalizedEmail] = _MockAccount(password: password, user: user);
+
+    final tokens = _issueSession(user);
+    return (user: user, tokens: tokens);
+  }
+
+  @override
   Future<AuthTokens> refreshToken(String refreshToken) async {
     await _simulateLatency();
     final oldAccessToken = _accessTokenByRefreshToken.remove(refreshToken);
@@ -85,6 +115,20 @@ class AuthMockDataSource implements AuthRemoteDataSource {
   Future<bool> verifyOtp({required String destination, required String code}) async {
     await _simulateLatency();
     return code == '1234';
+  }
+
+  @override
+  Future<void> resetPassword({required String destination, required String code, required String newPassword}) async {
+    await _simulateLatency();
+    if (code != '1234') throw const UnauthorizedFailure();
+
+    final account = _accounts[destination.trim().toLowerCase()];
+    if (account != null) {
+      _accounts[destination.trim().toLowerCase()] = _MockAccount(password: newPassword, user: account.user);
+    }
+    // Unknown destination (e.g. a phone number, not one of the demo emails)
+    // still succeeds — a real backend looks the account up by verified
+    // phone/email, which this mock has no equivalent index for.
   }
 
   AuthTokens _issueSession(AuthUser user) {
