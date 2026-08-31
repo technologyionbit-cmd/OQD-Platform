@@ -1,25 +1,36 @@
 import 'package:flutter/material.dart';
 
-/// Placeholder palette — the real design tokens (primary/secondary/surface/
-/// text/status colors, exact hex values) come from the UI/UX screenshots,
-/// which have not been provided yet. Everything below is a neutral,
-/// professional stand-in so the theme/component foundation is structurally
-/// complete and swappable: once screenshots land, only this file changes —
-/// no widget references a color literal directly.
+/// Design tokens sampled from the Aqd UI/UX reference screenshots (pixel
+/// color extraction, not eyeballed) — this is the real palette, not a
+/// placeholder. If a new screenshot batch implies a different value, update
+/// it here only; no widget or screen should ever reference a color literal
+/// directly.
 class AppColors {
   const AppColors._();
 
-  static const primary = Color(0xFF1B3A5C);
-  static const primaryLight = Color(0xFF2E5578);
-  static const primaryDark = Color(0xFF0F2740);
+  // Navy — splash/auth headers, icon badges, lawyer-dashboard header. This
+  // is a surface color, not the interactive "primary" — see [primary] below.
+  static const navyDarkest = Color(0xFF0C1830);
+  static const navy = Color(0xFF12294F);
+  static const navyLight = Color(0xFF1B3A63);
 
-  static const secondary = Color(0xFFB88A2E);
+  // Primary/action blue — every button, link, and active/selected state.
+  // This is what ColorScheme.primary maps to, not the navy above.
+  static const primary = Color(0xFF0078C0);
+  static const primaryDark = Color(0xFF005E96);
+
+  // Gold/amber — ratings, "Pro"/"most popular" badges, demo-data callouts.
+  static const secondary = Color(0xFFC98A0E);
+  static const secondaryBackground = Color(0xFFFCF0C0);
+
+  // NDA/lock and similar category-icon accent seen in the template gallery.
+  static const purpleAccent = Color(0xFF7C4DFF);
 
   static const background = Color(0xFFF7F8FA);
   static const surface = Color(0xFFFFFFFF);
   static const surfaceVariant = Color(0xFFEEF1F4);
 
-  static const textPrimary = Color(0xFF1A1D1F);
+  static const textPrimary = Color(0xFF0F1B2B);
   static const textSecondary = Color(0xFF6B7280);
   static const textDisabled = Color(0xFFA1A7AE);
   static const onPrimary = Color(0xFFFFFFFF);
@@ -27,14 +38,22 @@ class AppColors {
   static const border = Color(0xFFE1E4E8);
   static const divider = Color(0xFFE1E4E8);
 
-  static const success = Color(0xFF1E8A5F);
-  static const warning = Color(0xFFC08A1E);
-  static const error = Color(0xFFC0392B);
-  static const info = Color(0xFF2E6FB0);
+  // Status — matches the badge colors used for contract/document/booking
+  // states (completed/pending-signature/draft) and analysis-risk alerts.
+  static const success = Color(0xFF188C4E);
+  static const successBackground = Color(0xFFC8F0D4);
+  static const warning = secondary;
+  static const warningBackground = secondaryBackground;
+  static const error = Color(0xFFD64545);
+  static const errorBackground = Color(0xFFFCD8D8);
+  static const info = primary;
+  static const infoBackground = Color(0xFFE1F0FB);
+  static const neutral = Color(0xFF6B7280);
+  static const neutralBackground = Color(0xFFEEF1F4);
 
-  // Dark theme placeholders
-  static const backgroundDark = Color(0xFF13161A);
-  static const surfaceDark = Color(0xFF1C2025);
+  // Dark theme — derived from the same navy family for consistency.
+  static const backgroundDark = Color(0xFF0C1420);
+  static const surfaceDark = Color(0xFF152238);
   static const textPrimaryDark = Color(0xFFF2F3F4);
   static const textSecondaryDark = Color(0xFF9AA1A9);
 }

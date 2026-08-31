@@ -31,7 +31,7 @@ class AppTheme {
 
   static ThemeData get dark {
     final colorScheme = const ColorScheme.dark(
-      primary: AppColors.primaryLight,
+      primary: AppColors.primary,
       onPrimary: AppColors.onPrimary,
       secondary: AppColors.secondary,
       onSecondary: AppColors.textPrimary,

@@ -1,6 +1,18 @@
 import 'package:flutter/material.dart';
 
-enum AppButtonVariant { primary, outlined, text }
+import 'package:aqd_ionbit/core/theme/app_colors.dart';
+import 'package:aqd_ionbit/core/theme/app_radii.dart';
+
+enum AppButtonVariant {
+  primary,
+  outlined,
+  text,
+
+  /// The green CTA reserved for e-signature confirm/sign actions — a
+  /// deliberate, recurring color distinct from the primary action blue in
+  /// the reference screenshots, not a one-off override.
+  success,
+}
 
 /// Wraps Elevated/Outlined/Text button with a built-in loading state so no
 /// screen hand-rolls "disable + spinner while submitting" itself.
@@ -41,12 +53,23 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.primary => ElevatedButton(onPressed: isDisabled ? null : onPressed, child: child),
       AppButtonVariant.outlined => OutlinedButton(onPressed: isDisabled ? null : onPressed, child: child),
       AppButtonVariant.text => TextButton(onPressed: isDisabled ? null : onPressed, child: child),
+      AppButtonVariant.success => ElevatedButton(
+        onPressed: isDisabled ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.success,
+          foregroundColor: AppColors.onPrimary,
+          disabledBackgroundColor: AppColors.textDisabled,
+          minimumSize: const Size.fromHeight(52),
+          shape: RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
+        ),
+        child: child,
+      ),
     };
   }
 
   Color _spinnerColor(BuildContext context) {
     return switch (variant) {
-      AppButtonVariant.primary => Theme.of(context).colorScheme.onPrimary,
+      AppButtonVariant.primary || AppButtonVariant.success => Theme.of(context).colorScheme.onPrimary,
       AppButtonVariant.outlined || AppButtonVariant.text => Theme.of(context).colorScheme.primary,
     };
   }

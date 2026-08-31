@@ -52,12 +52,12 @@ class HomeScreen extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
                 decoration: BoxDecoration(
-                  color: context.statusColors.info.withValues(alpha: 0.12),
+                  color: context.statusColors.info.background,
                   borderRadius: AppRadii.smRadius,
                 ),
                 child: Text(
                   l10n.foundationEnvBanner(envConfig.environment.name),
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: context.statusColors.info),
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: context.statusColors.info.foreground),
                 ),
               ),
               const SizedBox(height: AppSpacing.xl),
