@@ -264,12 +264,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String get validationInvalidPhone => 'Enter a valid phone number';
 
   @override
-  String homeWelcome(String name) {
-    return 'Welcome, $name';
-  }
+  String get navHome => 'Home';
 
   @override
-  String foundationEnvBanner(String env) {
-    return 'Environment: $env';
+  String get navAi => 'AI';
+
+  @override
+  String get navDocuments => 'Documents';
+
+  @override
+  String get navLawyers => 'Lawyers';
+
+  @override
+  String get navAccount => 'Account';
+
+  @override
+  String get navContracts => 'Contracts';
+
+  @override
+  String get navLawyerDashboard => 'Dashboard';
+
+  @override
+  String get navSchedule => 'Schedule';
+
+  @override
+  String get navClients => 'Clients';
+
+  @override
+  String get navEarnings => 'Earnings';
+
+  @override
+  String get navMyProfile => 'My Profile';
+
+  @override
+  String get placeholderComingSoonMessage => 'This section is under development and will be available soon';
+
+  @override
+  String get accountLanguage => 'Language';
+
+  @override
+  String get accountRoleClient => 'Client';
+
+  @override
+  String get accountRoleLawyer => 'Lawyer';
+
+  @override
+  String get accountRoleCompany => 'Company';
+
+  @override
+  String get confirmLogoutTitle => 'Log Out';
+
+  @override
+  String get confirmLogoutMessage => 'Are you sure you want to log out?';
+
+  @override
+  String homeWelcome(String name) {
+    return 'Welcome, $name';
   }
 }

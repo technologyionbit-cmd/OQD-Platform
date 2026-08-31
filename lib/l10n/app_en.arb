@@ -94,7 +94,27 @@
   "validationPasswordTooShort": "Password must be at least 8 characters",
   "validationInvalidPhone": "Enter a valid phone number",
 
-  "homeWelcome": "Welcome, {name}",
+  "navHome": "Home",
+  "navAi": "AI",
+  "navDocuments": "Documents",
+  "navLawyers": "Lawyers",
+  "navAccount": "Account",
+  "navContracts": "Contracts",
+  "navLawyerDashboard": "Dashboard",
+  "navSchedule": "Schedule",
+  "navClients": "Clients",
+  "navEarnings": "Earnings",
+  "navMyProfile": "My Profile",
 
-  "foundationEnvBanner": "Environment: {env}"
+  "placeholderComingSoonMessage": "This section is under development and will be available soon",
+
+  "accountLanguage": "Language",
+  "accountRoleClient": "Client",
+  "accountRoleLawyer": "Lawyer",
+  "accountRoleCompany": "Company",
+
+  "confirmLogoutTitle": "Log Out",
+  "confirmLogoutMessage": "Are you sure you want to log out?",
+
+  "homeWelcome": "Welcome, {name}"
 }

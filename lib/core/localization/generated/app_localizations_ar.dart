@@ -264,12 +264,61 @@ class AppLocalizationsAr extends AppLocalizations {
   String get validationInvalidPhone => 'رقم الهاتف غير صحيح';
 
   @override
-  String homeWelcome(String name) {
-    return 'مرحبًا، $name';
-  }
+  String get navHome => 'الرئيسية';
 
   @override
-  String foundationEnvBanner(String env) {
-    return 'بيئة: $env';
+  String get navAi => 'AI';
+
+  @override
+  String get navDocuments => 'المستندات';
+
+  @override
+  String get navLawyers => 'المحامون';
+
+  @override
+  String get navAccount => 'حسابي';
+
+  @override
+  String get navContracts => 'العقود';
+
+  @override
+  String get navLawyerDashboard => 'لوحة التحكم';
+
+  @override
+  String get navSchedule => 'المواعيد';
+
+  @override
+  String get navClients => 'العملاء';
+
+  @override
+  String get navEarnings => 'الأرباح';
+
+  @override
+  String get navMyProfile => 'ملفي';
+
+  @override
+  String get placeholderComingSoonMessage => 'هذا القسم قيد التطوير وسيتوفر قريبًا';
+
+  @override
+  String get accountLanguage => 'اللغة';
+
+  @override
+  String get accountRoleClient => 'عميل';
+
+  @override
+  String get accountRoleLawyer => 'محامٍ';
+
+  @override
+  String get accountRoleCompany => 'شركة';
+
+  @override
+  String get confirmLogoutTitle => 'تسجيل الخروج';
+
+  @override
+  String get confirmLogoutMessage => 'هل أنت متأكد أنك تريد تسجيل الخروج؟';
+
+  @override
+  String homeWelcome(String name) {
+    return 'مرحبًا، $name';
   }
 }

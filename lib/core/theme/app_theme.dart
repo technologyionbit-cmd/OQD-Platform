@@ -114,6 +114,31 @@ class AppTheme {
         hintStyle: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
       ),
       dividerTheme: const DividerThemeData(color: AppColors.divider, thickness: 1, space: 1),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: colorScheme.surface,
+        indicatorColor: Colors.transparent,
+        elevation: 0,
+        height: 64,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(color: states.contains(WidgetState.selected) ? colorScheme.primary : AppColors.textSecondary),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => textTheme.labelSmall?.copyWith(
+            color: states.contains(WidgetState.selected) ? colorScheme.primary : AppColors.textSecondary,
+            fontWeight: states.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w500,
+          ),
+        ),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: colorScheme.surface,
+        indicatorColor: Colors.transparent,
+        elevation: 0,
+        selectedIconTheme: IconThemeData(color: colorScheme.primary),
+        unselectedIconTheme: const IconThemeData(color: AppColors.textSecondary),
+        selectedLabelTextStyle: textTheme.labelSmall?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.w700),
+        unselectedLabelTextStyle: textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+      ),
       extensions: [statusColors],
     );
   }

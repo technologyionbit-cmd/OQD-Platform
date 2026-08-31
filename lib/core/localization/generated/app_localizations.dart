@@ -593,17 +593,119 @@ abstract class AppLocalizations {
   /// **'رقم الهاتف غير صحيح'**
   String get validationInvalidPhone;
 
+  /// No description provided for @navHome.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرئيسية'**
+  String get navHome;
+
+  /// No description provided for @navAi.
+  ///
+  /// In ar, this message translates to:
+  /// **'AI'**
+  String get navAi;
+
+  /// No description provided for @navDocuments.
+  ///
+  /// In ar, this message translates to:
+  /// **'المستندات'**
+  String get navDocuments;
+
+  /// No description provided for @navLawyers.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحامون'**
+  String get navLawyers;
+
+  /// No description provided for @navAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسابي'**
+  String get navAccount;
+
+  /// No description provided for @navContracts.
+  ///
+  /// In ar, this message translates to:
+  /// **'العقود'**
+  String get navContracts;
+
+  /// No description provided for @navLawyerDashboard.
+  ///
+  /// In ar, this message translates to:
+  /// **'لوحة التحكم'**
+  String get navLawyerDashboard;
+
+  /// No description provided for @navSchedule.
+  ///
+  /// In ar, this message translates to:
+  /// **'المواعيد'**
+  String get navSchedule;
+
+  /// No description provided for @navClients.
+  ///
+  /// In ar, this message translates to:
+  /// **'العملاء'**
+  String get navClients;
+
+  /// No description provided for @navEarnings.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأرباح'**
+  String get navEarnings;
+
+  /// No description provided for @navMyProfile.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملفي'**
+  String get navMyProfile;
+
+  /// No description provided for @placeholderComingSoonMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا القسم قيد التطوير وسيتوفر قريبًا'**
+  String get placeholderComingSoonMessage;
+
+  /// No description provided for @accountLanguage.
+  ///
+  /// In ar, this message translates to:
+  /// **'اللغة'**
+  String get accountLanguage;
+
+  /// No description provided for @accountRoleClient.
+  ///
+  /// In ar, this message translates to:
+  /// **'عميل'**
+  String get accountRoleClient;
+
+  /// No description provided for @accountRoleLawyer.
+  ///
+  /// In ar, this message translates to:
+  /// **'محامٍ'**
+  String get accountRoleLawyer;
+
+  /// No description provided for @accountRoleCompany.
+  ///
+  /// In ar, this message translates to:
+  /// **'شركة'**
+  String get accountRoleCompany;
+
+  /// No description provided for @confirmLogoutTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الخروج'**
+  String get confirmLogoutTitle;
+
+  /// No description provided for @confirmLogoutMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل أنت متأكد أنك تريد تسجيل الخروج؟'**
+  String get confirmLogoutMessage;
+
   /// Welcome message shown on home screen with the user's name
   ///
   /// In ar, this message translates to:
   /// **'مرحبًا، {name}'**
   String homeWelcome(String name);
-
-  /// Debug banner showing the current build environment
-  ///
-  /// In ar, this message translates to:
-  /// **'بيئة: {env}'**
-  String foundationEnvBanner(String env);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

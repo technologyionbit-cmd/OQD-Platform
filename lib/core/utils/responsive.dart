@@ -15,6 +15,11 @@ class ResponsiveBreakpoints {
   static const standardMax = 430.0;
 
   // Above standardMax is treated as a large phone / phablet.
+
+  /// Below this, a bottom `NavigationBar` fits; at or above it, navigation
+  /// shells switch to a side `NavigationRail` instead of squeezing a
+  /// bottom bar across a tablet/desktop-width screen.
+  static const tabletMin = 700.0;
 }
 
 extension ResponsiveContextX on BuildContext {
@@ -29,6 +34,7 @@ extension ResponsiveContextX on BuildContext {
 
   bool get isSmallPhone => responsiveSize == ScreenSize.small;
   bool get isLargePhone => responsiveSize == ScreenSize.large;
+  bool get isTabletOrWider => screenSize.width >= ResponsiveBreakpoints.tabletMin;
 
   EdgeInsets get safeAreaPadding => MediaQuery.paddingOf(this);
 }

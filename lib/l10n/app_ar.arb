@@ -112,21 +112,33 @@
   "validationPasswordTooShort": "كلمة المرور يجب ألا تقل عن 8 أحرف",
   "validationInvalidPhone": "رقم الهاتف غير صحيح",
 
+  "navHome": "الرئيسية",
+  "navAi": "AI",
+  "navDocuments": "المستندات",
+  "navLawyers": "المحامون",
+  "navAccount": "حسابي",
+  "navContracts": "العقود",
+  "navLawyerDashboard": "لوحة التحكم",
+  "navSchedule": "المواعيد",
+  "navClients": "العملاء",
+  "navEarnings": "الأرباح",
+  "navMyProfile": "ملفي",
+
+  "placeholderComingSoonMessage": "هذا القسم قيد التطوير وسيتوفر قريبًا",
+
+  "accountLanguage": "اللغة",
+  "accountRoleClient": "عميل",
+  "accountRoleLawyer": "محامٍ",
+  "accountRoleCompany": "شركة",
+
+  "confirmLogoutTitle": "تسجيل الخروج",
+  "confirmLogoutMessage": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+
   "homeWelcome": "مرحبًا، {name}",
   "@homeWelcome": {
     "description": "Welcome message shown on home screen with the user's name",
     "placeholders": {
       "name": {
-        "type": "String"
-      }
-    }
-  },
-
-  "foundationEnvBanner": "بيئة: {env}",
-  "@foundationEnvBanner": {
-    "description": "Debug banner showing the current build environment",
-    "placeholders": {
-      "env": {
         "type": "String"
       }
     }
