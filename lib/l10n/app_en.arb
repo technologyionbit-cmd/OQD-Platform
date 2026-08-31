@@ -1,0 +1,30 @@
+{
+  "@@locale": "en",
+  "appName": "Aqd",
+
+  "commonRetry": "Retry",
+  "commonLogout": "Logout",
+  "commonLoading": "Loading...",
+  "commonCancel": "Cancel",
+  "commonConfirm": "Confirm",
+
+  "authLoginTitle": "Login",
+  "authEmailLabel": "Email",
+  "authPasswordLabel": "Password",
+  "authLoginSubmit": "Sign In",
+
+  "errorGeneric": "Something went wrong",
+  "errorNetwork": "Could not connect, check your internet connection",
+  "errorUnauthorized": "Your session has expired, please sign in again",
+  "errorInvalidCredentials": "Invalid email or password",
+  "errorServer": "A server error occurred, please try again later",
+  "errorTimeout": "The connection timed out",
+
+  "validationRequired": "This field is required",
+  "validationInvalidEmail": "Enter a valid email address",
+  "validationPasswordTooShort": "Password must be at least 8 characters",
+
+  "homeWelcome": "Welcome, {name}",
+
+  "foundationEnvBanner": "Environment: {env}"
+}

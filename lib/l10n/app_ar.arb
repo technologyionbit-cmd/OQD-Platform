@@ -1,0 +1,49 @@
+{
+  "@@locale": "ar",
+  "appName": "عقد",
+  "@appName": {
+    "description": "Application name shown in title bars and splash screen"
+  },
+
+  "commonRetry": "إعادة المحاولة",
+  "commonLogout": "تسجيل الخروج",
+  "commonLoading": "جارٍ التحميل...",
+  "commonCancel": "إلغاء",
+  "commonConfirm": "تأكيد",
+
+  "authLoginTitle": "تسجيل الدخول",
+  "authEmailLabel": "البريد الإلكتروني",
+  "authPasswordLabel": "كلمة المرور",
+  "authLoginSubmit": "دخول",
+
+  "errorGeneric": "حدث خطأ غير متوقع",
+  "errorNetwork": "تعذّر الاتصال بالشبكة، تحقق من الاتصال بالإنترنت",
+  "errorUnauthorized": "الجلسة غير صالحة، الرجاء تسجيل الدخول مرة أخرى",
+  "errorInvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+  "errorServer": "حدث خطأ في الخادم، حاول لاحقًا",
+  "errorTimeout": "انتهت مهلة الاتصال",
+
+  "validationRequired": "هذا الحقل مطلوب",
+  "validationInvalidEmail": "صيغة البريد الإلكتروني غير صحيحة",
+  "validationPasswordTooShort": "كلمة المرور يجب ألا تقل عن 8 أحرف",
+
+  "homeWelcome": "مرحبًا، {name}",
+  "@homeWelcome": {
+    "description": "Welcome message shown on home screen with the user's name",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "foundationEnvBanner": "بيئة: {env}",
+  "@foundationEnvBanner": {
+    "description": "Debug banner showing the current build environment",
+    "placeholders": {
+      "env": {
+        "type": "String"
+      }
+    }
+  }
+}
