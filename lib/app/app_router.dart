@@ -14,6 +14,12 @@ import 'package:aqd_ionbit/features/auth/presentation/screens/otp_verification_s
 import 'package:aqd_ionbit/features/auth/presentation/screens/register_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/reset_password_screen.dart';
 
+/// Lives in `app/`, not `core/routing/` — unlike [RoutePaths] (plain
+/// constants, genuinely feature-agnostic), this file imports every
+/// feature's screens to wire routes, which is exactly the kind of
+/// cross-feature composition `core/` must never depend on. `app/` is the
+/// composition root: it's allowed to know about everything.
+///
 /// Routes reachable while signed out, once onboarding has been seen. Kept
 /// as a set so `_redirect` doesn't hardcode a chain of `||` comparisons.
 const _publicAuthRoutes = {

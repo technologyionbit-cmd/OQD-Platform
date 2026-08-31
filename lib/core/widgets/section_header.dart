@@ -14,7 +14,9 @@ class SectionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(title, style: Theme.of(context).textTheme.titleMedium),
+        // A long title must never push the action button off-screen — it
+        // truncates instead of forcing a horizontal overflow.
+        Flexible(child: Text(title, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.titleMedium)),
         if (actionLabel != null) TextButton(onPressed: onActionTap, child: Text(actionLabel!)),
       ],
     );

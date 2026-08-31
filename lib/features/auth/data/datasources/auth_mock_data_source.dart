@@ -102,11 +102,6 @@ class AuthMockDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> requestPasswordReset({required String email}) async {
-    await _simulateLatency();
-  }
-
-  @override
   Future<void> requestOtp({required String destination}) async {
     await _simulateLatency();
   }

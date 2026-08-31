@@ -32,14 +32,23 @@ class AppChip extends StatelessWidget {
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (icon != null) ...[
               Icon(icon, size: 16, color: selected ? primary : AppColors.textSecondary),
               const SizedBox(width: 6),
             ],
-            Text(
-              label,
-              style: TextStyle(color: selected ? primary : AppColors.textSecondary, fontWeight: selected ? FontWeight.w600 : FontWeight.w400),
+            // Flexible + ellipsis: this widget is frequently given a tight
+            // width (e.g. Expanded in a 3-way selector row) — a plain Text
+            // here would overflow instead of truncating on narrow screens
+            // or longer translated labels.
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: TextStyle(color: selected ? primary : AppColors.textSecondary, fontWeight: selected ? FontWeight.w600 : FontWeight.w400),
+              ),
             ),
           ],
         ),

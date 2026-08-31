@@ -18,8 +18,6 @@ abstract interface class AuthRepository {
 
   Future<void> logout();
 
-  Future<Result<void>> requestPasswordReset({required String email});
-
   Future<Result<void>> requestOtp({required String destination});
 
   Future<Result<bool>> verifyOtp({required String destination, required String code});

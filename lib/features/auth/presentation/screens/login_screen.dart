@@ -179,7 +179,9 @@ class _DevCredentialsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.secondaryBackground,
         borderRadius: AppRadii.mdRadius,
-        border: const Border(left: BorderSide(color: AppColors.secondary, width: 3)),
+        // BorderDirectional, not Border: the accent stripe belongs on the
+        // leading edge (right in RTL, left in LTR), not a hardcoded side.
+        border: const BorderDirectional(start: BorderSide(color: AppColors.secondary, width: 3)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

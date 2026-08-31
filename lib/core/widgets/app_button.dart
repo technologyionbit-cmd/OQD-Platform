@@ -43,9 +43,13 @@ class AppButton extends StatelessWidget {
           )
         : Row(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (icon != null) ...[Icon(icon, size: 18), const SizedBox(width: 8)],
-              Text(label),
+              // Flexible + ellipsis so a longer label truncates instead of
+              // overflowing if this button ever ends up in a narrower
+              // context than the full-width usage it has today.
+              Flexible(child: Text(label, overflow: TextOverflow.ellipsis, maxLines: 1)),
             ],
           );
 

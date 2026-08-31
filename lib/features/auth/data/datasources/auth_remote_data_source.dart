@@ -22,8 +22,6 @@ abstract interface class AuthRemoteDataSource {
 
   Future<void> logout(String accessToken);
 
-  Future<void> requestPasswordReset({required String email});
-
   Future<void> requestOtp({required String destination});
 
   Future<bool> verifyOtp({required String destination, required String code});

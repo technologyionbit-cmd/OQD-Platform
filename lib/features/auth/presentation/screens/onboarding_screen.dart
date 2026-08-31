@@ -8,6 +8,7 @@ import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_gradients.dart';
 import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
+import 'package:aqd_ionbit/core/utils/responsive.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
@@ -73,37 +74,52 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   onPageChanged: (index) => setState(() => _page = index),
                   itemBuilder: (context, index) {
                     final slide = slides[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 140,
-                            height: 140,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.1),
-                              borderRadius: AppRadii.xlRadius,
+                    // Text length varies a lot by locale (English runs
+                    // noticeably longer than Arabic here) and the smallest
+                    // realistic phone heights leave little slack — a fixed
+                    // centered Column would overflow for some combination
+                    // of the two. Scrollable-with-a-minimum-height keeps it
+                    // visually centered when it fits and simply scrolls,
+                    // never overflows, when it doesn't.
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        final iconSize = responsiveValue(context, standard: 140.0, small: 108.0);
+                        return SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl, vertical: AppSpacing.md),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(minHeight: constraints.maxHeight - AppSpacing.md * 2),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: iconSize,
+                                  height: iconSize,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.1),
+                                    borderRadius: AppRadii.xlRadius,
+                                  ),
+                                  child: Icon(slide.icon, size: iconSize * 0.46, color: Colors.white),
+                                ),
+                                const SizedBox(height: AppSpacing.xxl),
+                                Text(
+                                  slide.title,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
+                                ),
+                                const SizedBox(height: AppSpacing.sm),
+                                Text(
+                                  slide.subtitle,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.75)),
+                                ),
+                              ],
                             ),
-                            child: Icon(slide.icon, size: 64, color: Colors.white),
                           ),
-                          const SizedBox(height: AppSpacing.xxl),
-                          Text(
-                            slide.title,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            slide.subtitle,
-                            textAlign: TextAlign.center,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.75)),
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     );
                   },
                 ),

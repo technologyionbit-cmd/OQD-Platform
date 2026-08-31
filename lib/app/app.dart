@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:aqd_ionbit/app/app_router.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
-import 'package:aqd_ionbit/core/routing/app_router.dart';
 import 'package:aqd_ionbit/core/theme/app_theme.dart';
 
 class AqdApp extends ConsumerWidget {
