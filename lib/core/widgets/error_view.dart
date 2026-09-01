@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 
@@ -12,6 +13,11 @@ class ErrorView extends StatelessWidget {
 
   final String message;
   final VoidCallback? onRetry;
+
+  /// Defaults to the localized "Retry" — override only for a
+  /// context-specific verb (e.g. "Reload"). Every current call site relies
+  /// on this default rather than passing its own, which is exactly why it
+  /// must be localized here and not a hardcoded literal.
   final String? retryLabel;
 
   @override
@@ -27,7 +33,11 @@ class ErrorView extends StatelessWidget {
             Text(message, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium),
             if (onRetry != null) ...[
               const SizedBox(height: AppSpacing.lg),
-              AppButton(label: retryLabel ?? 'Retry', onPressed: onRetry, variant: AppButtonVariant.outlined),
+              AppButton(
+                label: retryLabel ?? AppLocalizations.of(context)!.commonRetry,
+                onPressed: onRetry,
+                variant: AppButtonVariant.outlined,
+              ),
             ],
           ],
         ),

@@ -9,6 +9,17 @@
   "commonConfirm": "Confirm",
   "commonSkip": "Skip",
   "commonNext": "Next",
+  "commonViewAll": "View All",
+  "commonSave": "Save",
+  "commonEdit": "Edit",
+  "commonDelete": "Delete",
+  "commonContinue": "Continue",
+  "commonSearch": "Search",
+  "commonDownload": "Download",
+  "commonShare": "Share",
+  "commonCopy": "Copy",
+  "contractContentCopiedMessage": "Contract content copied",
+  "commonOptional": "(optional)",
 
   "authLoginTitle": "Login",
   "authLoginSubtitle": "Welcome back! Sign in to continue",
@@ -115,6 +126,65 @@
 
   "confirmLogoutTitle": "Log Out",
   "confirmLogoutMessage": "Are you sure you want to log out?",
+
+  "clientHomeCreateContract": "Create New Contract",
+  "clientHomeMyContracts": "My Contracts",
+  "clientHomeNoContractsTitle": "No contracts yet",
+  "clientHomeNoContractsMessage": "Start creating your first legal contract with AI assistance",
+  "clientHomeServicesTitle": "Legal Services",
+  "serviceCreateContract": "Create Contract",
+  "serviceAnalyzeContract": "Analyze Contract",
+  "serviceFindLawyer": "Find a Lawyer",
+  "clientNotificationsTitle": "Notifications",
+
+  "contractsSearchHint": "Search your contracts...",
+  "contractsFilterAll": "All",
+
+  "contractStatusDraft": "Draft",
+  "contractStatusPendingSignature": "Pending Signature",
+  "contractStatusSigned": "Signed",
+  "contractStatusCompleted": "Completed",
+  "contractStatusCancelled": "Cancelled",
+
+  "contractCategoryEmployment": "Employment Contract",
+  "contractCategorySale": "Sale Contract",
+  "contractCategoryRental": "Rental Contract",
+  "contractCategoryPartnership": "Partnership Contract",
+  "contractCategoryNda": "NDA Agreement",
+  "contractCategoryServiceAgreement": "Service Agreement",
+  "contractCategoryOther": "Other Contract",
+
+  "contractTypeSelectionTitle": "Choose Contract Type",
+  "contractTypeSelectionSubtitle": "Select the type of contract you want to create",
+  "contractTypeSearchHint": "Search contract types...",
+
+  "contractFormTitle": "Fill Contract Details",
+  "validationInvalidNumber": "Please enter a valid number",
+  "validationInvalidDate": "Please select a valid date",
+
+  "contractPreviewTitle": "Contract Preview",
+  "contractPreviewParties": "Parties",
+  "contractPreviewDetails": "Details",
+  "contractPreviewSaveDraft": "Save as Draft",
+  "contractPreviewGenerate": "Generate Contract",
+  "contractGeneratedSuccessTitle": "Contract Generated Successfully!",
+  "contractGeneratedSuccessMessage": "Your contract has been saved to your digital vault",
+  "contractDraftSavedMessage": "Contract saved as draft",
+  "contractViewDetails": "View Details",
+
+  "contractDetailsTitle": "Contract Details",
+  "contractDetailsType": "Contract Type",
+  "contractDetailsStatus": "Status",
+  "contractDetailsCreated": "Created",
+  "contractDetailsUpdated": "Last Updated",
+  "contractDetailsContent": "Contract Content",
+  "contractDetailsDeleteConfirmTitle": "Delete Draft",
+  "contractDetailsDeleteConfirmMessage": "Are you sure you want to delete this draft? This action cannot be undone.",
+  "contractDetailsDeletedMessage": "Draft deleted",
+
+  "documentsEmptyTitle": "No documents yet",
+  "documentsEmptyMessage": "Your contracts and documents will appear here once created",
+  "documentsSearchHint": "Search your documents...",
 
   "homeWelcome": "Welcome, {name}"
 }

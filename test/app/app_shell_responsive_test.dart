@@ -7,13 +7,30 @@ import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 
 import '../support/role_test_harness.dart';
 
-// Required by Phase 5 step 8: smallest and largest realistic phone widths,
-// plus a tablet/desktop width that should trigger the NavigationRail layout.
-const _sizes = {'small phone': Size(320, 568), 'large phone': Size(430, 932), 'tablet': Size(1024, 800)};
+// Required by Phase 5 step 8 (extended in Phase 6 to add the mid-range
+// phone size): smallest and largest realistic phone widths, a common
+// mid-size phone, plus a tablet/desktop width that should trigger the
+// NavigationRail layout.
+const _sizes = {
+  'small phone': Size(320, 568),
+  'mid phone': Size(390, 844),
+  'large phone': Size(430, 932),
+  'tablet': Size(1024, 800),
+};
 
 void main() {
   final destinations = <String, ({AuthUser user, List<String> routes})>{
-    'client': (user: testClient, routes: [RoutePaths.clientHome, RoutePaths.clientAi, RoutePaths.clientAccount]),
+    'client': (
+      user: testClient,
+      routes: [
+        RoutePaths.clientHome,
+        RoutePaths.clientAi,
+        RoutePaths.clientDocuments,
+        RoutePaths.clientContracts,
+        RoutePaths.clientContractsNew,
+        RoutePaths.clientAccount,
+      ],
+    ),
     'lawyer': (user: testLawyer, routes: [RoutePaths.lawyerDashboard, RoutePaths.lawyerSchedule, RoutePaths.lawyerProfile]),
     'company': (user: testCompany, routes: [RoutePaths.companyHome, RoutePaths.companyContracts, RoutePaths.companyAccount]),
   };

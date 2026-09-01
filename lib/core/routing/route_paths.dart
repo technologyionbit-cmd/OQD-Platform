@@ -19,6 +19,18 @@ class RoutePaths {
   static const clientLawyers = '/client/lawyers';
   static const clientAccount = '/client/account';
 
+  // Pushed full-screen on top of the client shell (no bottom nav while
+  // mid-flow) — still nested under clientBase so the role guard covers
+  // them automatically.
+  static const clientNotifications = '/client/notifications';
+  static const clientContracts = '/client/contracts';
+  static const clientContractsAnalyze = '/client/contracts/analyze';
+  static const clientContractsNew = '/client/contracts/new';
+  static const clientContractsNewForm = '/client/contracts/new/form';
+  static const clientContractsNewPreview = '/client/contracts/new/preview';
+  static const clientContractDetailsPattern = '/client/contracts/details/:id';
+  static String clientContractDetails(String id) => '/client/contracts/details/$id';
+
   static const lawyerBase = '/lawyer';
   static const lawyerDashboard = '/lawyer/dashboard';
   static const lawyerSchedule = '/lawyer/schedule';

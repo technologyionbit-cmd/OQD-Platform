@@ -33,6 +33,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonNext => 'Next';
 
   @override
+  String get commonViewAll => 'View All';
+
+  @override
+  String get commonSave => 'Save';
+
+  @override
+  String get commonEdit => 'Edit';
+
+  @override
+  String get commonDelete => 'Delete';
+
+  @override
+  String get commonContinue => 'Continue';
+
+  @override
+  String get commonSearch => 'Search';
+
+  @override
+  String get commonDownload => 'Download';
+
+  @override
+  String get commonShare => 'Share';
+
+  @override
+  String get commonCopy => 'Copy';
+
+  @override
+  String get contractContentCopiedMessage => 'Contract content copied';
+
+  @override
+  String get commonOptional => '(optional)';
+
+  @override
   String get authLoginTitle => 'Login';
 
   @override
@@ -316,6 +349,156 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmLogoutMessage => 'Are you sure you want to log out?';
+
+  @override
+  String get clientHomeCreateContract => 'Create New Contract';
+
+  @override
+  String get clientHomeMyContracts => 'My Contracts';
+
+  @override
+  String get clientHomeNoContractsTitle => 'No contracts yet';
+
+  @override
+  String get clientHomeNoContractsMessage => 'Start creating your first legal contract with AI assistance';
+
+  @override
+  String get clientHomeServicesTitle => 'Legal Services';
+
+  @override
+  String get serviceCreateContract => 'Create Contract';
+
+  @override
+  String get serviceAnalyzeContract => 'Analyze Contract';
+
+  @override
+  String get serviceFindLawyer => 'Find a Lawyer';
+
+  @override
+  String get clientNotificationsTitle => 'Notifications';
+
+  @override
+  String get contractsSearchHint => 'Search your contracts...';
+
+  @override
+  String get contractsFilterAll => 'All';
+
+  @override
+  String get contractStatusDraft => 'Draft';
+
+  @override
+  String get contractStatusPendingSignature => 'Pending Signature';
+
+  @override
+  String get contractStatusSigned => 'Signed';
+
+  @override
+  String get contractStatusCompleted => 'Completed';
+
+  @override
+  String get contractStatusCancelled => 'Cancelled';
+
+  @override
+  String get contractCategoryEmployment => 'Employment Contract';
+
+  @override
+  String get contractCategorySale => 'Sale Contract';
+
+  @override
+  String get contractCategoryRental => 'Rental Contract';
+
+  @override
+  String get contractCategoryPartnership => 'Partnership Contract';
+
+  @override
+  String get contractCategoryNda => 'NDA Agreement';
+
+  @override
+  String get contractCategoryServiceAgreement => 'Service Agreement';
+
+  @override
+  String get contractCategoryOther => 'Other Contract';
+
+  @override
+  String get contractTypeSelectionTitle => 'Choose Contract Type';
+
+  @override
+  String get contractTypeSelectionSubtitle => 'Select the type of contract you want to create';
+
+  @override
+  String get contractTypeSearchHint => 'Search contract types...';
+
+  @override
+  String get contractFormTitle => 'Fill Contract Details';
+
+  @override
+  String get validationInvalidNumber => 'Please enter a valid number';
+
+  @override
+  String get validationInvalidDate => 'Please select a valid date';
+
+  @override
+  String get contractPreviewTitle => 'Contract Preview';
+
+  @override
+  String get contractPreviewParties => 'Parties';
+
+  @override
+  String get contractPreviewDetails => 'Details';
+
+  @override
+  String get contractPreviewSaveDraft => 'Save as Draft';
+
+  @override
+  String get contractPreviewGenerate => 'Generate Contract';
+
+  @override
+  String get contractGeneratedSuccessTitle => 'Contract Generated Successfully!';
+
+  @override
+  String get contractGeneratedSuccessMessage => 'Your contract has been saved to your digital vault';
+
+  @override
+  String get contractDraftSavedMessage => 'Contract saved as draft';
+
+  @override
+  String get contractViewDetails => 'View Details';
+
+  @override
+  String get contractDetailsTitle => 'Contract Details';
+
+  @override
+  String get contractDetailsType => 'Contract Type';
+
+  @override
+  String get contractDetailsStatus => 'Status';
+
+  @override
+  String get contractDetailsCreated => 'Created';
+
+  @override
+  String get contractDetailsUpdated => 'Last Updated';
+
+  @override
+  String get contractDetailsContent => 'Contract Content';
+
+  @override
+  String get contractDetailsDeleteConfirmTitle => 'Delete Draft';
+
+  @override
+  String get contractDetailsDeleteConfirmMessage => 'Are you sure you want to delete this draft? This action cannot be undone.';
+
+  @override
+  String get contractDetailsDeletedMessage => 'Draft deleted';
+
+  @override
+  String get documentsEmptyTitle => 'No documents yet';
+
+  @override
+  String get documentsEmptyMessage => 'Your contracts and documents will appear here once created';
+
+  @override
+  String get documentsSearchHint => 'Search your documents...';
 
   @override
   String homeWelcome(String name) {

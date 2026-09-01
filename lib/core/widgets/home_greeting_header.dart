@@ -6,14 +6,16 @@ import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
 
 /// The navy greeting hero atop each role's home/dashboard tab — visually
 /// shared chrome (same treatment as [AuthHeader]'s gradient), content
-/// differs per role via [greeting]/[icon]. Deliberately just a greeting: a
-/// notification bell or search bar here would be a fake control until
-/// those features exist.
+/// differs per role via [greeting]/[icon]. [trailing] is an optional extra
+/// slot (e.g. a notification action) for a role that has a real
+/// destination to send it to — omit it rather than wiring a control that
+/// goes nowhere.
 class HomeGreetingHeader extends StatelessWidget {
-  const HomeGreetingHeader({super.key, required this.greeting, required this.icon});
+  const HomeGreetingHeader({super.key, required this.greeting, required this.icon, this.trailing});
 
   final String greeting;
   final IconData icon;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class HomeGreetingHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
+              if (trailing != null) ...[trailing!, const SizedBox(width: AppSpacing.sm)],
               IconBadge(icon: icon, backgroundColor: Colors.white.withValues(alpha: 0.12), iconColor: Colors.white),
             ],
           ),

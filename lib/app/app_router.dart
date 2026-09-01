@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:aqd_ionbit/app/routing/auth_routes.dart';
+import 'package:aqd_ionbit/app/routing/client_contract_routes.dart';
 import 'package:aqd_ionbit/app/routing/client_routes.dart';
 import 'package:aqd_ionbit/app/routing/company_routes.dart';
 import 'package:aqd_ionbit/app/routing/lawyer_routes.dart';
@@ -34,6 +35,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(path: RoutePaths.splash, builder: (context, state) => const SplashScreen()),
       ...authRoutes,
+      ...clientContractRoutes(),
       clientShellRoute(),
       lawyerShellRoute(),
       companyShellRoute(),

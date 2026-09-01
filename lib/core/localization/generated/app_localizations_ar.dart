@@ -33,6 +33,39 @@ class AppLocalizationsAr extends AppLocalizations {
   String get commonNext => 'التالي';
 
   @override
+  String get commonViewAll => 'عرض الكل';
+
+  @override
+  String get commonSave => 'حفظ';
+
+  @override
+  String get commonEdit => 'تعديل';
+
+  @override
+  String get commonDelete => 'حذف';
+
+  @override
+  String get commonContinue => 'متابعة';
+
+  @override
+  String get commonSearch => 'بحث';
+
+  @override
+  String get commonDownload => 'تحميل';
+
+  @override
+  String get commonShare => 'مشاركة';
+
+  @override
+  String get commonCopy => 'نسخ';
+
+  @override
+  String get contractContentCopiedMessage => 'تم نسخ محتوى العقد';
+
+  @override
+  String get commonOptional => '(اختياري)';
+
+  @override
   String get authLoginTitle => 'تسجيل الدخول';
 
   @override
@@ -316,6 +349,156 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get confirmLogoutMessage => 'هل أنت متأكد أنك تريد تسجيل الخروج؟';
+
+  @override
+  String get clientHomeCreateContract => 'إنشاء عقد جديد';
+
+  @override
+  String get clientHomeMyContracts => 'عقودي';
+
+  @override
+  String get clientHomeNoContractsTitle => 'لا توجد عقود بعد';
+
+  @override
+  String get clientHomeNoContractsMessage => 'ابدأ بإنشاء أول عقد قانوني لك بمساعدة الذكاء الاصطناعي';
+
+  @override
+  String get clientHomeServicesTitle => 'الخدمات القانونية';
+
+  @override
+  String get serviceCreateContract => 'إنشاء عقد';
+
+  @override
+  String get serviceAnalyzeContract => 'تحليل عقد';
+
+  @override
+  String get serviceFindLawyer => 'البحث عن محامٍ';
+
+  @override
+  String get clientNotificationsTitle => 'الإشعارات';
+
+  @override
+  String get contractsSearchHint => 'ابحث في عقودك...';
+
+  @override
+  String get contractsFilterAll => 'الكل';
+
+  @override
+  String get contractStatusDraft => 'مسودة';
+
+  @override
+  String get contractStatusPendingSignature => 'بانتظار التوقيع';
+
+  @override
+  String get contractStatusSigned => 'تم التوقيع';
+
+  @override
+  String get contractStatusCompleted => 'مكتمل';
+
+  @override
+  String get contractStatusCancelled => 'ملغى';
+
+  @override
+  String get contractCategoryEmployment => 'عقد عمل';
+
+  @override
+  String get contractCategorySale => 'عقد بيع';
+
+  @override
+  String get contractCategoryRental => 'عقد إيجار';
+
+  @override
+  String get contractCategoryPartnership => 'عقد شراكة';
+
+  @override
+  String get contractCategoryNda => 'اتفاقية عدم إفصاح';
+
+  @override
+  String get contractCategoryServiceAgreement => 'عقد خدمات';
+
+  @override
+  String get contractCategoryOther => 'عقد آخر';
+
+  @override
+  String get contractTypeSelectionTitle => 'اختر نوع العقد';
+
+  @override
+  String get contractTypeSelectionSubtitle => 'اختر نوع العقد الذي تريد إنشاءه';
+
+  @override
+  String get contractTypeSearchHint => 'ابحث عن نوع العقد...';
+
+  @override
+  String get contractFormTitle => 'تعبئة بيانات العقد';
+
+  @override
+  String get validationInvalidNumber => 'الرجاء إدخال رقم صحيح';
+
+  @override
+  String get validationInvalidDate => 'الرجاء اختيار تاريخ صحيح';
+
+  @override
+  String get contractPreviewTitle => 'معاينة العقد';
+
+  @override
+  String get contractPreviewParties => 'الأطراف';
+
+  @override
+  String get contractPreviewDetails => 'التفاصيل';
+
+  @override
+  String get contractPreviewSaveDraft => 'حفظ كمسودة';
+
+  @override
+  String get contractPreviewGenerate => 'إنشاء العقد';
+
+  @override
+  String get contractGeneratedSuccessTitle => 'تم إنشاء العقد بنجاح!';
+
+  @override
+  String get contractGeneratedSuccessMessage => 'تم حفظ عقدك في الخزنة الرقمية';
+
+  @override
+  String get contractDraftSavedMessage => 'تم حفظ العقد كمسودة';
+
+  @override
+  String get contractViewDetails => 'عرض التفاصيل';
+
+  @override
+  String get contractDetailsTitle => 'تفاصيل العقد';
+
+  @override
+  String get contractDetailsType => 'نوع العقد';
+
+  @override
+  String get contractDetailsStatus => 'الحالة';
+
+  @override
+  String get contractDetailsCreated => 'تاريخ الإنشاء';
+
+  @override
+  String get contractDetailsUpdated => 'آخر تحديث';
+
+  @override
+  String get contractDetailsContent => 'محتوى العقد';
+
+  @override
+  String get contractDetailsDeleteConfirmTitle => 'حذف المسودة';
+
+  @override
+  String get contractDetailsDeleteConfirmMessage => 'هل أنت متأكد أنك تريد حذف هذه المسودة؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get contractDetailsDeletedMessage => 'تم حذف المسودة';
+
+  @override
+  String get documentsEmptyTitle => 'لا توجد مستندات بعد';
+
+  @override
+  String get documentsEmptyMessage => 'ستظهر عقودك ومستنداتك هنا بعد إنشائها';
+
+  @override
+  String get documentsSearchHint => 'ابحث في مستنداتك...';
 
   @override
   String homeWelcome(String name) {

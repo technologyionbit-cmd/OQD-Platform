@@ -9,13 +9,24 @@ import 'package:aqd_ionbit/features/profile/presentation/screens/account_screen.
 
 import '../support/role_test_harness.dart';
 
+/// Client/company home now surface real content, which legitimately reuses
+/// some of the same words as their own nav labels (a "Documents" service
+/// shortcut card living on a screen next to a "Documents" nav tab, say) —
+/// so nav-label presence must be checked within the nav chrome itself
+/// (`NavigationBar` or `NavigationRail`, whichever the layout is using)
+/// rather than anywhere on screen.
+Finder _navLabel(String label) {
+  final navChrome = find.byWidgetPredicate((widget) => widget is NavigationBar || widget is NavigationRail);
+  return find.descendant(of: navChrome, matching: find.text(label));
+}
+
 void main() {
   testWidgets('client shell renders with a 5-item bottom nav and no exceptions', (tester) async {
     await pumpAuthenticatedApp(tester, user: testClient);
 
     expect(find.byType(ClientHomeScreen), findsOneWidget);
     for (final label in ['الرئيسية', 'AI', 'المستندات', 'المحامون', 'حسابي']) {
-      expect(find.text(label), findsOneWidget, reason: 'missing client nav label "$label"');
+      expect(_navLabel(label), findsOneWidget, reason: 'missing client nav label "$label"');
     }
     expect(tester.takeException(), isNull);
   });
@@ -25,7 +36,7 @@ void main() {
 
     expect(find.byType(LawyerDashboardScreen), findsOneWidget);
     for (final label in ['لوحة التحكم', 'المواعيد', 'العملاء', 'الأرباح', 'ملفي']) {
-      expect(find.text(label), findsOneWidget, reason: 'missing lawyer nav label "$label"');
+      expect(_navLabel(label), findsOneWidget, reason: 'missing lawyer nav label "$label"');
     }
     expect(tester.takeException(), isNull);
   });
@@ -35,7 +46,7 @@ void main() {
 
     expect(find.byType(CompanyHomeScreen), findsOneWidget);
     for (final label in ['الرئيسية', 'العقود', 'المحامون', 'المستندات', 'حسابي']) {
-      expect(find.text(label), findsOneWidget, reason: 'missing company nav label "$label"');
+      expect(_navLabel(label), findsOneWidget, reason: 'missing company nav label "$label"');
     }
     expect(tester.takeException(), isNull);
   });

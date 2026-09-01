@@ -143,6 +143,72 @@ abstract class AppLocalizations {
   /// **'التالي'**
   String get commonNext;
 
+  /// No description provided for @commonViewAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض الكل'**
+  String get commonViewAll;
+
+  /// No description provided for @commonSave.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ'**
+  String get commonSave;
+
+  /// No description provided for @commonEdit.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل'**
+  String get commonEdit;
+
+  /// No description provided for @commonDelete.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف'**
+  String get commonDelete;
+
+  /// No description provided for @commonContinue.
+  ///
+  /// In ar, this message translates to:
+  /// **'متابعة'**
+  String get commonContinue;
+
+  /// No description provided for @commonSearch.
+  ///
+  /// In ar, this message translates to:
+  /// **'بحث'**
+  String get commonSearch;
+
+  /// No description provided for @commonDownload.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل'**
+  String get commonDownload;
+
+  /// No description provided for @commonShare.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة'**
+  String get commonShare;
+
+  /// No description provided for @commonCopy.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخ'**
+  String get commonCopy;
+
+  /// No description provided for @contractContentCopiedMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم نسخ محتوى العقد'**
+  String get contractContentCopiedMessage;
+
+  /// No description provided for @commonOptional.
+  ///
+  /// In ar, this message translates to:
+  /// **'(اختياري)'**
+  String get commonOptional;
+
   /// No description provided for @authLoginTitle.
   ///
   /// In ar, this message translates to:
@@ -700,6 +766,306 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'هل أنت متأكد أنك تريد تسجيل الخروج؟'**
   String get confirmLogoutMessage;
+
+  /// No description provided for @clientHomeCreateContract.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء عقد جديد'**
+  String get clientHomeCreateContract;
+
+  /// No description provided for @clientHomeMyContracts.
+  ///
+  /// In ar, this message translates to:
+  /// **'عقودي'**
+  String get clientHomeMyContracts;
+
+  /// No description provided for @clientHomeNoContractsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد عقود بعد'**
+  String get clientHomeNoContractsTitle;
+
+  /// No description provided for @clientHomeNoContractsMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ بإنشاء أول عقد قانوني لك بمساعدة الذكاء الاصطناعي'**
+  String get clientHomeNoContractsMessage;
+
+  /// No description provided for @clientHomeServicesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخدمات القانونية'**
+  String get clientHomeServicesTitle;
+
+  /// No description provided for @serviceCreateContract.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء عقد'**
+  String get serviceCreateContract;
+
+  /// No description provided for @serviceAnalyzeContract.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحليل عقد'**
+  String get serviceAnalyzeContract;
+
+  /// No description provided for @serviceFindLawyer.
+  ///
+  /// In ar, this message translates to:
+  /// **'البحث عن محامٍ'**
+  String get serviceFindLawyer;
+
+  /// No description provided for @clientNotificationsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإشعارات'**
+  String get clientNotificationsTitle;
+
+  /// No description provided for @contractsSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في عقودك...'**
+  String get contractsSearchHint;
+
+  /// No description provided for @contractsFilterAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكل'**
+  String get contractsFilterAll;
+
+  /// No description provided for @contractStatusDraft.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسودة'**
+  String get contractStatusDraft;
+
+  /// No description provided for @contractStatusPendingSignature.
+  ///
+  /// In ar, this message translates to:
+  /// **'بانتظار التوقيع'**
+  String get contractStatusPendingSignature;
+
+  /// No description provided for @contractStatusSigned.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم التوقيع'**
+  String get contractStatusSigned;
+
+  /// No description provided for @contractStatusCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكتمل'**
+  String get contractStatusCompleted;
+
+  /// No description provided for @contractStatusCancelled.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملغى'**
+  String get contractStatusCancelled;
+
+  /// No description provided for @contractCategoryEmployment.
+  ///
+  /// In ar, this message translates to:
+  /// **'عقد عمل'**
+  String get contractCategoryEmployment;
+
+  /// No description provided for @contractCategorySale.
+  ///
+  /// In ar, this message translates to:
+  /// **'عقد بيع'**
+  String get contractCategorySale;
+
+  /// No description provided for @contractCategoryRental.
+  ///
+  /// In ar, this message translates to:
+  /// **'عقد إيجار'**
+  String get contractCategoryRental;
+
+  /// No description provided for @contractCategoryPartnership.
+  ///
+  /// In ar, this message translates to:
+  /// **'عقد شراكة'**
+  String get contractCategoryPartnership;
+
+  /// No description provided for @contractCategoryNda.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتفاقية عدم إفصاح'**
+  String get contractCategoryNda;
+
+  /// No description provided for @contractCategoryServiceAgreement.
+  ///
+  /// In ar, this message translates to:
+  /// **'عقد خدمات'**
+  String get contractCategoryServiceAgreement;
+
+  /// No description provided for @contractCategoryOther.
+  ///
+  /// In ar, this message translates to:
+  /// **'عقد آخر'**
+  String get contractCategoryOther;
+
+  /// No description provided for @contractTypeSelectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر نوع العقد'**
+  String get contractTypeSelectionTitle;
+
+  /// No description provided for @contractTypeSelectionSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر نوع العقد الذي تريد إنشاءه'**
+  String get contractTypeSelectionSubtitle;
+
+  /// No description provided for @contractTypeSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن نوع العقد...'**
+  String get contractTypeSearchHint;
+
+  /// No description provided for @contractFormTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعبئة بيانات العقد'**
+  String get contractFormTitle;
+
+  /// No description provided for @validationInvalidNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرجاء إدخال رقم صحيح'**
+  String get validationInvalidNumber;
+
+  /// No description provided for @validationInvalidDate.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرجاء اختيار تاريخ صحيح'**
+  String get validationInvalidDate;
+
+  /// No description provided for @contractPreviewTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'معاينة العقد'**
+  String get contractPreviewTitle;
+
+  /// No description provided for @contractPreviewParties.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأطراف'**
+  String get contractPreviewParties;
+
+  /// No description provided for @contractPreviewDetails.
+  ///
+  /// In ar, this message translates to:
+  /// **'التفاصيل'**
+  String get contractPreviewDetails;
+
+  /// No description provided for @contractPreviewSaveDraft.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ كمسودة'**
+  String get contractPreviewSaveDraft;
+
+  /// No description provided for @contractPreviewGenerate.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء العقد'**
+  String get contractPreviewGenerate;
+
+  /// No description provided for @contractGeneratedSuccessTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إنشاء العقد بنجاح!'**
+  String get contractGeneratedSuccessTitle;
+
+  /// No description provided for @contractGeneratedSuccessMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ عقدك في الخزنة الرقمية'**
+  String get contractGeneratedSuccessMessage;
+
+  /// No description provided for @contractDraftSavedMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ العقد كمسودة'**
+  String get contractDraftSavedMessage;
+
+  /// No description provided for @contractViewDetails.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض التفاصيل'**
+  String get contractViewDetails;
+
+  /// No description provided for @contractDetailsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفاصيل العقد'**
+  String get contractDetailsTitle;
+
+  /// No description provided for @contractDetailsType.
+  ///
+  /// In ar, this message translates to:
+  /// **'نوع العقد'**
+  String get contractDetailsType;
+
+  /// No description provided for @contractDetailsStatus.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحالة'**
+  String get contractDetailsStatus;
+
+  /// No description provided for @contractDetailsCreated.
+  ///
+  /// In ar, this message translates to:
+  /// **'تاريخ الإنشاء'**
+  String get contractDetailsCreated;
+
+  /// No description provided for @contractDetailsUpdated.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر تحديث'**
+  String get contractDetailsUpdated;
+
+  /// No description provided for @contractDetailsContent.
+  ///
+  /// In ar, this message translates to:
+  /// **'محتوى العقد'**
+  String get contractDetailsContent;
+
+  /// No description provided for @contractDetailsDeleteConfirmTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف المسودة'**
+  String get contractDetailsDeleteConfirmTitle;
+
+  /// No description provided for @contractDetailsDeleteConfirmMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'هل أنت متأكد أنك تريد حذف هذه المسودة؟ لا يمكن التراجع عن هذا الإجراء.'**
+  String get contractDetailsDeleteConfirmMessage;
+
+  /// No description provided for @contractDetailsDeletedMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حذف المسودة'**
+  String get contractDetailsDeletedMessage;
+
+  /// No description provided for @documentsEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مستندات بعد'**
+  String get documentsEmptyTitle;
+
+  /// No description provided for @documentsEmptyMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستظهر عقودك ومستنداتك هنا بعد إنشائها'**
+  String get documentsEmptyMessage;
+
+  /// No description provided for @documentsSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في مستنداتك...'**
+  String get documentsSearchHint;
 
   /// Welcome message shown on home screen with the user's name
   ///
