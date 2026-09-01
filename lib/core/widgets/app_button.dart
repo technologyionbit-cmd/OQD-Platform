@@ -12,6 +12,12 @@ enum AppButtonVariant {
   /// deliberate, recurring color distinct from the primary action blue in
   /// the reference screenshots, not a one-off override.
   success,
+
+  /// Outlined-but-red treatment for a destructive action's trigger button
+  /// (e.g. "Delete") — kept visually distinct from [outlined]'s primary-blue
+  /// so a destructive action never looks identical to a neutral one, even
+  /// before the confirmation dialog appears.
+  destructive,
 }
 
 /// Wraps Elevated/Outlined/Text button with a built-in loading state so no
@@ -57,6 +63,16 @@ class AppButton extends StatelessWidget {
       AppButtonVariant.primary => ElevatedButton(onPressed: isDisabled ? null : onPressed, child: child),
       AppButtonVariant.outlined => OutlinedButton(onPressed: isDisabled ? null : onPressed, child: child),
       AppButtonVariant.text => TextButton(onPressed: isDisabled ? null : onPressed, child: child),
+      AppButtonVariant.destructive => OutlinedButton(
+        onPressed: isDisabled ? null : onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.error,
+          side: const BorderSide(color: AppColors.error),
+          minimumSize: const Size.fromHeight(52),
+          shape: RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
+        ),
+        child: child,
+      ),
       AppButtonVariant.success => ElevatedButton(
         onPressed: isDisabled ? null : onPressed,
         style: ElevatedButton.styleFrom(
@@ -75,6 +91,7 @@ class AppButton extends StatelessWidget {
     return switch (variant) {
       AppButtonVariant.primary || AppButtonVariant.success => Theme.of(context).colorScheme.onPrimary,
       AppButtonVariant.outlined || AppButtonVariant.text => Theme.of(context).colorScheme.primary,
+      AppButtonVariant.destructive => AppColors.error,
     };
   }
 }

@@ -57,6 +57,13 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                 AsyncData(value: final documents) => Builder(
                   builder: (context) {
                     final filtered = documents.where((d) => d.title.toLowerCase().contains(_query.toLowerCase())).toList();
+                    if (filtered.isEmpty && _query.isNotEmpty) {
+                      return EmptyState(
+                        icon: Icons.search_off_outlined,
+                        title: l10n.documentsSearchEmptyTitle,
+                        message: l10n.documentsSearchEmptyMessage,
+                      );
+                    }
                     if (filtered.isEmpty) {
                       return EmptyState(
                         icon: Icons.folder_open_outlined,
@@ -119,7 +126,11 @@ class _DocumentCard extends StatelessWidget {
               ],
             ),
           ),
-          if (canOpen) const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+          if (canOpen)
+            Icon(
+              Directionality.of(context) == TextDirection.rtl ? Icons.chevron_left : Icons.chevron_right,
+              color: AppColors.textSecondary,
+            ),
         ],
       ),
     );

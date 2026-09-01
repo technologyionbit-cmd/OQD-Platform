@@ -92,6 +92,14 @@ class _ContractsListScreenState extends ConsumerState<ContractsListScreen> {
                 AsyncData(value: final contracts) => Builder(
                   builder: (context) {
                     final filtered = _applyFilters(contracts, l10n);
+                    final isFiltering = _query.isNotEmpty || _statusFilter != null;
+                    if (filtered.isEmpty && isFiltering) {
+                      return EmptyState(
+                        icon: Icons.search_off_outlined,
+                        title: l10n.contractsSearchEmptyTitle,
+                        message: l10n.contractsSearchEmptyMessage,
+                      );
+                    }
                     if (filtered.isEmpty) {
                       return EmptyState(
                         icon: Icons.description_outlined,

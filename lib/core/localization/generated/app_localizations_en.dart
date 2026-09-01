@@ -384,6 +384,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contractsFilterAll => 'All';
 
   @override
+  String get contractsSearchEmptyTitle => 'No matching contracts';
+
+  @override
+  String get contractsSearchEmptyMessage => 'Try a different search term or filter';
+
+  @override
   String get contractStatusDraft => 'Draft';
 
   @override
@@ -427,6 +433,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contractTypeSearchHint => 'Search contract types...';
+
+  @override
+  String get contractTypeSearchEmptyMessage => 'No contract types match your search';
 
   @override
   String get contractFormTitle => 'Fill Contract Details';
@@ -499,6 +508,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get documentsSearchHint => 'Search your documents...';
+
+  @override
+  String get documentsSearchEmptyTitle => 'No matching documents';
+
+  @override
+  String get documentsSearchEmptyMessage => 'Try a different search term';
 
   @override
   String homeWelcome(String name) {

@@ -139,6 +139,8 @@
 
   "contractsSearchHint": "Search your contracts...",
   "contractsFilterAll": "All",
+  "contractsSearchEmptyTitle": "No matching contracts",
+  "contractsSearchEmptyMessage": "Try a different search term or filter",
 
   "contractStatusDraft": "Draft",
   "contractStatusPendingSignature": "Pending Signature",
@@ -157,6 +159,7 @@
   "contractTypeSelectionTitle": "Choose Contract Type",
   "contractTypeSelectionSubtitle": "Select the type of contract you want to create",
   "contractTypeSearchHint": "Search contract types...",
+  "contractTypeSearchEmptyMessage": "No contract types match your search",
 
   "contractFormTitle": "Fill Contract Details",
   "validationInvalidNumber": "Please enter a valid number",
@@ -185,6 +188,8 @@
   "documentsEmptyTitle": "No documents yet",
   "documentsEmptyMessage": "Your contracts and documents will appear here once created",
   "documentsSearchHint": "Search your documents...",
+  "documentsSearchEmptyTitle": "No matching documents",
+  "documentsSearchEmptyMessage": "Try a different search term",
 
   "homeWelcome": "Welcome, {name}"
 }

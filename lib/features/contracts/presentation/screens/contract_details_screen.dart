@@ -134,7 +134,7 @@ class ContractDetailsScreen extends ConsumerWidget {
                 AppButton(
                   label: l10n.commonDelete,
                   icon: Icons.delete_outline,
-                  variant: AppButtonVariant.outlined,
+                  variant: AppButtonVariant.destructive,
                   onPressed: () => _delete(context, ref),
                 ),
               ],

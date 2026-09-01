@@ -77,7 +77,7 @@ class _ContractTypeSelectionScreenState extends ConsumerState<ContractTypeSelect
                   builder: (context) {
                     final filtered = templates.where((t) => t.title.toLowerCase().contains(_query.toLowerCase())).toList();
                     if (filtered.isEmpty) {
-                      return EmptyState(icon: Icons.search_off_outlined, message: l10n.contractTypeSearchHint);
+                      return EmptyState(icon: Icons.search_off_outlined, message: l10n.contractTypeSearchEmptyMessage);
                     }
                     return GridView.builder(
                       padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xl),

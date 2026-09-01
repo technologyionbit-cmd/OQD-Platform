@@ -833,6 +833,18 @@ abstract class AppLocalizations {
   /// **'الكل'**
   String get contractsFilterAll;
 
+  /// No description provided for @contractsSearchEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد عقود مطابقة'**
+  String get contractsSearchEmptyTitle;
+
+  /// No description provided for @contractsSearchEmptyMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'جرّب كلمة بحث أو تصفية مختلفة'**
+  String get contractsSearchEmptyMessage;
+
   /// No description provided for @contractStatusDraft.
   ///
   /// In ar, this message translates to:
@@ -922,6 +934,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ابحث عن نوع العقد...'**
   String get contractTypeSearchHint;
+
+  /// No description provided for @contractTypeSearchEmptyMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد أنواع عقود مطابقة لبحثك'**
+  String get contractTypeSearchEmptyMessage;
 
   /// No description provided for @contractFormTitle.
   ///
@@ -1066,6 +1084,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ابحث في مستنداتك...'**
   String get documentsSearchHint;
+
+  /// No description provided for @documentsSearchEmptyTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مستندات مطابقة'**
+  String get documentsSearchEmptyTitle;
+
+  /// No description provided for @documentsSearchEmptyMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'جرّب كلمة بحث مختلفة'**
+  String get documentsSearchEmptyMessage;
 
   /// Welcome message shown on home screen with the user's name
   ///

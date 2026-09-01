@@ -157,6 +157,8 @@
 
   "contractsSearchHint": "ابحث في عقودك...",
   "contractsFilterAll": "الكل",
+  "contractsSearchEmptyTitle": "لا توجد عقود مطابقة",
+  "contractsSearchEmptyMessage": "جرّب كلمة بحث أو تصفية مختلفة",
 
   "contractStatusDraft": "مسودة",
   "contractStatusPendingSignature": "بانتظار التوقيع",
@@ -175,6 +177,7 @@
   "contractTypeSelectionTitle": "اختر نوع العقد",
   "contractTypeSelectionSubtitle": "اختر نوع العقد الذي تريد إنشاءه",
   "contractTypeSearchHint": "ابحث عن نوع العقد...",
+  "contractTypeSearchEmptyMessage": "لا توجد أنواع عقود مطابقة لبحثك",
 
   "contractFormTitle": "تعبئة بيانات العقد",
   "validationInvalidNumber": "الرجاء إدخال رقم صحيح",
@@ -203,6 +206,8 @@
   "documentsEmptyTitle": "لا توجد مستندات بعد",
   "documentsEmptyMessage": "ستظهر عقودك ومستنداتك هنا بعد إنشائها",
   "documentsSearchHint": "ابحث في مستنداتك...",
+  "documentsSearchEmptyTitle": "لا توجد مستندات مطابقة",
+  "documentsSearchEmptyMessage": "جرّب كلمة بحث مختلفة",
 
   "homeWelcome": "مرحبًا، {name}",
   "@homeWelcome": {

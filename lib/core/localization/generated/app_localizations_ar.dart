@@ -384,6 +384,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get contractsFilterAll => 'الكل';
 
   @override
+  String get contractsSearchEmptyTitle => 'لا توجد عقود مطابقة';
+
+  @override
+  String get contractsSearchEmptyMessage => 'جرّب كلمة بحث أو تصفية مختلفة';
+
+  @override
   String get contractStatusDraft => 'مسودة';
 
   @override
@@ -427,6 +433,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get contractTypeSearchHint => 'ابحث عن نوع العقد...';
+
+  @override
+  String get contractTypeSearchEmptyMessage => 'لا توجد أنواع عقود مطابقة لبحثك';
 
   @override
   String get contractFormTitle => 'تعبئة بيانات العقد';
@@ -499,6 +508,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get documentsSearchHint => 'ابحث في مستنداتك...';
+
+  @override
+  String get documentsSearchEmptyTitle => 'لا توجد مستندات مطابقة';
+
+  @override
+  String get documentsSearchEmptyMessage => 'جرّب كلمة بحث مختلفة';
 
   @override
   String homeWelcome(String name) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 
 class AppCard extends StatelessWidget {
@@ -15,7 +16,7 @@ class AppCard extends StatelessWidget {
     if (onTap == null) return card;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppRadii.mdRadius,
       child: card,
     );
   }
