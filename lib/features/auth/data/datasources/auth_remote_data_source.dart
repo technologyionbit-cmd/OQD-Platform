@@ -20,6 +20,8 @@ abstract interface class AuthRemoteDataSource {
 
   Future<AuthUser> currentUser(String accessToken);
 
+  Future<AuthUser> updateProfile({required String accessToken, required String fullName, required String email});
+
   Future<void> logout(String accessToken);
 
   Future<void> requestOtp({required String destination});

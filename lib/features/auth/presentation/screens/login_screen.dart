@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:aqd_ionbit/core/errors/failure.dart';
+import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
@@ -11,14 +12,20 @@ import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
+import 'package:aqd_ionbit/core/widgets/app_chip.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
 import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
+import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 
 /// Demo accounts mirrored from AuthMockDataSource — kept here only for the
 /// dev-only quick-fill card below, never referenced by production logic.
 const _devPassword = 'Password123';
-const _devAccounts = [('client@aqd.test', 'عميل'), ('lawyer@aqd.test', 'محامٍ'), ('company@aqd.test', 'شركة')];
+const _devAccounts = [
+  ('client@aqd.test', 'عميل', UserRole.client),
+  ('lawyer@aqd.test', 'محامٍ', UserRole.lawyer),
+  ('company@aqd.test', 'شركة', UserRole.company),
+];
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -35,6 +42,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _passwordError;
   String? _formError;
   bool _isSubmitting = false;
+  UserRole _selectedRole = UserRole.client;
 
   @override
   void dispose() {
@@ -43,9 +51,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _fillDemoAccount(String email) {
+  void _fillDemoAccount(String email, UserRole role) {
     _emailController.text = email;
     _passwordController.text = _devPassword;
+    setState(() => _selectedRole = role);
+  }
+
+  String _roleLabel(UserRole role, AppLocalizations l10n) {
+    return switch (role) {
+      UserRole.client => l10n.accountRoleClient,
+      UserRole.lawyer => l10n.accountRoleLawyer,
+      UserRole.company => l10n.accountRoleCompany,
+    };
   }
 
   Future<void> _submit() async {
@@ -72,10 +89,24 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
-    result.fold((failure) => setState(() => _formError = _messageFor(failure, l10n)), (_) {
-      // Navigation is driven by the router's redirect reacting to
-      // authControllerProvider — this screen doesn't navigate itself.
-    });
+    switch (result) {
+      case ResultFailure(:final failure):
+        setState(() => _formError = _messageFor(failure, l10n));
+      case Success(:final data):
+        // The role toggle only distinguishes client/lawyer (no company tab
+        // exists) — enforce it only when both the selected tab and the
+        // account that actually matched are one of those two, so a company
+        // login is never blocked by a tab that doesn't represent it.
+        final expectsClientOrLawyer = _selectedRole == UserRole.client || _selectedRole == UserRole.lawyer;
+        final actualIsClientOrLawyer = data.role == UserRole.client || data.role == UserRole.lawyer;
+        if (expectsClientOrLawyer && actualIsClientOrLawyer && data.role != _selectedRole) {
+          await ref.read(authControllerProvider.notifier).logout();
+          if (!mounted) return;
+          setState(() => _formError = l10n.authLoginRoleMismatch(_roleLabel(data.role, l10n)));
+        }
+      // Otherwise navigation is driven by the router's redirect reacting
+      // to authControllerProvider — this screen doesn't navigate itself.
+    }
   }
 
   String _messageFor(Failure failure, AppLocalizations l10n) {
@@ -115,6 +146,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   if (!isProduction) ...[_DevCredentialsCard(l10n: l10n, onSelect: _fillDemoAccount), const SizedBox(height: AppSpacing.lg)],
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppChip(
+                          label: l10n.accountRoleLawyer,
+                          icon: Icons.gavel_outlined,
+                          selected: _selectedRole == UserRole.lawyer,
+                          onTap: () => setState(() => _selectedRole = UserRole.lawyer),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Expanded(
+                        child: AppChip(
+                          label: l10n.accountRoleClient,
+                          icon: Icons.person_outline,
+                          selected: _selectedRole == UserRole.client,
+                          onTap: () => setState(() => _selectedRole = UserRole.client),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
                   AppTextField(
                     controller: _emailController,
                     label: l10n.authEmailOrPhoneLabel,
@@ -139,7 +192,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   if (_formError != null) ...[
                     const SizedBox(height: AppSpacing.xs),
-                    Text(_formError!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                    Text(
+                      _formError!,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.error),
+                    ),
                   ],
                   const SizedBox(height: AppSpacing.md),
                   AppButton(label: l10n.authLoginSubmit, isLoading: _isSubmitting, onPressed: _submit),
@@ -170,7 +226,7 @@ class _DevCredentialsCard extends StatelessWidget {
   const _DevCredentialsCard({required this.l10n, required this.onSelect});
 
   final AppLocalizations l10n;
-  final ValueChanged<String> onSelect;
+  final void Function(String email, UserRole role) onSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -186,9 +242,9 @@ class _DevCredentialsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(l10n.devCredentialsTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+          Text(l10n.devCredentialsTitle, style: Theme.of(context).textTheme.labelMedium),
           const SizedBox(height: AppSpacing.xxs),
-          Text(l10n.devCredentialsPassword(_devPassword), style: const TextStyle(fontSize: 12)),
+          Text(l10n.devCredentialsPassword(_devPassword), style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: AppSpacing.xs),
           Wrap(
             spacing: AppSpacing.xs,
@@ -196,8 +252,8 @@ class _DevCredentialsCard extends StatelessWidget {
             children: _devAccounts
                 .map(
                   (account) => ActionChip(
-                    label: Text('${account.$2} — ${account.$1}', style: const TextStyle(fontSize: 11)),
-                    onPressed: () => onSelect(account.$1),
+                    label: Text('${account.$2} — ${account.$1}', style: Theme.of(context).textTheme.labelSmall),
+                    onPressed: () => onSelect(account.$1, account.$3),
                   ),
                 )
                 .toList(),

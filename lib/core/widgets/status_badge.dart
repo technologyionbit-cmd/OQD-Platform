@@ -10,6 +10,22 @@ import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
 /// five tones — never a bespoke colored `Container` per screen.
 enum AppStatusTone { success, warning, error, info, neutral }
 
+extension AppStatusToneX on AppStatusTone {
+  /// Resolves this tone against the current theme — shared by [StatusBadge]
+  /// and any widget that needs the same foreground/background pair outside
+  /// a badge (e.g. a tinted icon container).
+  StatusTone resolve(BuildContext context) {
+    final colors = context.statusColors;
+    return switch (this) {
+      AppStatusTone.success => colors.success,
+      AppStatusTone.warning => colors.warning,
+      AppStatusTone.error => colors.error,
+      AppStatusTone.info => colors.info,
+      AppStatusTone.neutral => colors.neutral,
+    };
+  }
+}
+
 class StatusBadge extends StatelessWidget {
   const StatusBadge({super.key, required this.label, required this.tone, this.icon});
 
@@ -19,14 +35,7 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.statusColors;
-    final statusTone = switch (tone) {
-      AppStatusTone.success => colors.success,
-      AppStatusTone.warning => colors.warning,
-      AppStatusTone.error => colors.error,
-      AppStatusTone.info => colors.info,
-      AppStatusTone.neutral => colors.neutral,
-    };
+    final statusTone = tone.resolve(context);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 4),
@@ -38,9 +47,13 @@ class StatusBadge extends StatelessWidget {
             Icon(icon, size: 14, color: statusTone.foreground),
             const SizedBox(width: 4),
           ],
-          Text(
-            label,
-            style: TextStyle(color: statusTone.foreground, fontSize: 12, fontWeight: FontWeight.w600),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: statusTone.foreground, fontSize: 12, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),

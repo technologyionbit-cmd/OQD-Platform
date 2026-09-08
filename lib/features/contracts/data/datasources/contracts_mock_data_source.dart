@@ -73,6 +73,16 @@ class ContractsMockDataSource implements ContractsRemoteDataSource {
   }
 
   @override
+  Future<Contract> signContract(String id) async {
+    await _simulateLatency();
+    final index = _contracts.indexWhere((contract) => contract.id == id);
+    if (index == -1) throw const NotFoundFailure();
+    final signed = _contracts[index].copyWith(status: ContractStatus.signed, updatedAt: DateTime.now());
+    _contracts[index] = signed;
+    return signed;
+  }
+
+  @override
   Future<void> deleteContract(String id) async {
     await _simulateLatency();
     _contracts.removeWhere((contract) => contract.id == id);

@@ -4,8 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import 'package:aqd_ionbit/app/routing/auth_routes.dart';
 import 'package:aqd_ionbit/app/routing/client_contract_routes.dart';
+import 'package:aqd_ionbit/app/routing/client_extra_routes.dart';
 import 'package:aqd_ionbit/app/routing/client_routes.dart';
+import 'package:aqd_ionbit/app/routing/company_extra_routes.dart';
 import 'package:aqd_ionbit/app/routing/company_routes.dart';
+import 'package:aqd_ionbit/app/routing/lawyer_extra_routes.dart';
 import 'package:aqd_ionbit/app/routing/lawyer_routes.dart';
 import 'package:aqd_ionbit/app/splash_screen.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
@@ -36,6 +39,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: RoutePaths.splash, builder: (context, state) => const SplashScreen()),
       ...authRoutes,
       ...clientContractRoutes(),
+      ...clientExtraRoutes(),
+      ...lawyerExtraRoutes(),
+      ...companyExtraRoutes(),
       clientShellRoute(),
       lawyerShellRoute(),
       companyShellRoute(),

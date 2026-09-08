@@ -34,5 +34,8 @@ abstract interface class ContractsRepository {
     String? contractId,
   });
 
+  /// Moves a pending-signature contract to signed — mock e-signature only.
+  Future<Result<Contract>> signContract(String id);
+
   Future<Result<void>> deleteContract(String id);
 }

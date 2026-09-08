@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_gradients.dart';
 import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
@@ -30,21 +31,23 @@ class AuthHeader extends StatelessWidget {
             children: [
               SizedBox(
                 height: 40,
-                child: showBackButton ? const Align(alignment: AlignmentDirectional.topStart, child: BackButton(color: Colors.white)) : null,
+                child: showBackButton
+                    ? const Align(alignment: AlignmentDirectional.topStart, child: BackButton(color: AppColors.onPrimary))
+                    : null,
               ),
               Container(
                 width: 56,
                 height: 56,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.12), borderRadius: AppRadii.mdRadius),
-                child: Icon(icon, color: Colors.white, size: 28),
+                decoration: BoxDecoration(color: AppColors.onPrimary.withValues(alpha: 0.12), borderRadius: AppRadii.mdRadius),
+                child: Icon(icon, color: AppColors.onPrimary, size: 28),
               ),
               if (title != null) ...[
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   title!,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: AppColors.onPrimary),
                 ),
               ],
               if (subtitle != null) ...[
@@ -54,7 +57,7 @@ class AuthHeader extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: Theme.of(
                     context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.75)),
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.onPrimary.withValues(alpha: 0.75)),
                 ),
               ],
             ],

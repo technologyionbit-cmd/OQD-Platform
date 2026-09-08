@@ -44,6 +44,9 @@ class ContractsRepositoryImpl implements ContractsRepository {
   }
 
   @override
+  Future<Result<Contract>> signContract(String id) => _guard(() => _remote.signContract(id));
+
+  @override
   Future<Result<void>> deleteContract(String id) => _guard(() => _remote.deleteContract(id));
 
   Future<Result<T>> _guard<T>(Future<T> Function() action) async {

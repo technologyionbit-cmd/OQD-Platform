@@ -44,6 +44,16 @@ void main() {
           testWidgets('${roleEntry.key} $route renders with no overflow at ${sizeEntry.key} (${locale.languageCode})', (tester) async {
             final harness = await pumpAuthenticatedApp(tester, user: roleEntry.value.user, size: sizeEntry.value, locale: locale);
             harness.container.read(routerProvider).go(route);
+            // The account tab (kept alive alongside every other shell
+            // branch by StatefulShellRoute.indexedStack) now watches
+            // several mock-latency providers for its stats row. A bare
+            // Future.delayed doesn't itself keep a frame scheduled, so
+            // pumpAndSettle (which only keeps pumping while frames are
+            // scheduled) can return before those futures resolve — drain
+            // them explicitly first, in more than one jump since the
+            // provider may not even be built yet on the very first pump.
+            await tester.pump(const Duration(seconds: 1));
+            await tester.pump(const Duration(seconds: 1));
             await tester.pumpAndSettle();
 
             expect(tester.takeException(), isNull);

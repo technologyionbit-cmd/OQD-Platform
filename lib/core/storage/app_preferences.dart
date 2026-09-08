@@ -9,6 +9,7 @@ class AppPreferences {
   static const _localeKey = 'prefs.locale';
   static const _themeModeKey = 'prefs.theme_mode';
   static const _onboardingSeenKey = 'prefs.onboarding_seen';
+  static const _notificationsEnabledKey = 'prefs.notifications_enabled';
 
   final SharedPreferences _prefs;
 
@@ -20,4 +21,7 @@ class AppPreferences {
 
   bool get hasSeenOnboarding => _prefs.getBool(_onboardingSeenKey) ?? false;
   Future<void> setOnboardingSeen(bool seen) => _prefs.setBool(_onboardingSeenKey, seen);
+
+  bool get notificationsEnabled => _prefs.getBool(_notificationsEnabledKey) ?? true;
+  Future<void> setNotificationsEnabled(bool enabled) => _prefs.setBool(_notificationsEnabledKey, enabled);
 }

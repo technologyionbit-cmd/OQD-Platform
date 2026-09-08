@@ -67,6 +67,11 @@ void main() {
     await tester.tap(find.text('حسابي'));
     await tester.pumpAndSettle();
 
+    // The account screen's menu list is long enough (subscriptions, payment
+    // methods, saved signature, security, help, ...) that logout sits below
+    // the fold on a phone-height test surface — scroll it into view first.
+    await tester.ensureVisible(find.text('تسجيل الخروج').first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('تسجيل الخروج').first);
     await tester.pumpAndSettle();
 

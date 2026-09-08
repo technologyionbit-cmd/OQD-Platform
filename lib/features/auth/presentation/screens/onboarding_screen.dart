@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
+import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_gradients.dart';
 import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
@@ -62,7 +63,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   padding: const EdgeInsets.all(AppSpacing.xs),
                   child: TextButton(
                     onPressed: _finish,
-                    style: TextButton.styleFrom(foregroundColor: Colors.white70),
+                    style: TextButton.styleFrom(foregroundColor: AppColors.onPrimary.withValues(alpha: 0.7)),
                     child: Text(l10n.commonSkip),
                   ),
                 ),
@@ -96,16 +97,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                   height: iconSize,
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.1),
+                                    color: AppColors.onPrimary.withValues(alpha: 0.1),
                                     borderRadius: AppRadii.xlRadius,
                                   ),
-                                  child: Icon(slide.icon, size: iconSize * 0.46, color: Colors.white),
+                                  child: Icon(slide.icon, size: iconSize * 0.46, color: AppColors.onPrimary),
                                 ),
                                 const SizedBox(height: AppSpacing.xxl),
                                 Text(
                                   slide.title,
                                   textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.white),
+                                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: AppColors.onPrimary),
                                 ),
                                 const SizedBox(height: AppSpacing.sm),
                                 Text(
@@ -113,7 +114,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                   textAlign: TextAlign.center,
                                   style: Theme.of(
                                     context,
-                                  ).textTheme.bodyMedium?.copyWith(color: Colors.white.withValues(alpha: 0.75)),
+                                  ).textTheme.bodyMedium?.copyWith(color: AppColors.onPrimary.withValues(alpha: 0.75)),
                                 ),
                               ],
                             ),
@@ -130,11 +131,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   final isActive = index == _page;
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
                     width: isActive ? 20 : 6,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: isActive ? Colors.white : Colors.white.withValues(alpha: 0.3),
+                      color: isActive ? AppColors.onPrimary : AppColors.onPrimary.withValues(alpha: 0.3),
                       borderRadius: AppRadii.smRadius,
                     ),
                   );

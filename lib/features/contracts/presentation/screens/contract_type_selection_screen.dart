@@ -18,7 +18,9 @@ import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_te
 import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_category_x.dart';
 
 class ContractTypeSelectionScreen extends ConsumerStatefulWidget {
-  const ContractTypeSelectionScreen({super.key});
+  const ContractTypeSelectionScreen({super.key, this.routeBase = RoutePaths.clientBase});
+
+  final String routeBase;
 
   @override
   ConsumerState<ContractTypeSelectionScreen> createState() => _ContractTypeSelectionScreenState();
@@ -39,7 +41,7 @@ class _ContractTypeSelectionScreenState extends ConsumerState<ContractTypeSelect
     final selected = templates.where((template) => template.id == _selectedTemplateId).firstOrNull;
     if (selected == null) return;
     ref.read(contractDraftControllerProvider.notifier).selectTemplate(selected);
-    context.push(RoutePaths.clientContractsNewForm);
+    context.push(RoutePaths.contractsNewFormFor(widget.routeBase));
   }
 
   @override
@@ -58,10 +60,7 @@ class _ContractTypeSelectionScreenState extends ConsumerState<ContractTypeSelect
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    l10n.contractTypeSelectionSubtitle,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-                  ),
+                  Text(l10n.contractTypeSelectionSubtitle, style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(height: AppSpacing.md),
                   TextField(
                     controller: _searchController,
@@ -142,7 +141,7 @@ class _TemplateCard extends StatelessWidget {
               color: selected ? primary : primary.withValues(alpha: 0.1),
               borderRadius: AppRadii.mdRadius,
             ),
-            child: Icon(template.category.icon, color: selected ? Colors.white : primary, size: 22),
+            child: Icon(template.category.icon, color: selected ? AppColors.onPrimary : primary, size: 22),
           ),
           const SizedBox(height: AppSpacing.xs),
           Flexible(

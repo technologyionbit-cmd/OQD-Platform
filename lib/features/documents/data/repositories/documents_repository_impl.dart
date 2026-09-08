@@ -23,6 +23,17 @@ class DocumentsRepositoryImpl implements DocumentsRepository {
     return _guard(() => _remote.addGeneratedContractDocument(contractId: contractId, title: title));
   }
 
+  @override
+  Future<Result<Document>> uploadDocument({required String title}) => _guard(() => _remote.uploadDocument(title: title));
+
+  @override
+  Future<Result<Document>> renameDocument({required String id, required String newTitle}) {
+    return _guard(() => _remote.renameDocument(id: id, newTitle: newTitle));
+  }
+
+  @override
+  Future<Result<void>> deleteDocument(String id) => _guard(() => _remote.deleteDocument(id));
+
   Future<Result<T>> _guard<T>(Future<T> Function() action) async {
     try {
       return Result.success(await action());

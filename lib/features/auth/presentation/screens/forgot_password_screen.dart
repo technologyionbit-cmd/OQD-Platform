@@ -8,6 +8,7 @@ import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
+import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_chip.dart';
@@ -135,10 +136,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         const SizedBox(height: AppSpacing.md),
         Container(
           padding: const EdgeInsets.all(AppSpacing.sm),
-          decoration: BoxDecoration(color: AppColors.infoBackground, borderRadius: AppRadii.mdRadius),
+          decoration: BoxDecoration(color: context.statusColors.info.background, borderRadius: AppRadii.mdRadius),
           child: Row(
             children: [
-              const Icon(Icons.info_outline, size: 18, color: AppColors.info),
+              Icon(Icons.info_outline, size: 18, color: context.statusColors.info.foreground),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(
@@ -178,8 +179,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           width: 88,
           height: 88,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(color: AppColors.successBackground, shape: BoxShape.circle),
-          child: const Icon(Icons.check, color: AppColors.success, size: 40),
+          decoration: BoxDecoration(color: context.statusColors.success.background, shape: BoxShape.circle),
+          child: Icon(Icons.check, color: context.statusColors.success.foreground, size: 40),
         ),
         const SizedBox(height: AppSpacing.lg),
         Text(l10n.authSentTitle, style: Theme.of(context).textTheme.headlineSmall),

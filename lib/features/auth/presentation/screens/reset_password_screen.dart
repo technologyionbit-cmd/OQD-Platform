@@ -7,6 +7,7 @@ import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
+import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
@@ -133,8 +134,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           width: 88,
           height: 88,
           alignment: Alignment.center,
-          decoration: const BoxDecoration(color: AppColors.successBackground, shape: BoxShape.circle),
-          child: const Icon(Icons.check, color: AppColors.success, size: 40),
+          decoration: BoxDecoration(color: context.statusColors.success.background, shape: BoxShape.circle),
+          child: Icon(Icons.check, color: context.statusColors.success.foreground, size: 40),
         ),
         const SizedBox(height: AppSpacing.lg),
         Text(l10n.authResetPasswordSuccessTitle, style: Theme.of(context).textTheme.headlineSmall),

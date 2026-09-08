@@ -13,18 +13,26 @@ class AppColors {
   static const navyDarkest = Color(0xFF0C1830);
   static const navy = Color(0xFF12294F);
   static const navyLight = Color(0xFF1B3A63);
+  static const steelBlue = Color(0xFF2F5A93);
 
   // Primary/action blue — every button, link, and active/selected state.
   // This is what ColorScheme.primary maps to, not the navy above.
   static const primary = Color(0xFF0078C0);
   static const primaryDark = Color(0xFF005E96);
+  static const cyanAccent = Color(0xFF00A9C0);
 
   // Gold/amber — ratings, "Pro"/"most popular" badges, demo-data callouts.
   static const secondary = Color(0xFFC98A0E);
   static const secondaryBackground = Color(0xFFFCF0C0);
+  static const amberLight = Color(0xFFE0B34D);
 
   // NDA/lock and similar category-icon accent seen in the template gallery.
   static const purpleAccent = Color(0xFF7C4DFF);
+
+  // "Book a lawyer" service-tile gradient — a distinct violet from
+  // purpleAccent above (different reference sample).
+  static const violet = Color(0xFF6A3FBF);
+  static const violetLight = Color(0xFF9A6BE0);
 
   static const background = Color(0xFFF7F8FA);
   static const surface = Color(0xFFFFFFFF);

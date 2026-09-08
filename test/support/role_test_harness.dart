@@ -91,6 +91,11 @@ Future<RoleTestHarness> pumpAuthenticatedApp(
   await tester.pumpAndSettle();
   await container.read(authControllerProvider.notifier).login(email: user.email, password: 'Password123');
   await tester.pumpAndSettle();
+  // The landing shell's tabs each kick off their own mock-latency fetches
+  // (contracts/documents/team/consultations/...) — flush those explicitly
+  // rather than relying on `pumpAndSettle` to catch every last one, since a
+  // bare `Future.delayed` timer doesn't always keep it looping.
+  await tester.pump(const Duration(milliseconds: 700));
 
   return RoleTestHarness(container, repository);
 }

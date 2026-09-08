@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
-import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
+import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_card.dart';
 import 'package:aqd_ionbit/core/widgets/empty_state.dart';
@@ -13,7 +13,9 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dar
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 
 class ContractPreviewScreen extends ConsumerStatefulWidget {
-  const ContractPreviewScreen({super.key});
+  const ContractPreviewScreen({super.key, this.routeBase = RoutePaths.clientBase});
+
+  final String routeBase;
 
   @override
   ConsumerState<ContractPreviewScreen> createState() => _ContractPreviewScreenState();
@@ -32,7 +34,7 @@ class _ContractPreviewScreenState extends ConsumerState<ContractPreviewScreen> {
 
     result.fold((failure) => _showError(l10n), (contract) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.contractDraftSavedMessage)));
-      context.go(RoutePaths.clientContractDetails(contract.id));
+      context.go(RoutePaths.contractDetailsFor(widget.routeBase, contract.id));
     });
   }
 
@@ -55,7 +57,7 @@ class _ContractPreviewScreenState extends ConsumerState<ContractPreviewScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     if (_generatedContractId != null) {
-      return Scaffold(body: _GeneratedSuccessView(contractId: _generatedContractId!));
+      return Scaffold(body: _GeneratedSuccessView(contractId: _generatedContractId!, routeBase: widget.routeBase));
     }
 
     final draft = ref.watch(contractDraftControllerProvider);
@@ -152,7 +154,7 @@ class _FieldValueList extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text(entries[i].label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary)),
+                child: Text(entries[i].label, style: Theme.of(context).textTheme.bodySmall),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -172,9 +174,10 @@ class _FieldValueList extends StatelessWidget {
 }
 
 class _GeneratedSuccessView extends StatelessWidget {
-  const _GeneratedSuccessView({required this.contractId});
+  const _GeneratedSuccessView({required this.contractId, required this.routeBase});
 
   final String contractId;
+  final String routeBase;
 
   @override
   Widget build(BuildContext context) {
@@ -190,8 +193,8 @@ class _GeneratedSuccessView extends StatelessWidget {
                 width: 88,
                 height: 88,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(color: AppColors.successBackground, shape: BoxShape.circle),
-                child: const Icon(Icons.check, color: AppColors.success, size: 40),
+                decoration: BoxDecoration(color: context.statusColors.success.background, shape: BoxShape.circle),
+                child: Icon(Icons.check, color: context.statusColors.success.foreground, size: 40),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(l10n.contractGeneratedSuccessTitle, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
@@ -199,12 +202,12 @@ class _GeneratedSuccessView extends StatelessWidget {
               Text(
                 l10n.contractGeneratedSuccessMessage,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: AppSpacing.xl),
               AppButton(
                 label: l10n.contractViewDetails,
-                onPressed: () => context.go(RoutePaths.clientContractDetails(contractId)),
+                onPressed: () => context.go(RoutePaths.contractDetailsFor(routeBase, contractId)),
               ),
             ],
           ),

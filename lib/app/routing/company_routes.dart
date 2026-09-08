@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:aqd_ionbit/app/routing/placeholder_route.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/widgets/app_shell.dart';
 import 'package:aqd_ionbit/features/company/presentation/screens/company_home_screen.dart';
+import 'package:aqd_ionbit/features/contracts/presentation/screens/contracts_list_screen.dart';
+import 'package:aqd_ionbit/features/documents/presentation/screens/documents_screen.dart';
+import 'package:aqd_ionbit/features/lawyers/presentation/screens/lawyers_list_screen.dart';
 import 'package:aqd_ionbit/features/profile/presentation/screens/account_screen.dart';
 
 /// The company's 5-tab shell: Home, Contracts, Lawyers, Documents, Account.
-/// No distinct company UI appears in the reference screenshots (companies
-/// there show up as a lawyer's *client*, not as their own app experience),
-/// so this mirrors the client shell's structure/visual language rather
-/// than inventing a new one — only the Contracts tab (in place of client's
-/// AI tab) reflects a real product difference from the brief.
+/// Contracts/Lawyers/Documents mount the exact same screens the client
+/// uses (via each screen's `routeBase` param) — a company is, in this
+/// mock backend, just another account that creates contracts and books
+/// lawyers, so duplicating those features per role would only create two
+/// versions to keep in sync for no real behavioral difference.
 StatefulShellRoute companyShellRoute() {
   return StatefulShellRoute.indexedStack(
     builder: (context, state, navigationShell) {
@@ -44,13 +46,19 @@ StatefulShellRoute companyShellRoute() {
     branches: [
       StatefulShellBranch(routes: [GoRoute(path: RoutePaths.companyHome, builder: (context, state) => const CompanyHomeScreen())]),
       StatefulShellBranch(
-        routes: [placeholderRoute(path: RoutePaths.companyContracts, title: (l10n) => l10n.navContracts, icon: Icons.description_outlined)],
+        routes: [
+          GoRoute(path: RoutePaths.companyContracts, builder: (context, state) => const ContractsListScreen(routeBase: RoutePaths.companyBase)),
+        ],
       ),
       StatefulShellBranch(
-        routes: [placeholderRoute(path: RoutePaths.companyLawyers, title: (l10n) => l10n.navLawyers, icon: Icons.gavel_outlined)],
+        routes: [
+          GoRoute(path: RoutePaths.companyLawyers, builder: (context, state) => const LawyersListScreen(routeBase: RoutePaths.companyBase)),
+        ],
       ),
       StatefulShellBranch(
-        routes: [placeholderRoute(path: RoutePaths.companyDocuments, title: (l10n) => l10n.navDocuments, icon: Icons.folder_outlined)],
+        routes: [
+          GoRoute(path: RoutePaths.companyDocuments, builder: (context, state) => const DocumentsScreen(routeBase: RoutePaths.companyBase)),
+        ],
       ),
       StatefulShellBranch(routes: [GoRoute(path: RoutePaths.companyAccount, builder: (context, state) => const AccountScreen())]),
     ],

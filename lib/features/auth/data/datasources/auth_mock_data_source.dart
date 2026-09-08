@@ -96,6 +96,26 @@ class AuthMockDataSource implements AuthRemoteDataSource {
   }
 
   @override
+  Future<AuthUser> updateProfile({required String accessToken, required String fullName, required String email}) async {
+    await _simulateLatency();
+    final existing = _sessionsByAccessToken[accessToken];
+    if (existing == null) throw const UnauthorizedFailure();
+
+    final normalizedEmail = email.trim().toLowerCase();
+    final updated = AuthUser(id: existing.id, fullName: fullName, email: normalizedEmail, role: existing.role);
+
+    // Keep the accounts map keyed by the current email, moving the entry
+    // if the email itself changed.
+    final oldEmailKey = _accounts.entries.where((e) => e.value.user.id == existing.id).map((e) => e.key).firstOrNull;
+    if (oldEmailKey != null) {
+      final account = _accounts.remove(oldEmailKey)!;
+      _accounts[normalizedEmail] = _MockAccount(password: account.password, user: updated);
+    }
+    _sessionsByAccessToken[accessToken] = updated;
+    return updated;
+  }
+
+  @override
   Future<void> logout(String accessToken) async {
     await _simulateLatency();
     _sessionsByAccessToken.remove(accessToken);

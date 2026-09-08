@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:aqd_ionbit/app/routing/placeholder_route.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/widgets/app_shell.dart';
+import 'package:aqd_ionbit/features/consultations/presentation/screens/lawyer_schedule_screen.dart';
+import 'package:aqd_ionbit/features/lawyer_dashboard/presentation/screens/lawyer_clients_screen.dart';
 import 'package:aqd_ionbit/features/lawyer_dashboard/presentation/screens/lawyer_dashboard_screen.dart';
+import 'package:aqd_ionbit/features/lawyer_dashboard/presentation/screens/lawyer_earnings_screen.dart';
 import 'package:aqd_ionbit/features/profile/presentation/screens/account_screen.dart';
 
 /// The lawyer's 5-tab shell: Dashboard, Schedule, Clients, Earnings,
@@ -51,13 +53,13 @@ StatefulShellRoute lawyerShellRoute() {
         routes: [GoRoute(path: RoutePaths.lawyerDashboard, builder: (context, state) => const LawyerDashboardScreen())],
       ),
       StatefulShellBranch(
-        routes: [placeholderRoute(path: RoutePaths.lawyerSchedule, title: (l10n) => l10n.navSchedule, icon: Icons.calendar_today_outlined)],
+        routes: [GoRoute(path: RoutePaths.lawyerSchedule, builder: (context, state) => const LawyerScheduleScreen())],
       ),
       StatefulShellBranch(
-        routes: [placeholderRoute(path: RoutePaths.lawyerClients, title: (l10n) => l10n.navClients, icon: Icons.people_outline)],
+        routes: [GoRoute(path: RoutePaths.lawyerClients, builder: (context, state) => const LawyerClientsScreen())],
       ),
       StatefulShellBranch(
-        routes: [placeholderRoute(path: RoutePaths.lawyerEarnings, title: (l10n) => l10n.navEarnings, icon: Icons.payments_outlined)],
+        routes: [GoRoute(path: RoutePaths.lawyerEarnings, builder: (context, state) => const LawyerEarningsScreen())],
       ),
       StatefulShellBranch(routes: [GoRoute(path: RoutePaths.lawyerProfile, builder: (context, state) => const AccountScreen())]),
     ],

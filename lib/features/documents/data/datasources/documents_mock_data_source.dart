@@ -1,3 +1,4 @@
+import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/features/documents/data/datasources/documents_remote_data_source.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document_source_type.dart';
@@ -38,6 +39,36 @@ class DocumentsMockDataSource implements DocumentsRemoteDataSource {
     );
     _documents.insert(0, document);
     return document;
+  }
+
+  @override
+  Future<Document> uploadDocument({required String title}) async {
+    await _simulateLatency();
+    final document = Document(
+      id: 'd_${DateTime.now().microsecondsSinceEpoch}',
+      title: title,
+      sourceType: DocumentSourceType.uploaded,
+      createdAt: DateTime.now(),
+      sizeLabel: '${120 + title.length * 5} KB',
+    );
+    _documents.insert(0, document);
+    return document;
+  }
+
+  @override
+  Future<Document> renameDocument({required String id, required String newTitle}) async {
+    await _simulateLatency();
+    final index = _documents.indexWhere((d) => d.id == id);
+    if (index == -1) throw const NotFoundFailure();
+    final updated = _documents[index].copyWith(title: newTitle);
+    _documents[index] = updated;
+    return updated;
+  }
+
+  @override
+  Future<void> deleteDocument(String id) async {
+    await _simulateLatency();
+    _documents.removeWhere((d) => d.id == id);
   }
 
   Future<void> _simulateLatency() => Future.delayed(const Duration(milliseconds: 400));

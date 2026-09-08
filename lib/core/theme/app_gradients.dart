@@ -13,4 +13,30 @@ class AppGradients {
     end: Alignment.bottomRight,
     colors: [AppColors.navyDarkest, AppColors.navyLight],
   );
+
+  // Client-home "your legal services" tile gradients — one per service,
+  // sampled from the reference screenshots.
+  static const serviceTileAnalyze = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [AppColors.navy, AppColors.steelBlue],
+  );
+
+  static const serviceTileContracts = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [AppColors.primary, AppColors.cyanAccent],
+  );
+
+  static const serviceTileLawyer = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [AppColors.violet, AppColors.violetLight],
+  );
+
+  static const serviceTileGovDocuments = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [AppColors.secondary, AppColors.amberLight],
+  );
 }

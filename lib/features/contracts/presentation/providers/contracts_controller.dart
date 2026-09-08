@@ -33,6 +33,12 @@ class ContractsController extends AsyncNotifier<List<Contract>> {
     if (result.isSuccess) await refresh();
     return result;
   }
+
+  Future<Result<Contract>> sign(String id) async {
+    final result = await _repository.signContract(id);
+    if (result.isSuccess) await refresh();
+    return result;
+  }
 }
 
 final contractsControllerProvider = AsyncNotifierProvider<ContractsController, List<Contract>>(ContractsController.new);

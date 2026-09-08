@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:aqd_ionbit/app/routing/placeholder_route.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/widgets/app_shell.dart';
+import 'package:aqd_ionbit/features/ai/presentation/screens/ai_chat_screen.dart';
 import 'package:aqd_ionbit/features/documents/presentation/screens/documents_screen.dart';
 import 'package:aqd_ionbit/features/home/presentation/screens/client_home_screen.dart';
+import 'package:aqd_ionbit/features/lawyers/presentation/screens/lawyers_list_screen.dart';
 import 'package:aqd_ionbit/features/profile/presentation/screens/account_screen.dart';
 
 /// The client's 5-tab shell: Home, AI, Documents, Lawyers, Account — order
@@ -37,14 +38,12 @@ StatefulShellRoute clientShellRoute() {
     },
     branches: [
       StatefulShellBranch(routes: [GoRoute(path: RoutePaths.clientHome, builder: (context, state) => const ClientHomeScreen())]),
-      StatefulShellBranch(
-        routes: [placeholderRoute(path: RoutePaths.clientAi, title: (l10n) => l10n.navAi, icon: Icons.smart_toy_outlined)],
-      ),
+      StatefulShellBranch(routes: [GoRoute(path: RoutePaths.clientAi, builder: (context, state) => const AiChatScreen())]),
       StatefulShellBranch(
         routes: [GoRoute(path: RoutePaths.clientDocuments, builder: (context, state) => const DocumentsScreen())],
       ),
       StatefulShellBranch(
-        routes: [placeholderRoute(path: RoutePaths.clientLawyers, title: (l10n) => l10n.navLawyers, icon: Icons.gavel_outlined)],
+        routes: [GoRoute(path: RoutePaths.clientLawyers, builder: (context, state) => const LawyersListScreen())],
       ),
       StatefulShellBranch(routes: [GoRoute(path: RoutePaths.clientAccount, builder: (context, state) => const AccountScreen())]),
     ],

@@ -6,8 +6,8 @@ import 'package:intl/intl.dart' show DateFormat;
 
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
-import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
+import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_card.dart';
 import 'package:aqd_ionbit/core/widgets/confirmation_dialog.dart';
@@ -21,12 +21,14 @@ import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_dr
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_templates_provider.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contracts_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_category_x.dart';
+import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_signature_sheet.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_status_x.dart';
 
 class ContractDetailsScreen extends ConsumerWidget {
-  const ContractDetailsScreen({super.key, required this.contractId});
+  const ContractDetailsScreen({super.key, required this.contractId, this.routeBase = RoutePaths.clientBase});
 
   final String contractId;
+  final String routeBase;
 
   Future<void> _edit(BuildContext context, WidgetRef ref, Contract contract) async {
     final templates = await ref.read(contractTemplatesProvider.future);
@@ -35,7 +37,7 @@ class ContractDetailsScreen extends ConsumerWidget {
 
     ref.read(contractDraftControllerProvider.notifier).startEditing(contract: contract, template: template);
     if (!context.mounted) return;
-    context.push(RoutePaths.clientContractsNewForm);
+    context.push(RoutePaths.contractsNewFormFor(routeBase));
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {
@@ -60,7 +62,7 @@ class ContractDetailsScreen extends ConsumerWidget {
       if (context.canPop()) {
         context.pop();
       } else {
-        context.go(RoutePaths.clientContracts);
+        context.go(RoutePaths.contractsRootFor(routeBase));
       }
     });
   }
@@ -69,6 +71,49 @@ class ContractDetailsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     Clipboard.setData(ClipboardData(text: contract.generatedContent));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.contractContentCopiedMessage)));
+  }
+
+  Future<void> _sign(BuildContext context, WidgetRef ref, String contractId) async {
+    final confirmed = await showContractSignatureSheet(context);
+    if (confirmed != true || !context.mounted) return;
+
+    final l10n = AppLocalizations.of(context)!;
+    final result = await ref.read(contractsControllerProvider.notifier).sign(contractId);
+    if (!context.mounted) return;
+
+    result.fold((failure) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.errorGeneric))), (_) {
+      // The details screen watches contractByIdProvider, a separate fetch
+      // from contractsControllerProvider's list (which sign() already
+      // refreshes) — without this it keeps showing the pre-sign status
+      // until the provider is invalidated some other way.
+      ref.invalidate(contractByIdProvider(contractId));
+      return showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: dialogContext.statusColors.success.background, shape: BoxShape.circle),
+                child: Icon(Icons.check, color: dialogContext.statusColors.success.foreground, size: 36),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(l10n.contractSignedSuccessTitle, textAlign: TextAlign.center, style: Theme.of(dialogContext).textTheme.titleMedium),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.contractSignedSuccessMessage,
+                textAlign: TextAlign.center,
+                style: Theme.of(dialogContext).textTheme.bodySmall,
+              ),
+            ],
+          ),
+          actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: Text(l10n.commonConfirm))],
+        ),
+      );
+    });
   }
 
   @override
@@ -127,7 +172,16 @@ class ContractDetailsScreen extends ConsumerWidget {
                 variant: AppButtonVariant.outlined,
                 onPressed: () => _copyContent(context, contract),
               ),
-              if (contract.status == ContractStatus.draft) ...[
+              if (contract.status == ContractStatus.pendingSignature) ...[
+                const SizedBox(height: AppSpacing.sm),
+                AppButton(
+                  label: l10n.contractSignButton,
+                  icon: Icons.draw_outlined,
+                  variant: AppButtonVariant.success,
+                  onPressed: () => _sign(context, ref, contract.id),
+                ),
+              ],
+              if (contract.status == ContractStatus.draft && routeBase != RoutePaths.lawyerBase) ...[
                 const SizedBox(height: AppSpacing.sm),
                 AppButton(label: l10n.commonEdit, icon: Icons.edit_outlined, onPressed: () => _edit(context, ref, contract)),
                 const SizedBox(height: AppSpacing.sm),
@@ -158,7 +212,7 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary))),
+        Expanded(child: Text(label, style: Theme.of(context).textTheme.bodySmall)),
         const SizedBox(width: AppSpacing.sm),
         Expanded(child: Text(value, textAlign: TextAlign.end, style: Theme.of(context).textTheme.bodyMedium)),
       ],

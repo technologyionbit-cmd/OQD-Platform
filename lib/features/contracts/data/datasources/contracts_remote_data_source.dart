@@ -18,5 +18,9 @@ abstract interface class ContractsRemoteDataSource {
 
   Future<Contract> generateContract({required ContractTemplate template, required Map<String, String> fieldValues, String? contractId});
 
+  /// Moves a pending-signature contract to signed — mock e-signature only,
+  /// no real cryptographic signing.
+  Future<Contract> signContract(String id);
+
   Future<void> deleteContract(String id);
 }

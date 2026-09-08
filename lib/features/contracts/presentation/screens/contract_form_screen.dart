@@ -15,7 +15,9 @@ import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_fiel
 /// [ContractFieldWidget]. A new contract category never needs a new
 /// screen, only a new [ContractTemplate] in the data source.
 class ContractFormScreen extends ConsumerWidget {
-  const ContractFormScreen({super.key});
+  const ContractFormScreen({super.key, this.routeBase = RoutePaths.clientBase});
+
+  final String routeBase;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,7 +34,7 @@ class ContractFormScreen extends ConsumerWidget {
         body: EmptyState(
           icon: Icons.error_outline,
           message: l10n.errorGeneric,
-          action: AppButton(label: l10n.commonContinue, onPressed: () => context.go(RoutePaths.clientContractsNew)),
+          action: AppButton(label: l10n.commonContinue, onPressed: () => context.go(RoutePaths.contractsNewFor(routeBase))),
         ),
       );
     }
@@ -57,7 +59,7 @@ class ContractFormScreen extends ConsumerWidget {
             label: l10n.commonContinue,
             onPressed: () {
               if (ref.read(contractDraftControllerProvider.notifier).validate(l10n)) {
-                context.push(RoutePaths.clientContractsNewPreview);
+                context.push(RoutePaths.contractsNewPreviewFor(routeBase));
               }
             },
           ),

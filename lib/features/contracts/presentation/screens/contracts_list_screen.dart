@@ -16,7 +16,12 @@ import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_card
 import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_status_x.dart';
 
 class ContractsListScreen extends ConsumerStatefulWidget {
-  const ContractsListScreen({super.key});
+  const ContractsListScreen({super.key, this.routeBase = RoutePaths.clientBase});
+
+  /// Lets the company shell mount this exact screen at `/company/contracts`
+  /// — defaults to the client base so every existing call site/test keeps
+  /// pushing `/client/...` routes unchanged.
+  final String routeBase;
 
   @override
   ConsumerState<ContractsListScreen> createState() => _ContractsListScreenState();
@@ -45,13 +50,19 @@ class _ContractsListScreenState extends ConsumerState<ContractsListScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final contractsState = ref.watch(contractsControllerProvider);
+    // A lawyer only ever gets read access to a client's contracts — see
+    // lawyer_extra_routes.dart's doc comment. No lawyerContractsNew route
+    // exists to push to, so the FAB must not be offered here either.
+    final canCreate = widget.routeBase != RoutePaths.lawyerBase;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.clientHomeMyContracts)),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push(RoutePaths.clientContractsNew),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: canCreate
+          ? FloatingActionButton(
+              onPressed: () => context.push(RoutePaths.contractsNewFor(widget.routeBase)),
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -117,7 +128,7 @@ class _ContractsListScreenState extends ConsumerState<ContractsListScreen> {
                           final contract = filtered[index];
                           return ContractCard(
                             contract: contract,
-                            onTap: () => context.push(RoutePaths.clientContractDetails(contract.id)),
+                            onTap: () => context.push(RoutePaths.contractDetailsFor(widget.routeBase, contract.id)),
                           );
                         },
                       ),

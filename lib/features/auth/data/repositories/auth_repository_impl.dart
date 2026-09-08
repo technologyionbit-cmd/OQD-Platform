@@ -70,6 +70,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Result<AuthUser>> updateProfile({required String fullName, required String email}) async {
+    final accessToken = _tokenManager.current?.accessToken;
+    if (accessToken == null) return const Result.failure(UnauthorizedFailure());
+    try {
+      final user = await _remote.updateProfile(accessToken: accessToken, fullName: fullName, email: email);
+      return Result.success(user);
+    } catch (e) {
+      return Result.failure(_errorMapper.map(e));
+    }
+  }
+
+  @override
   Future<void> logout() async {
     final accessToken = _tokenManager.current?.accessToken;
     if (accessToken != null) {
