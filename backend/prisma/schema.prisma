@@ -1,0 +1,262 @@
+// Aqd Backend — Prisma schema
+//
+// Phase 1A scope ONLY: infrastructure/identity/organization foundation
+// (docs/backend/16-backend-roadmap.md, Phase 1 table list):
+//   users, refresh_tokens, verification_codes, lawyer_registration_details,
+//   organizations, organization_members, organization_invitations
+//
+// Full field/relationship rationale: docs/backend/01-domain-model.md §1-2
+// Ownership/tenancy rationale: docs/backend/03-multi-tenancy.md
+// Table/index/constraint notes: docs/backend/04-database-design.md
+//
+// No other domain tables (lawyer profiles, contracts, consultations, etc.)
+// are created in this phase — those belong to Phase 2+.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [citext]
+}
+
+// -----------------------------------------------------------------------------
+// Enums
+// -----------------------------------------------------------------------------
+
+/// docs/backend/01-domain-model.md — "Drives UX only... must never be treated
+/// as an authorization mechanism." Kept as account type, not a permission.
+enum UserRole {
+  client
+  lawyer
+  company
+}
+
+enum UserStatus {
+  active
+  suspended
+  banned
+  pendingDeletion
+}
+
+/// docs/backend/01-domain-model.md §Enum reference — 8 fixed values.
+enum LawyerSpecialty {
+  commercial
+  personalStatus
+  criminal
+  labor
+  realEstate
+  corporate
+  intellectualProperty
+  general
+}
+
+enum VerificationChannel {
+  email
+  sms
+}
+
+enum VerificationPurpose {
+  passwordReset
+  emailVerification
+  phoneVerification
+}
+
+enum OrganizationVerificationStatus {
+  unverified
+  pending
+  verified
+  rejected
+}
+
+/// docs/backend/01-domain-model.md §2 — frontend has admin/manager/member;
+/// backend adds `owner`, auto-assigned to Organization.ownerUserId and
+/// never removable via the member-management endpoints built in a later phase.
+enum OrgMemberRole {
+  owner
+  admin
+  manager
+  member
+}
+
+enum OrgMemberStatus {
+  invited
+  active
+  removed
+}
+
+enum OrgInvitationStatus {
+  pending
+  accepted
+  declined
+  expired
+  revoked
+}
+
+// -----------------------------------------------------------------------------
+// 1. Identity & Access — docs/backend/01-domain-model.md §1
+// -----------------------------------------------------------------------------
+
+model User {
+  id               String     @id @default(uuid()) @db.Uuid
+  fullName         String     @map("full_name")
+  email            String     @unique @db.Citext
+  emailVerifiedAt  DateTime?  @map("email_verified_at") @db.Timestamptz
+  phone            String?
+  phoneVerifiedAt  DateTime?  @map("phone_verified_at") @db.Timestamptz
+  passwordHash     String     @map("password_hash")
+  role             UserRole
+  status           UserStatus @default(active)
+  twoFactorEnabled Boolean    @default(false) @map("two_factor_enabled")
+  lastLoginAt      DateTime?  @map("last_login_at") @db.Timestamptz
+  createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+  deletedAt        DateTime?  @map("deleted_at") @db.Timestamptz
+
+  lawyerRegistrationDetail LawyerRegistrationDetail?
+  refreshTokens            RefreshToken[]
+  verificationCodes        VerificationCode[]
+  ownedOrganizations       Organization[]            @relation("OrganizationOwner")
+  organizationMemberships  OrganizationMember[]
+  sentInvitations          OrganizationInvitation[]  @relation("InvitationSender")
+
+  @@index([role])
+  @@map("users")
+}
+
+/// One-to-one with User where role = lawyer. Captures registration-time
+/// fields (barLicenseNumber, mainSpecialty) that the frontend collects but
+/// discards. Feeds initial LawyerProfile creation in Phase 2 — not created here.
+model LawyerRegistrationDetail {
+  userId           String          @id @map("user_id") @db.Uuid
+  barLicenseNumber String          @unique @map("bar_license_number")
+  mainSpecialty    LawyerSpecialty @map("main_specialty")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("lawyer_registration_details")
+}
+
+/// Backs refresh-token rotation and the "Active Sessions" UI
+/// (SecurityPrivacyScreen). Never stores the raw token, only its hash.
+model RefreshToken {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  refreshTokenHash String    @map("refresh_token_hash")
+  deviceLabel      String?   @map("device_label")
+  ipAddress        String?   @map("ip_address") @db.Inet
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz
+  lastUsedAt       DateTime? @map("last_used_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+/// Backs requestOtp/verifyOtp/resetPassword. userId is nullable because
+/// email-verification codes may be issued before the User row exists in
+/// some registration flows.
+model VerificationCode {
+  id           String              @id @default(uuid()) @db.Uuid
+  userId       String?             @map("user_id") @db.Uuid
+  destination  String
+  channel      VerificationChannel
+  codeHash     String              @map("code_hash")
+  purpose      VerificationPurpose
+  expiresAt    DateTime            @map("expires_at") @db.Timestamptz
+  consumedAt   DateTime?           @map("consumed_at") @db.Timestamptz
+  attemptCount Int                 @default(0) @map("attempt_count")
+  createdAt    DateTime            @default(now()) @map("created_at") @db.Timestamptz
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([destination, purpose])
+  @@map("verification_codes")
+}
+
+// -----------------------------------------------------------------------------
+// 2. Organization / Company — docs/backend/01-domain-model.md §2
+// -----------------------------------------------------------------------------
+
+/// NEW entity entirely relative to the frontend (docs/backend/03-multi-tenancy.md
+/// §5). Owned by the `company`-role user that created it.
+model Organization {
+  id                           String                         @id @default(uuid()) @db.Uuid
+  name                         String
+  commercialRegistrationNumber String                         @unique @map("commercial_registration_number")
+  ownerUserId                  String                         @map("owner_user_id") @db.Uuid
+  verificationStatus           OrganizationVerificationStatus @default(unverified) @map("verification_status")
+  createdAt                    DateTime                       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                    DateTime                       @updatedAt @map("updated_at") @db.Timestamptz
+
+  // ON DELETE RESTRICT: an org must never be left ownerless silently —
+  // ownership transfer must be an explicit action (docs/backend/04-database-design.md §4).
+  owner       User                     @relation("OrganizationOwner", fields: [ownerUserId], references: [id], onDelete: Restrict)
+  members     OrganizationMember[]
+  invitations OrganizationInvitation[]
+
+  @@index([ownerUserId])
+  @@map("organizations")
+}
+
+/// docs/backend/01-domain-model.md §2 — frontend's TeamMember has no
+/// organizationId at all (single implicit company). userId is nullable
+/// until an invited email registers/links to an account.
+model OrganizationMember {
+  id             String          @id @default(uuid()) @db.Uuid
+  organizationId String          @map("organization_id") @db.Uuid
+  userId         String?         @map("user_id") @db.Uuid
+  email          String          @db.Citext
+  fullName       String          @map("full_name")
+  role           OrgMemberRole
+  status         OrgMemberStatus @default(invited)
+  joinedAt       DateTime?       @map("joined_at") @db.Timestamptz
+  invitedAt      DateTime        @default(now()) @map("invited_at") @db.Timestamptz
+  removedAt      DateTime?       @map("removed_at") @db.Timestamptz
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Postgres treats NULL as distinct in a UNIQUE constraint, so this
+  // naturally behaves as "unique where user_id IS NOT NULL" per
+  // docs/backend/04-database-design.md §4 without needing a partial index.
+  @@unique([organizationId, userId])
+  // docs/backend/04-database-design.md §4 also calls for
+  // UNIQUE (organization_id, lower(email)) WHERE status = 'invited'.
+  // That's a partial unique index, which Prisma's schema DSL cannot express
+  // declaratively — add it by hand-editing the SQL of the first
+  // `prisma migrate dev` migration before applying it. Indexed here for
+  // query performance in the meantime.
+  @@index([organizationId, email])
+  @@index([userId])
+  @@map("organization_members")
+}
+
+/// NEW entity — frontend's addMember is synchronous/immediate with no
+/// token, no expiry, no accept/decline step.
+model OrganizationInvitation {
+  id              String              @id @default(uuid()) @db.Uuid
+  organizationId  String              @map("organization_id") @db.Uuid
+  email           String              @db.Citext
+  role            OrgMemberRole
+  token           String              @unique
+  invitedByUserId String              @map("invited_by_user_id") @db.Uuid
+  status          OrgInvitationStatus @default(pending)
+  expiresAt       DateTime            @map("expires_at") @db.Timestamptz
+  respondedAt     DateTime?           @map("responded_at") @db.Timestamptz
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    User         @relation("InvitationSender", fields: [invitedByUserId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId])
+  @@index([email])
+  @@map("organization_invitations")
+}

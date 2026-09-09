@@ -1,0 +1,52 @@
+name: aqd-backend
+
+# Local development infrastructure only (Phase 1A scope):
+#   - PostgreSQL — primary datastore
+#   - Redis      — cache/pub-sub foundation for later phases
+#
+# The NestJS app itself is NOT containerized here — run it locally via
+# `npm run dev` against these services. See backend/Dockerfile if/when a
+# containerized app image is needed (a later, production-deployment phase).
+#
+# Credentials below are dev-only defaults, overridable via a backend/.env
+# file (docker compose reads it automatically) — never hardcode production
+# credentials here.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aqd}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aqd_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-aqd_dev}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - aqd_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-aqd} -d ${POSTGRES_DB:-aqd_dev}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - aqd_redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  aqd_postgres_data:
+  aqd_redis_data:
