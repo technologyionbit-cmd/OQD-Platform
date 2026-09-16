@@ -119,7 +119,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authCompanyName => 'Company / Entity Name';
 
   @override
-  String get authCommercialRegistrationNumber => 'Commercial Registration Number';
+  String get authCommercialRegistrationNumber =>
+      'Commercial Registration Number';
 
   @override
   String get authBarLicenseNumber => 'Bar License / Registration Number';
@@ -143,7 +144,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authForgotPasswordTitle => 'Forgot Password?';
 
   @override
-  String get authForgotPasswordSubtitle => 'Choose a recovery method to continue';
+  String get authForgotPasswordSubtitle =>
+      'Choose a recovery method to continue';
 
   @override
   String get authMethodSms => 'SMS';
@@ -152,10 +154,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authMethodEmail => 'Email';
 
   @override
-  String get authSmsInfo => 'We\'ll send a 6-digit verification code to reset your password';
+  String get authSmsInfo =>
+      'We\'ll send a 6-digit verification code to reset your password';
 
   @override
-  String get authEmailInfo => 'We\'ll send a verification link to reset your password';
+  String get authEmailInfo =>
+      'We\'ll send a verification link to reset your password';
 
   @override
   String get authSendCode => 'Send Verification Code';
@@ -167,10 +171,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authSentTitle => 'Sent!';
 
   @override
-  String get authSentSubtitleSms => 'Check your messages and follow the instructions to reset your password';
+  String get authSentSubtitleSms =>
+      'Check your messages and follow the instructions to reset your password';
 
   @override
-  String get authSentSubtitleEmail => 'Check your email and follow the instructions to reset your password';
+  String get authSentSubtitleEmail =>
+      'Check your email and follow the instructions to reset your password';
 
   @override
   String get authEnterCode => 'Enter Verification Code';
@@ -201,7 +207,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authResetPasswordTitle => 'New Password';
 
   @override
-  String get authResetPasswordSubtitle => 'Create a strong password for your account';
+  String get authResetPasswordSubtitle =>
+      'Create a strong password for your account';
 
   @override
   String get authNewPassword => 'New Password';
@@ -216,7 +223,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authResetPasswordSuccessTitle => 'Password Changed!';
 
   @override
-  String get authResetPasswordSuccessSubtitle => 'You can now sign in with your new password';
+  String get authResetPasswordSuccessSubtitle =>
+      'You can now sign in with your new password';
 
   @override
   String get authGoToLogin => 'Go to Login';
@@ -228,19 +236,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingSlide1Title => 'Your legal assistant in your pocket';
 
   @override
-  String get onboardingSlide1Subtitle => 'AI-powered preliminary consultations and instant explanations of legal terms, around the clock';
+  String get onboardingSlide1Subtitle =>
+      'AI-powered preliminary consultations and instant explanations of legal terms, around the clock';
 
   @override
   String get onboardingSlide2Title => 'Smart contracts in minutes';
 
   @override
-  String get onboardingSlide2Subtitle => 'Generate trusted legal contracts and analyze your existing ones with AI';
+  String get onboardingSlide2Subtitle =>
+      'Generate trusted legal contracts and analyze your existing ones with AI';
 
   @override
   String get onboardingSlide3Title => 'Connect directly with verified lawyers';
 
   @override
-  String get onboardingSlide3Subtitle => 'Book a video, voice, or written consultation with top licensed lawyers';
+  String get onboardingSlide3Subtitle =>
+      'Book a video, voice, or written consultation with top licensed lawyers';
 
   @override
   String get onboardingGetStarted => 'Get Started';
@@ -257,7 +268,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorGeneric => 'Something went wrong';
 
   @override
-  String get errorNetwork => 'Could not connect, check your internet connection';
+  String get errorNetwork =>
+      'Could not connect, check your internet connection';
 
   @override
   String get errorInvalidCredentials => 'Invalid email or password';
@@ -275,7 +287,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get validationInvalidEmail => 'Enter a valid email address';
 
   @override
-  String get validationPasswordTooShort => 'Password must be at least 8 characters';
+  String get validationPasswordTooShort =>
+      'Password must be at least 8 characters';
 
   @override
   String get validationInvalidPhone => 'Enter a valid phone number';
@@ -338,7 +351,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientHomeNoContractsTitle => 'No contracts yet';
 
   @override
-  String get clientHomeNoContractsMessage => 'Start creating your first legal contract with AI assistance';
+  String get clientHomeNoContractsMessage =>
+      'Start creating your first legal contract with AI assistance';
 
   @override
   String get clientHomeServicesTitle => 'Your Legal Services';
@@ -380,7 +394,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientHomeQuickFindLawyer => 'Find a Lawyer';
 
   @override
-  String get serviceAnalyzeContractDesc => 'Upload your contract and let AI help you';
+  String get serviceAnalyzeContractDesc =>
+      'Upload your contract and let AI help you';
 
   @override
   String get serviceSmartContracts => 'Smart Contracts';
@@ -392,7 +407,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get serviceBookLawyer => 'Book a Lawyer';
 
   @override
-  String get serviceBookLawyerDesc => 'Book a consultation with a specialist lawyer';
+  String get serviceBookLawyerDesc =>
+      'Book a consultation with a specialist lawyer';
 
   @override
   String get serviceGovDocuments => 'Government Documents';
@@ -404,7 +420,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientHomeVaultTitle => 'Digital Vault';
 
   @override
-  String get clientHomeVaultSubtitle => 'All your documents, contracts and reports, saved';
+  String get clientHomeVaultSubtitle =>
+      'All your documents, contracts and reports, saved';
 
   @override
   String get clientHomeRecentActivity => 'Recent Activity';
@@ -419,7 +436,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contractsSearchEmptyTitle => 'No matching contracts';
 
   @override
-  String get contractsSearchEmptyMessage => 'Try a different search term or filter';
+  String get contractsSearchEmptyMessage =>
+      'Try a different search term or filter';
 
   @override
   String get contractStatusDraft => 'Draft';
@@ -461,13 +479,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contractTypeSelectionTitle => 'Choose Contract Type';
 
   @override
-  String get contractTypeSelectionSubtitle => 'Select the type of contract you want to create';
+  String get contractTypeSelectionSubtitle =>
+      'Select the type of contract you want to create';
 
   @override
   String get contractTypeSearchHint => 'Search contract types...';
 
   @override
-  String get contractTypeSearchEmptyMessage => 'No contract types match your search';
+  String get contractTypeSearchEmptyMessage =>
+      'No contract types match your search';
 
   @override
   String get contractFormTitle => 'Fill Contract Details';
@@ -494,10 +514,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contractPreviewGenerate => 'Generate Contract';
 
   @override
-  String get contractGeneratedSuccessTitle => 'Contract Generated Successfully!';
+  String get contractGeneratedSuccessTitle =>
+      'Contract Generated Successfully!';
 
   @override
-  String get contractGeneratedSuccessMessage => 'Your contract has been saved to your digital vault';
+  String get contractGeneratedSuccessMessage =>
+      'Your contract has been saved to your digital vault';
 
   @override
   String get contractDraftSavedMessage => 'Contract saved as draft';
@@ -527,7 +549,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contractDetailsDeleteConfirmTitle => 'Delete Draft';
 
   @override
-  String get contractDetailsDeleteConfirmMessage => 'Are you sure you want to delete this draft? This action cannot be undone.';
+  String get contractDetailsDeleteConfirmMessage =>
+      'Are you sure you want to delete this draft? This action cannot be undone.';
 
   @override
   String get contractDetailsDeletedMessage => 'Draft deleted';
@@ -542,10 +565,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contractSignTabSaved => 'Saved Signature';
 
   @override
-  String get contractSignNoSavedSignature => 'No saved signature — add one from your account first';
+  String get contractSignNoSavedSignature =>
+      'No saved signature — add one from your account first';
 
   @override
-  String get contractSignLegalNotice => 'By signing this document, you legally agree to all its terms under the Jordanian Electronic Transactions Law.';
+  String get contractSignLegalNotice =>
+      'By signing this document, you legally agree to all its terms under the Jordanian Electronic Transactions Law.';
 
   @override
   String get contractSignConfirm => 'Confirm Signature';
@@ -554,13 +579,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contractSignedSuccessTitle => 'Contract signed successfully!';
 
   @override
-  String get contractSignedSuccessMessage => 'Your signature was recorded and the signed copy was saved securely to your digital vault.';
+  String get contractSignedSuccessMessage =>
+      'Your signature was recorded and the signed copy was saved securely to your digital vault.';
 
   @override
   String get documentsEmptyTitle => 'No documents yet';
 
   @override
-  String get documentsEmptyMessage => 'Your contracts and documents will appear here once created';
+  String get documentsEmptyMessage =>
+      'Your contracts and documents will appear here once created';
 
   @override
   String get documentsSearchHint => 'Search your documents...';
@@ -607,10 +634,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsEmptyTitle => 'No notifications';
 
   @override
-  String get notificationsEmptyMessage => 'You\'re all caught up — new notifications will show up here';
+  String get notificationsEmptyMessage =>
+      'You\'re all caught up — new notifications will show up here';
 
   @override
-  String get notificationUnavailableForRole => 'This notification isn\'t available from your current account';
+  String get notificationUnavailableForRole =>
+      'This notification isn\'t available from your current account';
 
   @override
   String get specialtyCommercial => 'Commercial Law';
@@ -658,7 +687,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lawyersSearchEmptyTitle => 'No matching lawyers';
 
   @override
-  String get lawyersSearchEmptyMessage => 'Try a different search term or filter';
+  String get lawyersSearchEmptyMessage =>
+      'Try a different search term or filter';
 
   @override
   String get lawyersFilterTitle => 'Filters';
@@ -742,7 +772,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingNotesLabel => 'Notes';
 
   @override
-  String get bookingNotesHint => 'Briefly describe what you\'d like to discuss...';
+  String get bookingNotesHint =>
+      'Briefly describe what you\'d like to discuss...';
 
   @override
   String get bookingConfirm => 'Confirm & Pay';
@@ -751,7 +782,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingSuccessTitle => 'Booking Request Sent!';
 
   @override
-  String get bookingSuccessMessage => 'We\'ve sent your request to the lawyer — you\'ll be notified once it\'s confirmed';
+  String get bookingSuccessMessage =>
+      'We\'ve sent your request to the lawyer — you\'ll be notified once it\'s confirmed';
 
   @override
   String get bookingViewDetails => 'View Booking';
@@ -795,7 +827,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentApplePayTitle => 'Apple Pay';
 
   @override
-  String get paymentApplePaySubtitle => 'Pay securely with one tap through your digital wallet';
+  String get paymentApplePaySubtitle =>
+      'Pay securely with one tap through your digital wallet';
 
   @override
   String get paymentApplePayNoCardSharing => 'No card details shared';
@@ -872,13 +905,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consultationsEmptyTitle => 'Nothing here yet';
 
   @override
-  String get consultationsEmptyMessage => 'Consultations in this category will show up here';
+  String get consultationsEmptyMessage =>
+      'Consultations in this category will show up here';
 
   @override
   String get consultationCancelConfirmTitle => 'Cancel Consultation';
 
   @override
-  String get consultationCancelConfirmMessage => 'Are you sure you want to cancel this consultation?';
+  String get consultationCancelConfirmMessage =>
+      'Are you sure you want to cancel this consultation?';
 
   @override
   String get consultationReschedule => 'Reschedule';
@@ -901,7 +936,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get notificationConsultationAcceptedTitle => 'Consultation request accepted';
+  String get notificationConsultationAcceptedTitle =>
+      'Consultation request accepted';
 
   @override
   String notificationConsultationAcceptedBody(String lawyerName) {
@@ -909,7 +945,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get notificationConsultationRejectedTitle => 'Consultation request declined';
+  String get notificationConsultationRejectedTitle =>
+      'Consultation request declined';
 
   @override
   String notificationConsultationRejectedBody(String lawyerName) {
@@ -920,13 +957,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationConsultationCancelledTitle => 'Consultation cancelled';
 
   @override
-  String get notificationConsultationCancelledBody => 'Your consultation appointment was cancelled';
+  String get notificationConsultationCancelledBody =>
+      'Your consultation appointment was cancelled';
 
   @override
   String get notificationConsultationCompletedTitle => 'Consultation ended';
 
   @override
-  String get notificationConsultationCompletedBody => 'Your consultation session has ended';
+  String get notificationConsultationCompletedBody =>
+      'Your consultation session has ended';
 
   @override
   String get notificationNewMessageTitle => 'New message';
@@ -963,7 +1002,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consultationRoomTooEarlyTitle => 'Not time yet';
 
   @override
-  String get consultationRoomTooEarlyMessage => 'Your consultation will open 15 minutes before the scheduled time.';
+  String get consultationRoomTooEarlyMessage =>
+      'Your consultation will open 15 minutes before the scheduled time.';
 
   @override
   String consultationRoomStartsIn(String remaining) {
@@ -989,25 +1029,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consultationRoomReadyTitle => 'Ready to join';
 
   @override
-  String get consultationRoomReadyMessage => 'You can join this consultation now.';
+  String get consultationRoomReadyMessage =>
+      'You can join this consultation now.';
 
   @override
   String get consultationRoomJoinAction => 'Join Consultation';
 
   @override
-  String get consultationRoomJoinFailedMessage => 'We couldn\'t start the session. Please try again.';
+  String get consultationRoomJoinFailedMessage =>
+      'We couldn\'t start the session. Please try again.';
 
   @override
   String get consultationRoomMissedTitle => 'Consultation missed';
 
   @override
-  String get consultationRoomMissedMessage => 'The join window for this consultation has expired.';
+  String get consultationRoomMissedMessage =>
+      'The join window for this consultation has expired.';
 
   @override
-  String get consultationRoomUnavailableMessage => 'This consultation is no longer available to join.';
+  String get consultationRoomUnavailableMessage =>
+      'This consultation is no longer available to join.';
 
   @override
-  String get consultationRoomSimulateConnectionLossAction => 'Simulate connection loss (dev)';
+  String get consultationRoomSimulateConnectionLossAction =>
+      'Simulate connection loss (dev)';
 
   @override
   String get chatOpenAction => 'Open Chat';
@@ -1038,10 +1083,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatImagePreviewTitle => 'Image';
 
   @override
-  String get chatImageUnavailableMock => 'Preview unavailable for this mock image';
+  String get chatImageUnavailableMock =>
+      'Preview unavailable for this mock image';
 
   @override
-  String get chatImagePickError => 'Couldn\'t open the gallery. Please try again.';
+  String get chatImagePickError =>
+      'Couldn\'t open the gallery. Please try again.';
 
   @override
   String get chatSendAttachment => 'Send';
@@ -1079,7 +1126,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chatEndConfirmTitle => 'End Consultation';
 
   @override
-  String get chatEndConfirmMessage => 'This will end the session for both you and the other party. You\'ll still be able to view the transcript afterwards.';
+  String get chatEndConfirmMessage =>
+      'This will end the session for both you and the other party. You\'ll still be able to view the transcript afterwards.';
 
   @override
   String get chatEndedBannerMessage => 'This consultation has ended';
@@ -1115,28 +1163,35 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get chatInvalidConsultationMessage => 'This consultation could not be found.';
+  String get chatInvalidConsultationMessage =>
+      'This consultation could not be found.';
 
   @override
   String get chatReturnToCallAction => 'Return to call — it\'s still active';
 
   @override
-  String get chatMockReply1 => 'Thank you for sharing that — based on what you\'ve described, I\'d recommend we review the relevant clause together before taking any next steps. Could you send over the specific document section you\'re referring to?';
+  String get chatMockReply1 =>
+      'Thank you for sharing that — based on what you\'ve described, I\'d recommend we review the relevant clause together before taking any next steps. Could you send over the specific document section you\'re referring to?';
 
   @override
-  String get chatMockReply2 => 'That\'s a fair concern. Generally speaking, the law gives you a reasonable window to respond formally, but the exact timeline depends on the contract terms. Let me take a closer look and get back to you shortly.';
+  String get chatMockReply2 =>
+      'That\'s a fair concern. Generally speaking, the law gives you a reasonable window to respond formally, but the exact timeline depends on the contract terms. Let me take a closer look and get back to you shortly.';
 
   @override
-  String get chatMockReply3 => 'I understand the urgency here. My suggestion is to hold off on signing anything until we\'ve confirmed the liability clause is worded in your favor. I\'ll draft a suggested revision for you to review.';
+  String get chatMockReply3 =>
+      'I understand the urgency here. My suggestion is to hold off on signing anything until we\'ve confirmed the liability clause is worded in your favor. I\'ll draft a suggested revision for you to review.';
 
   @override
-  String get chatMockReply4 => 'Good question. Based on similar cases, this type of dispute is usually resolved faster through direct negotiation rather than going straight to court. Would you like me to outline the steps for that route?';
+  String get chatMockReply4 =>
+      'Good question. Based on similar cases, this type of dispute is usually resolved faster through direct negotiation rather than going straight to court. Would you like me to outline the steps for that route?';
 
   @override
-  String get chatMockReply5 => 'Noted, thank you. I\'ll need a bit more context on the timeline of events to give you an accurate opinion — could you confirm the date the notice was issued?';
+  String get chatMockReply5 =>
+      'Noted, thank you. I\'ll need a bit more context on the timeline of events to give you an accurate opinion — could you confirm the date the notice was issued?';
 
   @override
-  String get chatMockReply6 => 'This looks straightforward enough — I don\'t see anything that puts you at legal risk here, but I\'d still recommend documenting the agreement in writing to avoid any future disputes.';
+  String get chatMockReply6 =>
+      'This looks straightforward enough — I don\'t see anything that puts you at legal risk here, but I\'d still recommend documenting the agreement in writing to avoid any future disputes.';
 
   @override
   String get voiceCallLabel => 'Voice Consultation';
@@ -1173,7 +1228,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceCallEndConfirmTitle => 'End consultation?';
 
   @override
-  String get voiceCallEndConfirmMessage => 'This will end the call for both you and the other party.';
+  String get voiceCallEndConfirmMessage =>
+      'This will end the call for both you and the other party.';
 
   @override
   String get voiceCallEndCallAction => 'End Call';
@@ -1197,7 +1253,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get voiceCallEndedTitle => 'Consultation ended';
 
   @override
-  String get voiceCallAutoEndedMessage => 'The maximum consultation duration has been reached.';
+  String get voiceCallAutoEndedMessage =>
+      'The maximum consultation duration has been reached.';
 
   @override
   String get voiceCallDoneAction => 'Done';
@@ -1242,7 +1299,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lawyerRequestsEmptyTitle => 'No pending requests';
 
   @override
-  String get lawyerRequestsEmptyMessage => 'New consultation requests will show up here';
+  String get lawyerRequestsEmptyMessage =>
+      'New consultation requests will show up here';
 
   @override
   String get lawyerRequestAccept => 'Accept';
@@ -1254,7 +1312,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lawyerRequestRejectConfirmTitle => 'Decline Request';
 
   @override
-  String get lawyerRequestRejectConfirmMessage => 'Are you sure you want to decline this consultation request?';
+  String get lawyerRequestRejectConfirmMessage =>
+      'Are you sure you want to decline this consultation request?';
 
   @override
   String get lawyerRequestAcceptedMessage => 'Request accepted';
@@ -1269,7 +1328,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scheduleRemoveSlotTitle => 'Remove Slot';
 
   @override
-  String get scheduleRemoveSlotMessage => 'Are you sure you want to remove this available slot?';
+  String get scheduleRemoveSlotMessage =>
+      'Are you sure you want to remove this available slot?';
 
   @override
   String get scheduleEmptyDayMessage => 'No availability set for this day';
@@ -1281,19 +1341,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scheduleSlotOpen => 'Open';
 
   @override
-  String get scheduleActionFailedMessage => 'Something went wrong. Please try again.';
+  String get scheduleActionFailedMessage =>
+      'Something went wrong. Please try again.';
 
   @override
-  String get scheduleSlotLinkedConsultationMissing => 'Couldn\'t find the linked consultation — showing all consultations instead.';
+  String get scheduleSlotLinkedConsultationMissing =>
+      'Couldn\'t find the linked consultation — showing all consultations instead.';
 
   @override
   String get aiRecentConversationsTitle => 'Recent Conversations';
 
   @override
-  String get aiNoConversationsMessage => 'Start a conversation to get quick answers to your legal questions';
+  String get aiNoConversationsMessage =>
+      'Start a conversation to get quick answers to your legal questions';
 
   @override
-  String get aiDisclaimer => 'This assistant provides general legal information, not a substitute for advice from a licensed lawyer.';
+  String get aiDisclaimer =>
+      'This assistant provides general legal information, not a substitute for advice from a licensed lawyer.';
 
   @override
   String get aiChatTitle => 'Smart Legal Assistant';
@@ -1308,13 +1372,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiClearConversationTitle => 'Clear Conversation';
 
   @override
-  String get aiClearConversationMessage => 'Are you sure you want to clear all messages in this conversation?';
+  String get aiClearConversationMessage =>
+      'Are you sure you want to clear all messages in this conversation?';
 
   @override
   String get aiStatusAvailable => 'Available now — replies instantly';
 
   @override
-  String get aiWelcomeMessage => 'Hello! I\'m your smart legal assistant. I can help you understand your contracts, know your rights, and draft new contracts. How can I help you today?';
+  String get aiWelcomeMessage =>
+      'Hello! I\'m your smart legal assistant. I can help you understand your contracts, know your rights, and draft new contracts. How can I help you today?';
 
   @override
   String get aiQuickActionCreateContract => 'I want to create a contract';
@@ -1326,19 +1392,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiQuickActionExplainClause => 'Explain a legal clause to me';
 
   @override
-  String get aiContractWizardIntro => 'Great! I\'ll help you draft a trusted legal contract. Choose the contract type you want to create from the list:';
+  String get aiContractWizardIntro =>
+      'Great! I\'ll help you draft a trusted legal contract. Choose the contract type you want to create from the list:';
 
   @override
-  String get aiContractWizardAskParty1 => 'Who is the first party to the contract (employer / entity)?';
+  String get aiContractWizardAskParty1 =>
+      'Who is the first party to the contract (employer / entity)?';
 
   @override
-  String get aiContractWizardAskParty2 => 'Got it. Who is the second party to the contract?';
+  String get aiContractWizardAskParty2 =>
+      'Got it. Who is the second party to the contract?';
 
   @override
-  String get aiContractWizardAskSubject => 'What is the contract\'s subject or main duties?';
+  String get aiContractWizardAskSubject =>
+      'What is the contract\'s subject or main duties?';
 
   @override
-  String get aiContractWizardAskValue => 'Finally, what\'s the financial value and duration of the contract?';
+  String get aiContractWizardAskValue =>
+      'Finally, what\'s the financial value and duration of the contract?';
 
   @override
   String aiContractWizardDraftTitle(String type) {
@@ -1349,7 +1420,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiContractWizardStatusDraft => 'Initial draft — under review';
 
   @override
-  String get aiContractWizardStatusSent => 'Awaiting the other party\'s signature';
+  String get aiContractWizardStatusSent =>
+      'Awaiting the other party\'s signature';
 
   @override
   String get aiContractWizardPartyA => 'First party';
@@ -1370,10 +1442,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiContractWizardSaveVault => 'Save to Vault';
 
   @override
-  String get aiContractWizardSentMessage => 'Signature request sent successfully';
+  String get aiContractWizardSentMessage =>
+      'Signature request sent successfully';
 
   @override
-  String get aiContractWizardSavedMessage => 'Draft saved to your digital vault';
+  String get aiContractWizardSavedMessage =>
+      'Draft saved to your digital vault';
 
   @override
   String get aiContractWizardInputHint => 'Type your answer here...';
@@ -1435,7 +1509,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardQuickActions => 'Quick Actions';
 
   @override
-  String get dashboardNoAppointmentsToday => 'No appointments scheduled for today';
+  String get dashboardNoAppointmentsToday =>
+      'No appointments scheduled for today';
 
   @override
   String get dashboardActiveSessionBadge => 'Urgent Consultation — Now';
@@ -1466,7 +1541,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get earningsHistoryTitle => 'Earnings History';
 
   @override
-  String get earningsEmptyMessage => 'Completed consultations will show up here';
+  String get earningsEmptyMessage =>
+      'Completed consultations will show up here';
 
   @override
   String get clientsSearchHint => 'Search clients...';
@@ -1475,7 +1551,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clientsEmptyTitle => 'No clients yet';
 
   @override
-  String get clientsEmptyMessage => 'Clients you\'ve had a consultation with will show up here';
+  String get clientsEmptyMessage =>
+      'Clients you\'ve had a consultation with will show up here';
 
   @override
   String clientsConsultationCount(int count) {
@@ -1489,7 +1566,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountEditProfileSubtitle => 'Name, email';
 
   @override
-  String get lawyerEditProfileSubtitle => 'Bio, specialties, pricing, verification';
+  String get lawyerEditProfileSubtitle =>
+      'Bio, specialties, pricing, verification';
 
   @override
   String get profileUpdatedMessage => 'Profile updated';
@@ -1498,7 +1576,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unsavedChangesTitle => 'Discard changes?';
 
   @override
-  String get unsavedChangesMessage => 'You have unsaved changes. Are you sure you want to leave without saving?';
+  String get unsavedChangesMessage =>
+      'You have unsaved changes. Are you sure you want to leave without saving?';
 
   @override
   String get unsavedChangesDiscard => 'Discard';
@@ -1525,7 +1604,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lawyerVerificationDocumentPreviewTitle => 'Document preview';
 
   @override
-  String get lawyerVerificationSubmittedMessage => 'Document submitted for review';
+  String get lawyerVerificationSubmittedMessage =>
+      'Document submitted for review';
 
   @override
   String get lawyerPriceLabel => 'Price';
@@ -1543,7 +1623,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lawyerSelectSpecialtyError => 'Select at least one specialty';
 
   @override
-  String get lawyerSelectConsultationTypeError => 'Select at least one consultation type you offer';
+  String get lawyerSelectConsultationTypeError =>
+      'Select at least one consultation type you offer';
 
   @override
   String get navTeam => 'Team';
@@ -1590,7 +1671,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get teamRemoveConfirmTitle => 'Remove Member';
 
   @override
-  String get teamRemoveConfirmMessage => 'Are you sure you want to remove this member from your team?';
+  String get teamRemoveConfirmMessage =>
+      'Are you sure you want to remove this member from your team?';
 
   @override
   String get companyActiveConsultations => 'Active Consultations';
@@ -1599,7 +1681,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get documentsUploadTitle => 'Upload Document';
 
   @override
-  String get documentsUploadHint => 'There\'s no file picker in this preview yet — just give the document a title.';
+  String get documentsUploadHint =>
+      'There\'s no file picker in this preview yet — just give the document a title.';
 
   @override
   String get documentsUploadLabel => 'Document Title';
@@ -1620,7 +1703,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get documentsDeleteConfirmTitle => 'Delete Document';
 
   @override
-  String get documentsDeleteConfirmMessage => 'Are you sure you want to delete this document? This action cannot be undone.';
+  String get documentsDeleteConfirmMessage =>
+      'Are you sure you want to delete this document? This action cannot be undone.';
 
   @override
   String get documentsDeletedMessage => 'Document deleted';
@@ -1677,7 +1761,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentMethodsEmptyTitle => 'No saved payment methods';
 
   @override
-  String get paymentMethodsEmptyMessage => 'Add a card to speed up future payments';
+  String get paymentMethodsEmptyMessage =>
+      'Add a card to speed up future payments';
 
   @override
   String get paymentMethodsAddCard => 'Add Card';
@@ -1707,7 +1792,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentMethodsRemoveConfirmTitle => 'Remove Card';
 
   @override
-  String get paymentMethodsRemoveConfirmMessage => 'Are you sure you want to remove this card?';
+  String get paymentMethodsRemoveConfirmMessage =>
+      'Are you sure you want to remove this card?';
 
   @override
   String get savedSignatureTitle => 'Saved Signature';
@@ -1731,7 +1817,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get savedSignatureTypedHint => 'Type your name here';
 
   @override
-  String get savedSignatureUploadPlaceholder => 'Tap to upload a signature image';
+  String get savedSignatureUploadPlaceholder =>
+      'Tap to upload a signature image';
 
   @override
   String get savedSignatureUploadedLabel => 'Signature uploaded as image';
@@ -1766,13 +1853,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securityTwoFactorTitle => 'Two-Factor Authentication';
 
   @override
-  String get securityTwoFactorSubtitle => 'An extra layer of protection at sign-in';
+  String get securityTwoFactorSubtitle =>
+      'An extra layer of protection at sign-in';
 
   @override
   String get securityBiometricTitle => 'Biometric Sign-In';
 
   @override
-  String get securityBiometricSubtitle => 'Use your fingerprint instead of a password';
+  String get securityBiometricSubtitle =>
+      'Use your fingerprint instead of a password';
 
   @override
   String get securityActiveSessionsTitle => 'Active Sessions';
@@ -1785,6 +1874,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get securitySessionLocationJordan => 'Jordan';
+
+  @override
+  String get securityTwoFactorUnavailable => 'Not available yet';
+
+  @override
+  String get securitySessionsError => 'Couldn\'t load your sessions';
+
+  @override
+  String get securityThisDevice => 'This device';
+
+  @override
+  String get securityUnknownDevice => 'Unknown device';
+
+  @override
+  String get securityEndAllOtherSessions => 'Sign out of all other devices';
 
   @override
   String get helpSupportTitle => 'Help & Support';
@@ -1805,31 +1909,39 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpSendMessage => 'Send';
 
   @override
-  String get helpRequestSentMessage => 'Your request has been sent, we\'ll get back to you soon';
+  String get helpRequestSentMessage =>
+      'Your request has been sent, we\'ll get back to you soon';
 
   @override
   String get helpFaqNewContractQuestion => 'How do I create a new contract?';
 
   @override
-  String get helpFaqNewContractAnswer => 'From Home, choose \"Smart Contracts\", then pick a contract type and fill in the required details step by step.';
+  String get helpFaqNewContractAnswer =>
+      'From Home, choose \"Smart Contracts\", then pick a contract type and fill in the required details step by step.';
 
   @override
-  String get helpFaqEsignatureQuestion => 'Is the electronic signature legally recognized?';
+  String get helpFaqEsignatureQuestion =>
+      'Is the electronic signature legally recognized?';
 
   @override
-  String get helpFaqEsignatureAnswer => 'Yes, the electronic signature complies with the Jordanian Electronic Transactions Law.';
+  String get helpFaqEsignatureAnswer =>
+      'Yes, the electronic signature complies with the Jordanian Electronic Transactions Law.';
 
   @override
-  String get helpFaqBookConsultationQuestion => 'How do I book a consultation with a lawyer?';
+  String get helpFaqBookConsultationQuestion =>
+      'How do I book a consultation with a lawyer?';
 
   @override
-  String get helpFaqBookConsultationAnswer => 'From the \"Lawyers\" tab, choose the right lawyer, tap \"Book a consultation now\", and follow the booking steps.';
+  String get helpFaqBookConsultationAnswer =>
+      'From the \"Lawyers\" tab, choose the right lawyer, tap \"Book a consultation now\", and follow the booking steps.';
 
   @override
-  String get helpFaqManageSubscriptionQuestion => 'How do I cancel or change my subscription?';
+  String get helpFaqManageSubscriptionQuestion =>
+      'How do I cancel or change my subscription?';
 
   @override
-  String get helpFaqManageSubscriptionAnswer => 'From \"Account\", choose \"Subscriptions\" to pick another plan or change your billing cycle at any time.';
+  String get helpFaqManageSubscriptionAnswer =>
+      'From \"Account\", choose \"Subscriptions\" to pick another plan or change your billing cycle at any time.';
 
   @override
   String get invoicesTitle => 'Invoices';
@@ -1838,7 +1950,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invoicesEmptyTitle => 'No invoices yet';
 
   @override
-  String get invoicesEmptyMessage => 'Your invoices will appear here after your first payment';
+  String get invoicesEmptyMessage =>
+      'Your invoices will appear here after your first payment';
 
   @override
   String get invoiceStatusPaid => 'Paid';
@@ -1904,7 +2017,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get subscriptionBasicDesc => 'Includes a set amount of AI services and contract drafting';
+  String get subscriptionBasicDesc =>
+      'Includes a set amount of AI services and contract drafting';
 
   @override
   String get subscriptionBasicFeature1 => '5 contracts per month';
@@ -1919,7 +2033,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscriptionBasicFeature4 => 'Email support';
 
   @override
-  String get subscriptionProDesc => 'Everything you need to manage your contracts and legal consultations, unlimited';
+  String get subscriptionProDesc =>
+      'Everything you need to manage your contracts and legal consultations, unlimited';
 
   @override
   String get subscriptionProFeature1 => 'Unlimited contracts';
@@ -1940,7 +2055,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscriptionProFeature6 => '24/7 priority support';
 
   @override
-  String get subscriptionEnterpriseDesc => 'A comprehensive solution for large companies and legal institutions';
+  String get subscriptionEnterpriseDesc =>
+      'A comprehensive solution for large companies and legal institutions';
 
   @override
   String get subscriptionEnterpriseFeature1 => 'Everything in Pro';
@@ -1964,7 +2080,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscriptionSuccessTitle => 'Your plan was upgraded successfully!';
 
   @override
-  String get subscriptionSuccessMessage => 'Comprehensive legal solutions for your team and organization';
+  String get subscriptionSuccessMessage =>
+      'Comprehensive legal solutions for your team and organization';
 
   @override
   String get subscriptionBackHome => 'Back to Home';
@@ -1973,7 +2090,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get govDocumentsTitle => 'Government Documents';
 
   @override
-  String get govDocumentsSearchHint => 'What do you want to get done? (e.g. register a company...)';
+  String get govDocumentsSearchHint =>
+      'What do you want to get done? (e.g. register a company...)';
 
   @override
   String get govProcedureCompanyRegistration => 'Company Registration';
@@ -1985,7 +2103,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get govProcedurePropertyRegistration => 'Property Registration';
 
   @override
-  String get govProcedurePropertyRegistrationCategory => 'Real Estate & Property';
+  String get govProcedurePropertyRegistrationCategory =>
+      'Real Estate & Property';
 
   @override
   String get govProcedureContractNotarization => 'Contract Notarization';
@@ -2025,7 +2144,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get govStartProcedure => 'Start Procedure Now';
 
   @override
-  String get govProcedureStartedMessage => 'You\'re now tracking this procedure — follow its status here';
+  String get govProcedureStartedMessage =>
+      'You\'re now tracking this procedure — follow its status here';
 
   @override
   String get govProcedureStatusInProgress => 'In progress — awaiting documents';

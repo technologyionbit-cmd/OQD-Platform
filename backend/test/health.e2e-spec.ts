@@ -5,8 +5,8 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 
 /**
- * Requires PostgreSQL + Redis reachable at DATABASE_URL/REDIS_URL
- * (`docker compose up -d` from backend/, per README.md).
+ * Requires PostgreSQL reachable at DATABASE_URL (see README.md), since
+ * PrismaModule connects eagerly on application bootstrap.
  */
 describe('GET /v1/health (e2e)', () => {
   let app: INestApplication;
@@ -25,7 +25,7 @@ describe('GET /v1/health (e2e)', () => {
     await app.close();
   });
 
-  it('reports ok with both database and redis up when infrastructure is reachable', async () => {
+  it('reports ok with the database up when infrastructure is reachable', async () => {
     const res = await request(app.getHttpServer() as Server).get('/v1/health');
 
     expect(res.status).toBe(200);
@@ -33,7 +33,6 @@ describe('GET /v1/health (e2e)', () => {
       status: 'ok',
       details: {
         database: { status: 'up' },
-        redis: { status: 'up' },
       },
     });
   });

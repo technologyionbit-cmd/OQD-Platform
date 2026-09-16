@@ -6,7 +6,6 @@ import {
   PrismaHealthIndicator,
 } from '@nestjs/terminus';
 import { PrismaService } from '../prisma/prisma.service';
-import { RedisHealthIndicator } from './indicators/redis.health-indicator';
 
 @Controller('health')
 export class HealthController {
@@ -14,20 +13,17 @@ export class HealthController {
     private readonly health: HealthCheckService,
     private readonly prisma: PrismaService,
     private readonly prismaIndicator: PrismaHealthIndicator,
-    private readonly redisIndicator: RedisHealthIndicator,
   ) {}
 
   /**
-   * GET /v1/health — reports application, PostgreSQL, and Redis status.
-   * Returns 503 automatically (via HealthCheckService) if any dependency
-   * is down, per docs/backend/00-backend-overview.md Phase 1A §9.
+   * GET /v1/health — reports application and PostgreSQL status. Returns
+   * 503 automatically (via HealthCheckService) if the database is down.
    */
   @Get()
   @HealthCheck()
   check(): Promise<HealthCheckResult> {
     return this.health.check([
       () => this.prismaIndicator.pingCheck('database', this.prisma),
-      () => this.redisIndicator.pingCheck('redis'),
     ]);
   }
 }

@@ -33,7 +33,7 @@ dependencies:
   shared_preferences: ^2.5.3
 
   # Localization
-  intl: ^0.19.0
+  intl: ^0.20.3
 
   # Media
   image_picker: ^1.1.2

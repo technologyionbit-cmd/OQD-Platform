@@ -3,9 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:aqd_ionbit/app/app.dart';
-import 'package:aqd_ionbit/core/config/env_config.dart';
-import 'package:aqd_ionbit/core/config/environment.dart';
+import 'package:aqd_ionbit/app.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
@@ -27,7 +25,6 @@ Future<void> _pumpApp(WidgetTester tester, {required Map<String, Object> initial
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        envConfigProvider.overrideWithValue(EnvConfig.forEnvironment(Environment.development)),
         appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
         tokenManagerProvider.overrideWithValue(tokenManager),
       ],

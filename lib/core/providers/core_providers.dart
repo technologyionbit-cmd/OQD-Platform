@@ -1,22 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:aqd_ionbit/core/config/env_config.dart';
+import 'package:aqd_ionbit/core/config/app_config.dart';
 import 'package:aqd_ionbit/core/network/auth_session_ports.dart';
 import 'package:aqd_ionbit/core/network/dio_client.dart';
 import 'package:aqd_ionbit/core/security/secure_storage_service.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
 
-/// [EnvConfig] and [AppPreferences] depend on values only known once
-/// `bootstrap()` resolves them (env is a compile-time selection, prefs
-/// wraps an async `SharedPreferences.getInstance()`) — both are overridden
-/// in `ProviderScope(overrides: [...])` at app start (see `app/bootstrap.dart`).
-/// Reading either before that override is a programmer error, so they throw
-/// loudly instead of silently falling back to a default.
-final envConfigProvider = Provider<EnvConfig>((ref) {
-  throw UnimplementedError('envConfigProvider must be overridden in bootstrap()');
-});
+/// Runtime configuration. [AppConfig.resolve] needs nothing from
+/// `bootstrap()` (it reads compile-time `--dart-define`s and the build
+/// mode), so this has a real default; tests may still override it.
+final appConfigProvider = Provider<AppConfig>((ref) => AppConfig.resolve());
 
+/// [AppPreferences] wraps an async `SharedPreferences.getInstance()` that
+/// can only be resolved once `bootstrap()` has awaited it, so this is
+/// overridden in `ProviderScope(overrides: [...])` at app start (see
+/// `core/app/bootstrap.dart`). Reading it before that override is a
+/// programmer error, so it throws loudly instead of silently defaulting.
 final appPreferencesProvider = Provider<AppPreferences>((ref) {
   throw UnimplementedError('appPreferencesProvider must be overridden in bootstrap()');
 });
@@ -31,7 +31,7 @@ final sessionExpiredNotifierProvider = Provider<SessionExpiredNotifier>((ref) =>
 
 final dioClientProvider = Provider<DioClient>((ref) {
   return DioClient(
-    envConfig: ref.watch(envConfigProvider),
+    appConfig: ref.watch(appConfigProvider),
     tokenManager: ref.watch(tokenManagerProvider),
     onSessionExpired: () => ref.read(sessionExpiredNotifierProvider).notify(),
     onRefreshToken: ref.watch(tokenRefresherProvider).call,

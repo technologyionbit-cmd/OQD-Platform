@@ -6,9 +6,8 @@ import { AppModule } from '../src/app.module';
 import { validationExceptionFactory } from '../src/common/pipes/validation-exception-factory';
 
 /**
- * Requires PostgreSQL + Redis reachable at DATABASE_URL/REDIS_URL
- * (`docker compose up -d` from backend/, per README.md), since PrismaModule
- * and RedisModule connect eagerly on application bootstrap.
+ * Requires PostgreSQL reachable at DATABASE_URL (see README.md), since
+ * PrismaModule connects eagerly on application bootstrap.
  */
 describe('Application bootstrap (e2e)', () => {
   let app: INestApplication;

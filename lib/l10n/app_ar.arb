@@ -732,6 +732,11 @@
   "securityEndSession": "إنهاء الجلسة",
   "securitySessionEndedMessage": "تم إنهاء الجلسة",
   "securitySessionLocationJordan": "الأردن",
+  "securityTwoFactorUnavailable": "غير متاح حالياً",
+  "securitySessionsError": "تعذّر تحميل الجلسات",
+  "securityThisDevice": "هذا الجهاز",
+  "securityUnknownDevice": "جهاز غير معروف",
+  "securityEndAllOtherSessions": "تسجيل الخروج من كل الأجهزة الأخرى",
 
   "helpSupportTitle": "المساعدة والدعم",
   "helpFaqTitle": "الأسئلة الشائعة",

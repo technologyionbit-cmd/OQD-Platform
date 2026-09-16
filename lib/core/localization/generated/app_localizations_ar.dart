@@ -152,7 +152,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authMethodEmail => 'البريد الإلكتروني';
 
   @override
-  String get authSmsInfo => 'سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور';
+  String get authSmsInfo =>
+      'سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور';
 
   @override
   String get authEmailInfo => 'سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور';
@@ -167,10 +168,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authSentTitle => 'تم الإرسال!';
 
   @override
-  String get authSentSubtitleSms => 'تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور';
+  String get authSentSubtitleSms =>
+      'تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور';
 
   @override
-  String get authSentSubtitleEmail => 'تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور';
+  String get authSentSubtitleEmail =>
+      'تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور';
 
   @override
   String get authEnterCode => 'إدخال رمز التحقق';
@@ -216,7 +219,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authResetPasswordSuccessTitle => 'تم تغيير كلمة المرور!';
 
   @override
-  String get authResetPasswordSuccessSubtitle => 'يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة';
+  String get authResetPasswordSuccessSubtitle =>
+      'يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة';
 
   @override
   String get authGoToLogin => 'الذهاب لتسجيل الدخول';
@@ -228,19 +232,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingSlide1Title => 'مساعدك القانوني في جيبك';
 
   @override
-  String get onboardingSlide1Subtitle => 'استشارات أولية وشرح فوري للبنود القانونية بالذكاء الاصطناعي على مدار الساعة';
+  String get onboardingSlide1Subtitle =>
+      'استشارات أولية وشرح فوري للبنود القانونية بالذكاء الاصطناعي على مدار الساعة';
 
   @override
   String get onboardingSlide2Title => 'عقود ذكية بدقائق';
 
   @override
-  String get onboardingSlide2Subtitle => 'أنشئ عقودًا قانونية موثوقة وحلل عقودك الحالية بالذكاء الاصطناعي';
+  String get onboardingSlide2Subtitle =>
+      'أنشئ عقودًا قانونية موثوقة وحلل عقودك الحالية بالذكاء الاصطناعي';
 
   @override
   String get onboardingSlide3Title => 'تواصل مباشرة مع محامين موثوقين';
 
   @override
-  String get onboardingSlide3Subtitle => 'احجز استشارة فيديو أو صوتية أو مكتوبة مع نخبة من المحامين المرخصين';
+  String get onboardingSlide3Subtitle =>
+      'احجز استشارة فيديو أو صوتية أو مكتوبة مع نخبة من المحامين المرخصين';
 
   @override
   String get onboardingGetStarted => 'ابدأ';
@@ -260,7 +267,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorNetwork => 'تعذّر الاتصال بالشبكة، تحقق من الاتصال بالإنترنت';
 
   @override
-  String get errorInvalidCredentials => 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+  String get errorInvalidCredentials =>
+      'البريد الإلكتروني أو كلمة المرور غير صحيحة';
 
   @override
   String get errorServer => 'حدث خطأ في الخادم، حاول لاحقًا';
@@ -338,7 +346,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clientHomeNoContractsTitle => 'لا توجد عقود بعد';
 
   @override
-  String get clientHomeNoContractsMessage => 'ابدأ بإنشاء أول عقد قانوني لك بمساعدة الذكاء الاصطناعي';
+  String get clientHomeNoContractsMessage =>
+      'ابدأ بإنشاء أول عقد قانوني لك بمساعدة الذكاء الاصطناعي';
 
   @override
   String get clientHomeServicesTitle => 'خدماتك القانونية';
@@ -380,7 +389,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clientHomeQuickFindLawyer => 'ابحث عن محام';
 
   @override
-  String get serviceAnalyzeContractDesc => 'ارفع العقد ودع الذكاء الاصطناعي يساعدك';
+  String get serviceAnalyzeContractDesc =>
+      'ارفع العقد ودع الذكاء الاصطناعي يساعدك';
 
   @override
   String get serviceSmartContracts => 'العقود الذكية';
@@ -467,7 +477,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get contractTypeSearchHint => 'ابحث عن نوع العقد...';
 
   @override
-  String get contractTypeSearchEmptyMessage => 'لا توجد أنواع عقود مطابقة لبحثك';
+  String get contractTypeSearchEmptyMessage =>
+      'لا توجد أنواع عقود مطابقة لبحثك';
 
   @override
   String get contractFormTitle => 'تعبئة بيانات العقد';
@@ -527,7 +538,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get contractDetailsDeleteConfirmTitle => 'حذف المسودة';
 
   @override
-  String get contractDetailsDeleteConfirmMessage => 'هل أنت متأكد أنك تريد حذف هذه المسودة؟ لا يمكن التراجع عن هذا الإجراء.';
+  String get contractDetailsDeleteConfirmMessage =>
+      'هل أنت متأكد أنك تريد حذف هذه المسودة؟ لا يمكن التراجع عن هذا الإجراء.';
 
   @override
   String get contractDetailsDeletedMessage => 'تم حذف المسودة';
@@ -542,10 +554,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get contractSignTabSaved => 'توقيع محفوظ';
 
   @override
-  String get contractSignNoSavedSignature => 'لا يوجد توقيع محفوظ — أضف واحداً من حسابي أولاً';
+  String get contractSignNoSavedSignature =>
+      'لا يوجد توقيع محفوظ — أضف واحداً من حسابي أولاً';
 
   @override
-  String get contractSignLegalNotice => 'بالتوقيع على هذا المستند، فإنك توافق قانونياً على جميع البنود الواردة فيه وفق أحكام قانون المعاملات الإلكترونية الأردني.';
+  String get contractSignLegalNotice =>
+      'بالتوقيع على هذا المستند، فإنك توافق قانونياً على جميع البنود الواردة فيه وفق أحكام قانون المعاملات الإلكترونية الأردني.';
 
   @override
   String get contractSignConfirm => 'تأكيد التوقيع';
@@ -554,7 +568,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get contractSignedSuccessTitle => 'تم توقيع العقد بنجاح!';
 
   @override
-  String get contractSignedSuccessMessage => 'تم اعتماد توقيعك وحفظ النسخة الموقعة بأمان في خزنتك الرقمية.';
+  String get contractSignedSuccessMessage =>
+      'تم اعتماد توقيعك وحفظ النسخة الموقعة بأمان في خزنتك الرقمية.';
 
   @override
   String get documentsEmptyTitle => 'لا توجد مستندات بعد';
@@ -607,10 +622,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationsEmptyTitle => 'لا توجد إشعارات';
 
   @override
-  String get notificationsEmptyMessage => 'لا يوجد جديد الآن، ستظهر إشعاراتك هنا';
+  String get notificationsEmptyMessage =>
+      'لا يوجد جديد الآن، ستظهر إشعاراتك هنا';
 
   @override
-  String get notificationUnavailableForRole => 'هذا الإشعار غير متاح من حسابك الحالي';
+  String get notificationUnavailableForRole =>
+      'هذا الإشعار غير متاح من حسابك الحالي';
 
   @override
   String get specialtyCommercial => 'قانون تجاري';
@@ -751,7 +768,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookingSuccessTitle => 'تم إرسال طلب الحجز!';
 
   @override
-  String get bookingSuccessMessage => 'أرسلنا طلبك إلى المحامي، سيتم إشعارك فور تأكيده';
+  String get bookingSuccessMessage =>
+      'أرسلنا طلبك إلى المحامي، سيتم إشعارك فور تأكيده';
 
   @override
   String get bookingViewDetails => 'عرض الحجز';
@@ -795,7 +813,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentApplePayTitle => 'Apple Pay';
 
   @override
-  String get paymentApplePaySubtitle => 'ادفع بأمان وبنقرة واحدة عبر محفظتك الرقمية';
+  String get paymentApplePaySubtitle =>
+      'ادفع بأمان وبنقرة واحدة عبر محفظتك الرقمية';
 
   @override
   String get paymentApplePayNoCardSharing => 'لا تُشارك بياناتك';
@@ -815,7 +834,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentCardNumberInvalid => 'أدخل رقم بطاقة صحيح';
 
   @override
-  String get paymentExpiryInvalid => 'أدخل تاريخ صلاحية صحيح وغير منتهٍ (MM/YY)';
+  String get paymentExpiryInvalid =>
+      'أدخل تاريخ صلاحية صحيح وغير منتهٍ (MM/YY)';
 
   @override
   String get paymentCvvInvalid => 'أدخل رمز CVV صحيح';
@@ -872,13 +892,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consultationsEmptyTitle => 'لا يوجد شيء هنا بعد';
 
   @override
-  String get consultationsEmptyMessage => 'ستظهر هنا الاستشارات ضمن هذا التصنيف';
+  String get consultationsEmptyMessage =>
+      'ستظهر هنا الاستشارات ضمن هذا التصنيف';
 
   @override
   String get consultationCancelConfirmTitle => 'إلغاء الاستشارة';
 
   @override
-  String get consultationCancelConfirmMessage => 'هل أنت متأكد أنك تريد إلغاء هذه الاستشارة؟';
+  String get consultationCancelConfirmMessage =>
+      'هل أنت متأكد أنك تريد إلغاء هذه الاستشارة؟';
 
   @override
   String get consultationReschedule => 'إعادة الجدولة';
@@ -926,7 +948,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationConsultationCompletedTitle => 'انتهت الاستشارة';
 
   @override
-  String get notificationConsultationCompletedBody => 'انتهت جلسة استشارتك بنجاح';
+  String get notificationConsultationCompletedBody =>
+      'انتهت جلسة استشارتك بنجاح';
 
   @override
   String get notificationNewMessageTitle => 'رسالة جديدة';
@@ -963,7 +986,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consultationRoomTooEarlyTitle => 'لم يحن الوقت بعد';
 
   @override
-  String get consultationRoomTooEarlyMessage => 'ستُفتح الاستشارة قبل 15 دقيقة من الموعد المحدد.';
+  String get consultationRoomTooEarlyMessage =>
+      'ستُفتح الاستشارة قبل 15 دقيقة من الموعد المحدد.';
 
   @override
   String consultationRoomStartsIn(String remaining) {
@@ -989,25 +1013,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consultationRoomReadyTitle => 'جاهز للانضمام';
 
   @override
-  String get consultationRoomReadyMessage => 'يمكنك الانضمام إلى هذه الاستشارة الآن.';
+  String get consultationRoomReadyMessage =>
+      'يمكنك الانضمام إلى هذه الاستشارة الآن.';
 
   @override
   String get consultationRoomJoinAction => 'الانضمام إلى الاستشارة';
 
   @override
-  String get consultationRoomJoinFailedMessage => 'تعذّر بدء الجلسة. يرجى المحاولة مرة أخرى.';
+  String get consultationRoomJoinFailedMessage =>
+      'تعذّر بدء الجلسة. يرجى المحاولة مرة أخرى.';
 
   @override
   String get consultationRoomMissedTitle => 'فاتت الاستشارة';
 
   @override
-  String get consultationRoomMissedMessage => 'انتهت مهلة الانضمام إلى هذه الاستشارة.';
+  String get consultationRoomMissedMessage =>
+      'انتهت مهلة الانضمام إلى هذه الاستشارة.';
 
   @override
-  String get consultationRoomUnavailableMessage => 'لم تعد هذه الاستشارة متاحة للانضمام إليها.';
+  String get consultationRoomUnavailableMessage =>
+      'لم تعد هذه الاستشارة متاحة للانضمام إليها.';
 
   @override
-  String get consultationRoomSimulateConnectionLossAction => 'محاكاة انقطاع الاتصال (للمطورين)';
+  String get consultationRoomSimulateConnectionLossAction =>
+      'محاكاة انقطاع الاتصال (للمطورين)';
 
   @override
   String get chatOpenAction => 'فتح المحادثة';
@@ -1038,10 +1067,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get chatImagePreviewTitle => 'صورة';
 
   @override
-  String get chatImageUnavailableMock => 'المعاينة غير متاحة لهذه الصورة التجريبية';
+  String get chatImageUnavailableMock =>
+      'المعاينة غير متاحة لهذه الصورة التجريبية';
 
   @override
-  String get chatImagePickError => 'تعذّر فتح معرض الصور، يرجى المحاولة مرة أخرى.';
+  String get chatImagePickError =>
+      'تعذّر فتح معرض الصور، يرجى المحاولة مرة أخرى.';
 
   @override
   String get chatSendAttachment => 'إرسال';
@@ -1079,7 +1110,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get chatEndConfirmTitle => 'إنهاء الاستشارة';
 
   @override
-  String get chatEndConfirmMessage => 'سيؤدي هذا إلى إنهاء الجلسة لك وللطرف الآخر. ستظل قادرًا على الاطلاع على المحادثة لاحقًا.';
+  String get chatEndConfirmMessage =>
+      'سيؤدي هذا إلى إنهاء الجلسة لك وللطرف الآخر. ستظل قادرًا على الاطلاع على المحادثة لاحقًا.';
 
   @override
   String get chatEndedBannerMessage => 'انتهت هذه الاستشارة';
@@ -1115,28 +1147,35 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get chatInvalidConsultationMessage => 'تعذّر العثور على هذه الاستشارة.';
+  String get chatInvalidConsultationMessage =>
+      'تعذّر العثور على هذه الاستشارة.';
 
   @override
   String get chatReturnToCallAction => 'العودة إلى المكالمة — لا تزال نشطة';
 
   @override
-  String get chatMockReply1 => 'شكرًا لمشاركة هذه التفاصيل. بناءً على ما ذكرته، أنصح بمراجعة البند المعني معًا قبل اتخاذ أي خطوة تالية. هل يمكنك إرسال الجزء المحدد من المستند الذي تقصده؟';
+  String get chatMockReply1 =>
+      'شكرًا لمشاركة هذه التفاصيل. بناءً على ما ذكرته، أنصح بمراجعة البند المعني معًا قبل اتخاذ أي خطوة تالية. هل يمكنك إرسال الجزء المحدد من المستند الذي تقصده؟';
 
   @override
-  String get chatMockReply2 => 'هذا استفسار وجيه. بشكل عام، يمنحك النظام مهلة معقولة للرد رسميًا، لكن المدة الدقيقة تعتمد على بنود العقد. دعني أطّلع على التفاصيل بدقة وأعود إليك قريبًا.';
+  String get chatMockReply2 =>
+      'هذا استفسار وجيه. بشكل عام، يمنحك النظام مهلة معقولة للرد رسميًا، لكن المدة الدقيقة تعتمد على بنود العقد. دعني أطّلع على التفاصيل بدقة وأعود إليك قريبًا.';
 
   @override
-  String get chatMockReply3 => 'أتفهم أهمية الأمر بالنسبة لك. اقتراحي هو الانتظار قبل توقيع أي شيء حتى نتأكد من أن بند المسؤولية مصاغ لصالحك. سأعدّ لك اقتراح تعديل لمراجعته.';
+  String get chatMockReply3 =>
+      'أتفهم أهمية الأمر بالنسبة لك. اقتراحي هو الانتظار قبل توقيع أي شيء حتى نتأكد من أن بند المسؤولية مصاغ لصالحك. سأعدّ لك اقتراح تعديل لمراجعته.';
 
   @override
-  String get chatMockReply4 => 'سؤال جيد. بناءً على حالات مشابهة، عادةً ما تُحل هذه النوعية من النزاعات بشكل أسرع عبر التفاوض المباشر بدلاً من اللجوء للقضاء مباشرة. هل ترغب أن أوضح لك خطوات هذا المسار؟';
+  String get chatMockReply4 =>
+      'سؤال جيد. بناءً على حالات مشابهة، عادةً ما تُحل هذه النوعية من النزاعات بشكل أسرع عبر التفاوض المباشر بدلاً من اللجوء للقضاء مباشرة. هل ترغب أن أوضح لك خطوات هذا المسار؟';
 
   @override
-  String get chatMockReply5 => 'تم الاطلاع، شكرًا لك. أحتاج بعض التفاصيل الإضافية حول تسلسل الأحداث لأقدّم لك رأيًا دقيقًا. هل يمكنك تأكيد تاريخ صدور الإشعار؟';
+  String get chatMockReply5 =>
+      'تم الاطلاع، شكرًا لك. أحتاج بعض التفاصيل الإضافية حول تسلسل الأحداث لأقدّم لك رأيًا دقيقًا. هل يمكنك تأكيد تاريخ صدور الإشعار؟';
 
   @override
-  String get chatMockReply6 => 'الأمر يبدو واضحًا نسبيًا، ولا أرى ما يعرّضك لمخاطر قانونية هنا، لكن أنصح بتوثيق الاتفاق كتابيًا لتفادي أي خلاف مستقبلي.';
+  String get chatMockReply6 =>
+      'الأمر يبدو واضحًا نسبيًا، ولا أرى ما يعرّضك لمخاطر قانونية هنا، لكن أنصح بتوثيق الاتفاق كتابيًا لتفادي أي خلاف مستقبلي.';
 
   @override
   String get voiceCallLabel => 'استشارة صوتية';
@@ -1173,7 +1212,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get voiceCallEndConfirmTitle => 'إنهاء الاستشارة؟';
 
   @override
-  String get voiceCallEndConfirmMessage => 'سيؤدي هذا إلى إنهاء المكالمة لك وللطرف الآخر.';
+  String get voiceCallEndConfirmMessage =>
+      'سيؤدي هذا إلى إنهاء المكالمة لك وللطرف الآخر.';
 
   @override
   String get voiceCallEndCallAction => 'إنهاء المكالمة';
@@ -1218,7 +1258,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get videoCallSwitchCameraAction => 'تبديل الكاميرا';
 
   @override
-  String get videoCallSwitchedToFrontCamera => 'تم التبديل إلى الكاميرا الأمامية';
+  String get videoCallSwitchedToFrontCamera =>
+      'تم التبديل إلى الكاميرا الأمامية';
 
   @override
   String get videoCallSwitchedToBackCamera => 'تم التبديل إلى الكاميرا الخلفية';
@@ -1254,7 +1295,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lawyerRequestRejectConfirmTitle => 'رفض الطلب';
 
   @override
-  String get lawyerRequestRejectConfirmMessage => 'هل أنت متأكد أنك تريد رفض طلب الاستشارة هذا؟';
+  String get lawyerRequestRejectConfirmMessage =>
+      'هل أنت متأكد أنك تريد رفض طلب الاستشارة هذا؟';
 
   @override
   String get lawyerRequestAcceptedMessage => 'تم قبول الطلب';
@@ -1269,7 +1311,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get scheduleRemoveSlotTitle => 'إزالة الموعد';
 
   @override
-  String get scheduleRemoveSlotMessage => 'هل أنت متأكد أنك تريد إزالة هذا الموعد المتاح؟';
+  String get scheduleRemoveSlotMessage =>
+      'هل أنت متأكد أنك تريد إزالة هذا الموعد المتاح؟';
 
   @override
   String get scheduleEmptyDayMessage => 'لا توجد مواعيد متاحة في هذا اليوم';
@@ -1281,19 +1324,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get scheduleSlotOpen => 'متاح';
 
   @override
-  String get scheduleActionFailedMessage => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+  String get scheduleActionFailedMessage =>
+      'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
 
   @override
-  String get scheduleSlotLinkedConsultationMissing => 'تعذّر العثور على الاستشارة المرتبطة — سيتم عرض جميع الاستشارات بدلاً من ذلك.';
+  String get scheduleSlotLinkedConsultationMissing =>
+      'تعذّر العثور على الاستشارة المرتبطة — سيتم عرض جميع الاستشارات بدلاً من ذلك.';
 
   @override
   String get aiRecentConversationsTitle => 'المحادثات الأخيرة';
 
   @override
-  String get aiNoConversationsMessage => 'ابدأ محادثة للحصول على إجابات سريعة لأسئلتك القانونية';
+  String get aiNoConversationsMessage =>
+      'ابدأ محادثة للحصول على إجابات سريعة لأسئلتك القانونية';
 
   @override
-  String get aiDisclaimer => 'يقدم هذا المساعد معلومات قانونية عامة، وهو ليس بديلاً عن استشارة محامٍ مرخّص.';
+  String get aiDisclaimer =>
+      'يقدم هذا المساعد معلومات قانونية عامة، وهو ليس بديلاً عن استشارة محامٍ مرخّص.';
 
   @override
   String get aiChatTitle => 'المساعد القانوني الذكي';
@@ -1308,13 +1355,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aiClearConversationTitle => 'مسح المحادثة';
 
   @override
-  String get aiClearConversationMessage => 'هل أنت متأكد أنك تريد مسح جميع الرسائل في هذه المحادثة؟';
+  String get aiClearConversationMessage =>
+      'هل أنت متأكد أنك تريد مسح جميع الرسائل في هذه المحادثة؟';
 
   @override
   String get aiStatusAvailable => 'متاح الآن — يرد فوراً';
 
   @override
-  String get aiWelcomeMessage => 'مرحباً! أنا مساعدك القانوني الذكي. يمكنني مساعدتك في فهم عقودك، معرفة حقوقك، وصياغة عقود جديدة. كيف يمكنني مساعدتك اليوم؟';
+  String get aiWelcomeMessage =>
+      'مرحباً! أنا مساعدك القانوني الذكي. يمكنني مساعدتك في فهم عقودك، معرفة حقوقك، وصياغة عقود جديدة. كيف يمكنني مساعدتك اليوم؟';
 
   @override
   String get aiQuickActionCreateContract => 'أريد إنشاء عقد';
@@ -1326,19 +1375,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get aiQuickActionExplainClause => 'اشرح لي بند قانوني';
 
   @override
-  String get aiContractWizardIntro => 'ممتاز! سأساعدك في صياغة عقد قانوني موثوق. اختر نوع العقد الذي تريد إنشاءه من القائمة:';
+  String get aiContractWizardIntro =>
+      'ممتاز! سأساعدك في صياغة عقد قانوني موثوق. اختر نوع العقد الذي تريد إنشاءه من القائمة:';
 
   @override
-  String get aiContractWizardAskParty1 => 'من هو الطرف الأول في العقد (صاحب العمل / المنشأة)؟';
+  String get aiContractWizardAskParty1 =>
+      'من هو الطرف الأول في العقد (صاحب العمل / المنشأة)؟';
 
   @override
   String get aiContractWizardAskParty2 => 'تمام. من هو الطرف الثاني في العقد؟';
 
   @override
-  String get aiContractWizardAskSubject => 'ما هو موضوع العقد أو المهام الرئيسية؟';
+  String get aiContractWizardAskSubject =>
+      'ما هو موضوع العقد أو المهام الرئيسية؟';
 
   @override
-  String get aiContractWizardAskValue => 'أخيرًا، ما القيمة المالية ومدة العقد؟';
+  String get aiContractWizardAskValue =>
+      'أخيرًا، ما القيمة المالية ومدة العقد؟';
 
   @override
   String aiContractWizardDraftTitle(String type) {
@@ -1475,7 +1528,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get clientsEmptyTitle => 'لا يوجد عملاء بعد';
 
   @override
-  String get clientsEmptyMessage => 'سيظهر هنا العملاء الذين أجريت معهم استشارة';
+  String get clientsEmptyMessage =>
+      'سيظهر هنا العملاء الذين أجريت معهم استشارة';
 
   @override
   String clientsConsultationCount(int count) {
@@ -1498,7 +1552,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get unsavedChangesTitle => 'تجاهل التغييرات؟';
 
   @override
-  String get unsavedChangesMessage => 'لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة دون حفظها؟';
+  String get unsavedChangesMessage =>
+      'لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة دون حفظها؟';
 
   @override
   String get unsavedChangesDiscard => 'تجاهل';
@@ -1543,7 +1598,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lawyerSelectSpecialtyError => 'اختر تخصصًا واحدًا على الأقل';
 
   @override
-  String get lawyerSelectConsultationTypeError => 'اختر نوع استشارة واحدًا على الأقل تقدمه';
+  String get lawyerSelectConsultationTypeError =>
+      'اختر نوع استشارة واحدًا على الأقل تقدمه';
 
   @override
   String get navTeam => 'الفريق';
@@ -1590,7 +1646,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get teamRemoveConfirmTitle => 'إزالة العضو';
 
   @override
-  String get teamRemoveConfirmMessage => 'هل أنت متأكد أنك تريد إزالة هذا العضو من فريقك؟';
+  String get teamRemoveConfirmMessage =>
+      'هل أنت متأكد أنك تريد إزالة هذا العضو من فريقك؟';
 
   @override
   String get companyActiveConsultations => 'استشارات نشطة';
@@ -1599,7 +1656,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get documentsUploadTitle => 'رفع مستند';
 
   @override
-  String get documentsUploadHint => 'لا يوجد منتقي ملفات حقيقي في هذه المعاينة بعد — فقط أدخل عنوانًا للمستند.';
+  String get documentsUploadHint =>
+      'لا يوجد منتقي ملفات حقيقي في هذه المعاينة بعد — فقط أدخل عنوانًا للمستند.';
 
   @override
   String get documentsUploadLabel => 'عنوان المستند';
@@ -1620,7 +1678,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get documentsDeleteConfirmTitle => 'حذف المستند';
 
   @override
-  String get documentsDeleteConfirmMessage => 'هل أنت متأكد أنك تريد حذف هذا المستند؟ لا يمكن التراجع عن هذا الإجراء.';
+  String get documentsDeleteConfirmMessage =>
+      'هل أنت متأكد أنك تريد حذف هذا المستند؟ لا يمكن التراجع عن هذا الإجراء.';
 
   @override
   String get documentsDeletedMessage => 'تم حذف المستند';
@@ -1677,7 +1736,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentMethodsEmptyTitle => 'لا توجد طرق دفع محفوظة';
 
   @override
-  String get paymentMethodsEmptyMessage => 'أضف بطاقة لتسهيل عمليات الدفع القادمة';
+  String get paymentMethodsEmptyMessage =>
+      'أضف بطاقة لتسهيل عمليات الدفع القادمة';
 
   @override
   String get paymentMethodsAddCard => 'إضافة بطاقة';
@@ -1707,7 +1767,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentMethodsRemoveConfirmTitle => 'حذف البطاقة';
 
   @override
-  String get paymentMethodsRemoveConfirmMessage => 'هل أنت متأكد أنك تريد حذف هذه البطاقة؟';
+  String get paymentMethodsRemoveConfirmMessage =>
+      'هل أنت متأكد أنك تريد حذف هذه البطاقة؟';
 
   @override
   String get savedSignatureTitle => 'التوقيع المحفوظ';
@@ -1787,6 +1848,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get securitySessionLocationJordan => 'الأردن';
 
   @override
+  String get securityTwoFactorUnavailable => 'غير متاح حالياً';
+
+  @override
+  String get securitySessionsError => 'تعذّر تحميل الجلسات';
+
+  @override
+  String get securityThisDevice => 'هذا الجهاز';
+
+  @override
+  String get securityUnknownDevice => 'جهاز غير معروف';
+
+  @override
+  String get securityEndAllOtherSessions => 'تسجيل الخروج من كل الأجهزة الأخرى';
+
+  @override
   String get helpSupportTitle => 'المساعدة والدعم';
 
   @override
@@ -1811,25 +1887,31 @@ class AppLocalizationsAr extends AppLocalizations {
   String get helpFaqNewContractQuestion => 'كيف أنشئ عقداً جديداً؟';
 
   @override
-  String get helpFaqNewContractAnswer => 'من الرئيسية اختر \"العقود الذكية\"، ثم اختر نوع العقد واملأ البيانات المطلوبة خطوة بخطوة.';
+  String get helpFaqNewContractAnswer =>
+      'من الرئيسية اختر \"العقود الذكية\"، ثم اختر نوع العقد واملأ البيانات المطلوبة خطوة بخطوة.';
 
   @override
-  String get helpFaqEsignatureQuestion => 'هل التوقيع الإلكتروني معتمد قانونياً؟';
+  String get helpFaqEsignatureQuestion =>
+      'هل التوقيع الإلكتروني معتمد قانونياً؟';
 
   @override
-  String get helpFaqEsignatureAnswer => 'نعم، يتوافق التوقيع الإلكتروني مع أحكام قانون المعاملات الإلكترونية الأردني.';
+  String get helpFaqEsignatureAnswer =>
+      'نعم، يتوافق التوقيع الإلكتروني مع أحكام قانون المعاملات الإلكترونية الأردني.';
 
   @override
   String get helpFaqBookConsultationQuestion => 'كيف أحجز استشارة مع محامٍ؟';
 
   @override
-  String get helpFaqBookConsultationAnswer => 'من تبويب \"المحامون\" اختر المحامي المناسب ثم اضغط \"احجز استشارة الآن\" واتبع خطوات الحجز.';
+  String get helpFaqBookConsultationAnswer =>
+      'من تبويب \"المحامون\" اختر المحامي المناسب ثم اضغط \"احجز استشارة الآن\" واتبع خطوات الحجز.';
 
   @override
-  String get helpFaqManageSubscriptionQuestion => 'كيف ألغي أو أغيّر باقة اشتراكي؟';
+  String get helpFaqManageSubscriptionQuestion =>
+      'كيف ألغي أو أغيّر باقة اشتراكي؟';
 
   @override
-  String get helpFaqManageSubscriptionAnswer => 'من \"حسابي\" اختر \"الاشتراكات والباقات\" لاختيار باقة أخرى أو تغيير دورة الفوترة في أي وقت.';
+  String get helpFaqManageSubscriptionAnswer =>
+      'من \"حسابي\" اختر \"الاشتراكات والباقات\" لاختيار باقة أخرى أو تغيير دورة الفوترة في أي وقت.';
 
   @override
   String get invoicesTitle => 'الفواتير';
@@ -1904,7 +1986,8 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get subscriptionBasicDesc => 'يشمل عدداً معيناً من خدمات الذكاء الاصطناعي وصياغة العقود';
+  String get subscriptionBasicDesc =>
+      'يشمل عدداً معيناً من خدمات الذكاء الاصطناعي وصياغة العقود';
 
   @override
   String get subscriptionBasicFeature1 => '5 عقود شهرياً';
@@ -1919,7 +2002,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get subscriptionBasicFeature4 => 'دعم البريد الإلكتروني';
 
   @override
-  String get subscriptionProDesc => 'كل ما تحتاجه لإدارة عقودك واستشاراتك القانونية بلا حدود';
+  String get subscriptionProDesc =>
+      'كل ما تحتاجه لإدارة عقودك واستشاراتك القانونية بلا حدود';
 
   @override
   String get subscriptionProFeature1 => 'عقود غير محدودة';
@@ -1940,7 +2024,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get subscriptionProFeature6 => 'دعم أولوية 24/7';
 
   @override
-  String get subscriptionEnterpriseDesc => 'حل شامل للشركات والمؤسسات القانونية الكبيرة';
+  String get subscriptionEnterpriseDesc =>
+      'حل شامل للشركات والمؤسسات القانونية الكبيرة';
 
   @override
   String get subscriptionEnterpriseFeature1 => 'كل مميزات Pro';
@@ -1973,7 +2058,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get govDocumentsTitle => 'المستندات الحكومية';
 
   @override
-  String get govDocumentsSearchHint => 'ماذا تريد إنجازه؟ (مثال: تسجيل شركة، تسجيل عقار...)';
+  String get govDocumentsSearchHint =>
+      'ماذا تريد إنجازه؟ (مثال: تسجيل شركة، تسجيل عقار...)';
 
   @override
   String get govProcedureCompanyRegistration => 'تسجيل شركة';
@@ -2025,7 +2111,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get govStartProcedure => 'ابدأ الإجراء الآن';
 
   @override
-  String get govProcedureStartedMessage => 'تم بدء متابعة الإجراء — يمكنك متابعة حالته من هنا';
+  String get govProcedureStartedMessage =>
+      'تم بدء متابعة الإجراء — يمكنك متابعة حالته من هنا';
 
   @override
   String get govProcedureStatusInProgress => 'قيد الإجراء — بانتظار المستندات';

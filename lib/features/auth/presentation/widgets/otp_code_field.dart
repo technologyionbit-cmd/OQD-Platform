@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_radii.dart';
+import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 
 /// Six single-digit boxes with auto-advance on input and auto-back on
 /// backspace — the verification-code input used by the OTP screen.
@@ -54,35 +55,47 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(widget.length, (index) {
-        return SizedBox(
-          width: 44,
-          height: 52,
-          child: KeyboardListener(
-            focusNode: _keyListenerNodes[index],
-            onKeyEvent: (event) => _onKey(index, event),
-            child: TextField(
-              controller: _controllers[index],
-              focusNode: _focusNodes[index],
-              textAlign: TextAlign.center,
-              keyboardType: TextInputType.number,
-              maxLength: 1,
-              style: Theme.of(context).textTheme.titleLarge,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(
-                counterText: '',
-                contentPadding: EdgeInsets.zero,
-                border: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: const BorderSide(color: AppColors.border)),
-                enabledBorder: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: const BorderSide(color: AppColors.border)),
-                focusedBorder: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: const BorderSide(color: AppColors.primary)),
+    // Codes read left-to-right regardless of locale; force LTR so box 1 is
+    // always the leftmost. Each box flexes to share the available width so
+    // six boxes never overflow a narrow screen.
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Row(
+        children: [
+          for (var index = 0; index < widget.length; index++) ...[
+            if (index > 0) const SizedBox(width: AppSpacing.xs),
+            Expanded(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 56),
+                child: AspectRatio(
+                  aspectRatio: 44 / 52,
+                  child: KeyboardListener(
+                    focusNode: _keyListenerNodes[index],
+                    onKeyEvent: (event) => _onKey(index, event),
+                    child: TextField(
+                      controller: _controllers[index],
+                      focusNode: _focusNodes[index],
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      maxLength: 1,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      decoration: InputDecoration(
+                        counterText: '',
+                        contentPadding: EdgeInsets.zero,
+                        border: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: const BorderSide(color: AppColors.border)),
+                        enabledBorder: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: const BorderSide(color: AppColors.border)),
+                        focusedBorder: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: const BorderSide(color: AppColors.primary)),
+                      ),
+                      onChanged: (value) => _onDigitChanged(index, value),
+                    ),
+                  ),
+                ),
               ),
-              onChanged: (value) => _onDigitChanged(index, value),
             ),
-          ),
-        );
-      }),
+          ],
+        ],
+      ),
     );
   }
 }

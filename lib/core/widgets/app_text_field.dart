@@ -17,6 +17,7 @@ class AppTextField extends StatefulWidget {
     this.maxLines = 1,
     this.minLines,
     this.onChanged,
+    this.onSubmitted,
     this.readOnly = false,
     this.onTap,
     this.suffixIcon,
@@ -37,6 +38,11 @@ class AppTextField extends StatefulWidget {
   final int maxLines;
   final int? minLines;
   final ValueChanged<String>? onChanged;
+
+  /// Called when the keyboard action button is pressed — wire it to the
+  /// form's submit handler so a form is completable without leaving the
+  /// keyboard.
+  final ValueChanged<String>? onSubmitted;
 
   /// Set alongside [onTap] for a field that opens a picker (date, etc.)
   /// instead of accepting direct keyboard input.
@@ -64,6 +70,7 @@ class _AppTextFieldState extends State<AppTextField> {
       maxLines: widget.obscureText ? 1 : widget.maxLines,
       minLines: widget.obscureText ? null : widget.minLines,
       onChanged: widget.onChanged,
+      onSubmitted: widget.onSubmitted,
       readOnly: widget.readOnly,
       onTap: widget.onTap,
       decoration: InputDecoration(

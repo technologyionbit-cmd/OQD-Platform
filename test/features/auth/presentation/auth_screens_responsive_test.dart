@@ -4,8 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:aqd_ionbit/core/config/env_config.dart';
-import 'package:aqd_ionbit/core/config/environment.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
@@ -41,7 +39,6 @@ Future<void> _pumpAtSize(WidgetTester tester, Widget screen, Size size, {Locale 
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
-        envConfigProvider.overrideWithValue(EnvConfig.forEnvironment(Environment.development)),
         appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
         tokenManagerProvider.overrideWithValue(tokenManager),
       ],

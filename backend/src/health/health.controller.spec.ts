@@ -2,10 +2,9 @@ import { Test } from '@nestjs/testing';
 import { HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
 import { PrismaService } from '../prisma/prisma.service';
 import { HealthController } from './health.controller';
-import { RedisHealthIndicator } from './indicators/redis.health-indicator';
 
 describe('HealthController', () => {
-  it('aggregates the database and redis indicators through HealthCheckService', async () => {
+  it('aggregates the database indicator through HealthCheckService', async () => {
     const check = jest
       .fn()
       .mockImplementation(
@@ -37,12 +36,6 @@ describe('HealthController', () => {
               .mockResolvedValue({ database: { status: 'up' } }),
           },
         },
-        {
-          provide: RedisHealthIndicator,
-          useValue: {
-            pingCheck: jest.fn().mockResolvedValue({ redis: { status: 'up' } }),
-          },
-        },
       ],
     }).compile();
 
@@ -51,9 +44,6 @@ describe('HealthController', () => {
 
     expect(check).toHaveBeenCalledTimes(1);
     expect(result.status).toBe('ok');
-    expect(result.details).toMatchObject({
-      database: { status: 'up' },
-      redis: { status: 'up' },
-    });
+    expect(result.details).toMatchObject({ database: { status: 'up' } });
   });
 });

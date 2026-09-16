@@ -4,9 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:aqd_ionbit/app/app.dart';
-import 'package:aqd_ionbit/core/config/env_config.dart';
-import 'package:aqd_ionbit/core/config/environment.dart';
+import 'package:aqd_ionbit/app.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
@@ -78,7 +76,6 @@ Future<RoleTestHarness> pumpAuthenticatedApp(
 
   final container = ProviderContainer(
     overrides: [
-      envConfigProvider.overrideWithValue(EnvConfig.forEnvironment(Environment.development)),
       appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
       authRepositoryProvider.overrideWithValue(repository),
       tokenManagerProvider.overrideWithValue(tokenManager),

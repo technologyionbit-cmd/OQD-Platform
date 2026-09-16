@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
-import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
@@ -14,7 +13,9 @@ import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_chip.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_header.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_success_state.dart';
 
 enum _RecoveryMethod { sms, email }
 
@@ -42,6 +43,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
   Future<void> _send() async {
     final l10n = AppLocalizations.of(context)!;
+    FocusScope.of(context).unfocus();
     final destination = _destinationController.text.trim();
 
     final error = _method == _RecoveryMethod.sms
@@ -71,31 +73,28 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     };
   }
 
+  void _setMethod(_RecoveryMethod method) {
+    setState(() {
+      _method = method;
+      _fieldError = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            AuthHeader(
-              icon: Icons.mark_email_unread_outlined,
-              title: l10n.authForgotPasswordTitle,
-              subtitle: l10n.authForgotPasswordSubtitle,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: _sent ? _buildSentState(context, l10n) : _buildRequestForm(context, l10n),
-            ),
-          ],
-        ),
-      ),
+    return AuthScaffold(
+      icon: Icons.mark_email_unread_outlined,
+      title: l10n.authForgotPasswordTitle,
+      subtitle: l10n.authForgotPasswordSubtitle,
+      showBackButton: !_sent,
+      child: _sent ? _buildSentState(l10n) : _buildRequestForm(context, l10n),
     );
   }
 
   Widget _buildRequestForm(BuildContext context, AppLocalizations l10n) {
+    final isSms = _method == _RecoveryMethod.sms;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -105,11 +104,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: AppChip(
                 label: l10n.authMethodSms,
                 icon: Icons.sms_outlined,
-                selected: _method == _RecoveryMethod.sms,
-                onTap: () => setState(() {
-                  _method = _RecoveryMethod.sms;
-                  _fieldError = null;
-                }),
+                selected: isSms,
+                onTap: () => _setMethod(_RecoveryMethod.sms),
               ),
             ),
             const SizedBox(width: AppSpacing.xs),
@@ -117,11 +113,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               child: AppChip(
                 label: l10n.authMethodEmail,
                 icon: Icons.email_outlined,
-                selected: _method == _RecoveryMethod.email,
-                onTap: () => setState(() {
-                  _method = _RecoveryMethod.email;
-                  _fieldError = null;
-                }),
+                selected: !isSms,
+                onTap: () => _setMethod(_RecoveryMethod.email),
               ),
             ),
           ],
@@ -129,37 +122,35 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         const SizedBox(height: AppSpacing.lg),
         AppTextField(
           controller: _destinationController,
-          label: _method == _RecoveryMethod.sms ? l10n.authPhoneLabel : l10n.authEmailLabel,
+          label: isSms ? l10n.authPhoneLabel : l10n.authEmailLabel,
           errorText: _fieldError,
-          keyboardType: _method == _RecoveryMethod.sms ? TextInputType.phone : TextInputType.emailAddress,
+          keyboardType: isSms ? TextInputType.phone : TextInputType.emailAddress,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (_) => _send(),
         ),
         const SizedBox(height: AppSpacing.md),
         Container(
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(color: context.statusColors.info.background, borderRadius: AppRadii.mdRadius),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(Icons.info_outline, size: 18, color: context.statusColors.info.foreground),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
-                child: Text(
-                  _method == _RecoveryMethod.sms ? l10n.authSmsInfo : l10n.authEmailInfo,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+                child: Text(isSms ? l10n.authSmsInfo : l10n.authEmailInfo, style: Theme.of(context).textTheme.bodySmall),
               ),
             ],
           ),
         ),
-        if (_formError != null) ...[
-          const SizedBox(height: AppSpacing.sm),
-          Text(_formError!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-        ],
+        AuthFormError(_formError),
         const SizedBox(height: AppSpacing.lg),
         AppButton(label: l10n.authSendCode, isLoading: _isSubmitting, onPressed: _send),
         const SizedBox(height: AppSpacing.md),
         Center(
           child: Wrap(
             alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(l10n.authRememberPassword, style: Theme.of(context).textTheme.bodyMedium),
               TextButton(onPressed: () => context.go(RoutePaths.login), child: Text(l10n.authLoginTitle)),
@@ -170,34 +161,14 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     );
   }
 
-  Widget _buildSentState(BuildContext context, AppLocalizations l10n) {
-    final destination = _destinationController.text.trim();
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 88,
-          height: 88,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(color: context.statusColors.success.background, shape: BoxShape.circle),
-          child: Icon(Icons.check, color: context.statusColors.success.foreground, size: 40),
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        Text(l10n.authSentTitle, style: Theme.of(context).textTheme.headlineSmall),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          _method == _RecoveryMethod.sms ? l10n.authSentSubtitleSms : l10n.authSentSubtitleEmail,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-        ),
-        const SizedBox(height: AppSpacing.xl),
-        AppButton(
-          label: l10n.authEnterCode,
-          onPressed: () => context.push(RoutePaths.otpVerification, extra: destination),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        TextButton(onPressed: _send, child: Text(l10n.authResend)),
-      ],
+  Widget _buildSentState(AppLocalizations l10n) {
+    return AuthSuccessState(
+      title: l10n.authSentTitle,
+      message: _method == _RecoveryMethod.sms ? l10n.authSentSubtitleSms : l10n.authSentSubtitleEmail,
+      primaryLabel: l10n.authEnterCode,
+      onPrimary: () => context.push(RoutePaths.otpVerification, extra: _destinationController.text.trim()),
+      secondaryLabel: l10n.authResend,
+      onSecondary: _send,
     );
   }
 }

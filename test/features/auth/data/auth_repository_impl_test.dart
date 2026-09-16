@@ -5,6 +5,7 @@ import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:aqd_ionbit/features/auth/domain/entities/auth_session.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
@@ -98,6 +99,68 @@ void main() {
       await repository.logout();
 
       verify(() => tokenManager.clear()).called(1);
+    });
+
+    test('passes the stored refresh token to the remote call', () async {
+      when(() => tokenManager.current).thenReturn(tokens);
+      when(() => remote.logout(any())).thenAnswer((_) async {});
+      when(() => tokenManager.clear()).thenAnswer((_) async {});
+
+      await repository.logout();
+
+      verify(() => remote.logout('refresh')).called(1);
+    });
+  });
+
+  group('refreshToken', () {
+    test('persists the rotated tokens on success', () async {
+      const rotated = AuthTokens(accessToken: 'access2', refreshToken: 'refresh2');
+      when(() => remote.refreshToken('refresh')).thenAnswer((_) async => rotated);
+      when(() => tokenManager.save(rotated)).thenAnswer((_) async {});
+
+      final result = await repository.refreshToken('refresh');
+
+      expect(result.valueOrNull, rotated);
+      verify(() => tokenManager.save(rotated)).called(1);
+    });
+  });
+
+  group('currentUser', () {
+    test('short-circuits to UnauthorizedFailure when no token is stored', () async {
+      when(() => tokenManager.current).thenReturn(null);
+
+      final result = await repository.currentUser();
+
+      expect(result.isFailure, isTrue);
+      verifyNever(() => remote.currentUser());
+    });
+  });
+
+  group('changePassword', () {
+    test('maps a thrown ValidationFailure to Result.failure', () async {
+      when(
+        () => remote.changePassword(currentPassword: any(named: 'currentPassword'), newPassword: any(named: 'newPassword')),
+      ).thenThrow(const ValidationFailure(fieldErrors: {
+        'currentPassword': ['Current password is incorrect.'],
+      }));
+
+      final result = await repository.changePassword(currentPassword: 'wrong', newPassword: 'Password123');
+
+      expect(result.isFailure, isTrue);
+    });
+  });
+
+  group('listSessions', () {
+    test('returns the sessions from the remote source', () async {
+      final sessions = [
+        AuthSession(id: 's1', createdAt: DateTime(2026), isCurrent: true),
+        AuthSession(id: 's2', createdAt: DateTime(2026), isCurrent: false),
+      ];
+      when(() => remote.listSessions()).thenAnswer((_) async => sessions);
+
+      final result = await repository.listSessions();
+
+      expect(result.valueOrNull, sessions);
     });
   });
 }

@@ -24,6 +24,9 @@ class AppDropdown<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
+      // `value` keeps this a controlled component (reflects external state
+      // changes); `initialValue` would only seed the first build.
+      // ignore: deprecated_member_use
       value: value,
       decoration: InputDecoration(labelText: label, errorText: errorText),
       items: [for (final item in items) DropdownMenuItem<T>(value: item, child: Text(itemLabel(item)))],

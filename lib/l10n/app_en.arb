@@ -655,6 +655,11 @@
   "securityEndSession": "End Session",
   "securitySessionEndedMessage": "Session ended",
   "securitySessionLocationJordan": "Jordan",
+  "securityTwoFactorUnavailable": "Not available yet",
+  "securitySessionsError": "Couldn't load your sessions",
+  "securityThisDevice": "This device",
+  "securityUnknownDevice": "Unknown device",
+  "securityEndAllOtherSessions": "Sign out of all other devices",
 
   "helpSupportTitle": "Help & Support",
   "helpFaqTitle": "Frequently Asked Questions",
