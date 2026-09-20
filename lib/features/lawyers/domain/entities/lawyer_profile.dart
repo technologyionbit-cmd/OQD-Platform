@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'package:aqd_ionbit/features/lawyers/domain/entities/consultation_type.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_specialty.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
 
 part 'lawyer_profile.freezed.dart';
 
@@ -23,11 +24,6 @@ abstract class LawyerProfile with _$LawyerProfile {
     required int reviewsCount,
     required List<ConsultationType> consultationTypes,
     required Map<ConsultationType, double> pricing,
-    @Default(true) bool isVerified,
-    // Mock-only session state: flips true once a verification document has
-    // been "submitted" via the profile screen's upload flow, so the status
-    // card can show "Pending Review" without pretending anything was
-    // actually sent to a backend. Meaningless once [isVerified] is true.
-    @Default(false) bool hasPendingVerification,
+    @Default(VerificationStatus.verified) VerificationStatus verificationStatus,
   }) = _LawyerProfile;
 }

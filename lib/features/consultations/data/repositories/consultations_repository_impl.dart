@@ -61,10 +61,10 @@ class ConsultationsRepositoryImpl implements ConsultationsRepository {
   Future<Result<Consultation>> acceptRequest(String id) => _guard(() => _remote.acceptRequest(id));
 
   @override
-  Future<Result<Consultation>> rejectRequest(String id) => _guard(() => _remote.rejectRequest(id));
+  Future<Result<Consultation>> rejectRequest(String id, {String? reason}) => _guard(() => _remote.rejectRequest(id, reason: reason));
 
   @override
-  Future<Result<Consultation>> cancel(String id) => _guard(() => _remote.cancel(id));
+  Future<Result<Consultation>> cancel(String id, {String? reason}) => _guard(() => _remote.cancel(id, reason: reason));
 
   @override
   Future<Result<Consultation>> reschedule({required String id, required DateTime newDateTime}) {
@@ -79,11 +79,6 @@ class ConsultationsRepositoryImpl implements ConsultationsRepository {
 
   @override
   Future<Result<Consultation>> markFailed(String id) => _guard(() => _remote.markFailed(id));
-
-  @override
-  Future<Result<Consultation>> sendMessage({required String id, required String text, required bool isFromLawyer}) {
-    return _guard(() => _remote.sendMessage(id: id, text: text, isFromLawyer: isFromLawyer));
-  }
 
   Future<Result<T>> _guard<T>(Future<T> Function() action) async {
     try {

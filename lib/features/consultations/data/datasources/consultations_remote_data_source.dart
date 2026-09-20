@@ -27,9 +27,9 @@ abstract interface class ConsultationsRemoteDataSource {
 
   Future<Consultation> acceptRequest(String id);
 
-  Future<Consultation> rejectRequest(String id);
+  Future<Consultation> rejectRequest(String id, {String? reason});
 
-  Future<Consultation> cancel(String id);
+  Future<Consultation> cancel(String id, {String? reason});
 
   Future<Consultation> reschedule({required String id, required DateTime newDateTime});
 
@@ -38,6 +38,4 @@ abstract interface class ConsultationsRemoteDataSource {
   Future<Consultation> markMissed(String id);
 
   Future<Consultation> markFailed(String id);
-
-  Future<Consultation> sendMessage({required String id, required String text, required bool isFromLawyer});
 }

@@ -244,14 +244,14 @@ class ConsultationsMockDataSource implements ConsultationsRemoteDataSource {
   Future<Consultation> acceptRequest(String id) => _updateStatus(id, ConsultationStatus.confirmed);
 
   @override
-  Future<Consultation> rejectRequest(String id) async {
+  Future<Consultation> rejectRequest(String id, {String? reason}) async {
     final updated = await _updateStatus(id, ConsultationStatus.declined);
     _unmarkSlotForConsultation(updated.lawyerId, updated);
     return updated;
   }
 
   @override
-  Future<Consultation> cancel(String id) async {
+  Future<Consultation> cancel(String id, {String? reason}) async {
     final updated = await _updateStatus(id, ConsultationStatus.cancelled);
     _unmarkSlotForConsultation(updated.lawyerId, updated);
     return updated;
@@ -278,22 +278,6 @@ class ConsultationsMockDataSource implements ConsultationsRemoteDataSource {
 
   @override
   Future<Consultation> markFailed(String id) => _updateStatus(id, ConsultationStatus.failed);
-
-  @override
-  Future<Consultation> sendMessage({required String id, required String text, required bool isFromLawyer}) async {
-    await _simulateLatency();
-    final index = _consultations.indexWhere((c) => c.id == id);
-    if (index == -1) throw const NotFoundFailure();
-    final message = ConsultationMessage(
-      id: 'msg_${DateTime.now().microsecondsSinceEpoch}',
-      text: text,
-      sentAt: DateTime.now(),
-      isFromLawyer: isFromLawyer,
-    );
-    final updated = _consultations[index].copyWith(messages: [..._consultations[index].messages, message]);
-    _consultations[index] = updated;
-    return updated;
-  }
 
   Future<Consultation> _updateStatus(String id, ConsultationStatus status) async {
     await _simulateLatency();

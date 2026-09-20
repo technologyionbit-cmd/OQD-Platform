@@ -25,9 +25,9 @@ abstract interface class ConsultationsRepository {
 
   Future<Result<Consultation>> acceptRequest(String id);
 
-  Future<Result<Consultation>> rejectRequest(String id);
+  Future<Result<Consultation>> rejectRequest(String id, {String? reason});
 
-  Future<Result<Consultation>> cancel(String id);
+  Future<Result<Consultation>> cancel(String id, {String? reason});
 
   Future<Result<Consultation>> reschedule({required String id, required DateTime newDateTime});
 
@@ -36,6 +36,4 @@ abstract interface class ConsultationsRepository {
   Future<Result<Consultation>> markMissed(String id);
 
   Future<Result<Consultation>> markFailed(String id);
-
-  Future<Result<Consultation>> sendMessage({required String id, required String text, required bool isFromLawyer});
 }

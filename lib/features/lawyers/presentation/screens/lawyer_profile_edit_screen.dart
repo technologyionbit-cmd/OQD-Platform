@@ -21,6 +21,7 @@ import 'package:aqd_ionbit/features/lawyers/data/repositories/lawyers_repository
 import 'package:aqd_ionbit/features/lawyers/domain/entities/consultation_type.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_specialty.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/providers/lawyer_by_id_provider.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/providers/lawyers_controller.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/consultation_type_x.dart';
@@ -210,7 +211,7 @@ class _EditFormState extends ConsumerState<_EditForm> {
   Future<void> _submitVerificationDocument(AppLocalizations l10n) async {
     setState(() => _isSubmittingVerification = true);
     final repository = ref.read(lawyersRepositoryProvider);
-    final result = await repository.updateProfile(widget.lawyer.copyWith(hasPendingVerification: true));
+    final result = await repository.updateProfile(widget.lawyer.copyWith(verificationStatus: VerificationStatus.pending));
     if (!mounted) return;
     setState(() => _isSubmittingVerification = false);
 
@@ -222,9 +223,11 @@ class _EditFormState extends ConsumerState<_EditForm> {
   }
 
   String _verificationStatusLabel(AppLocalizations l10n) {
-    if (widget.lawyer.isVerified) return l10n.lawyerVerified;
-    if (widget.lawyer.hasPendingVerification) return l10n.lawyerPendingVerification;
-    return l10n.lawyerNotVerified;
+    return switch (widget.lawyer.verificationStatus) {
+      VerificationStatus.verified => l10n.lawyerVerified,
+      VerificationStatus.pending => l10n.lawyerPendingVerification,
+      VerificationStatus.unverified || VerificationStatus.rejected => l10n.lawyerNotVerified,
+    };
   }
 
   @override
@@ -241,11 +244,11 @@ class _EditFormState extends ConsumerState<_EditForm> {
                 child: Row(
                   children: [
                     Icon(
-                      widget.lawyer.isVerified
-                          ? Icons.verified
-                          : widget.lawyer.hasPendingVerification
-                          ? Icons.hourglass_empty
-                          : Icons.error_outline,
+                      switch (widget.lawyer.verificationStatus) {
+                        VerificationStatus.verified => Icons.verified,
+                        VerificationStatus.pending => Icons.hourglass_empty,
+                        VerificationStatus.unverified || VerificationStatus.rejected => Icons.error_outline,
+                      },
                       color: AppColors.primary,
                     ),
                     const SizedBox(width: AppSpacing.sm),
@@ -257,18 +260,19 @@ class _EditFormState extends ConsumerState<_EditForm> {
                     Flexible(
                       child: StatusBadge(
                         label: _verificationStatusLabel(l10n),
-                        tone: widget.lawyer.isVerified
-                            ? AppStatusTone.success
-                            : widget.lawyer.hasPendingVerification
-                            ? AppStatusTone.warning
-                            : AppStatusTone.neutral,
+                        tone: switch (widget.lawyer.verificationStatus) {
+                          VerificationStatus.verified => AppStatusTone.success,
+                          VerificationStatus.pending => AppStatusTone.warning,
+                          VerificationStatus.unverified || VerificationStatus.rejected => AppStatusTone.neutral,
+                        },
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: AppSpacing.sm),
-              if (!widget.lawyer.isVerified && !widget.lawyer.hasPendingVerification)
+              if (widget.lawyer.verificationStatus == VerificationStatus.unverified ||
+                  widget.lawyer.verificationStatus == VerificationStatus.rejected)
                 AppButton(
                   label: l10n.lawyerUploadVerificationDocument,
                   icon: Icons.upload_file_outlined,

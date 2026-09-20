@@ -59,6 +59,14 @@ class _AppTextFieldState extends State<AppTextField> {
   late bool _obscured = widget.obscureText;
 
   @override
+  void didUpdateWidget(AppTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.obscureText != widget.obscureText) {
+      _obscured = widget.obscureText;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextField(
       controller: widget.controller,

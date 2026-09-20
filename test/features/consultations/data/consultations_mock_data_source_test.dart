@@ -50,15 +50,6 @@ void main() {
     expect(updated.status, ConsultationStatus.completed);
   });
 
-  test('sendMessage appends a message to the consultation', () async {
-    final before = await dataSource.getConsultationById('cons_seed_2');
-    final updated = await dataSource.sendMessage(id: 'cons_seed_2', text: 'رسالة جديدة', isFromLawyer: true);
-
-    expect(updated.messages.length, before.messages.length + 1);
-    expect(updated.messages.last.text, 'رسالة جديدة');
-    expect(updated.messages.last.isFromLawyer, isTrue);
-  });
-
   test('getAvailability generates slots only on working days (Sun-Thu)', () async {
     final slots = await dataSource.getAvailability('lwr_seed_2');
     expect(slots, isNotEmpty);

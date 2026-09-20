@@ -35,5 +35,12 @@ import { TokenService } from './services/token.service';
     OtpService,
     JwtAuthGuard,
   ],
+  // The auth surface other feature modules need to protect their own
+  // routes (docs/plans/individual-user-rollout.md). A `@UseGuards(Class)`
+  // reference is resolved in the *consuming* module's injector, so
+  // TokenService must be exported too — importing modules re-declare
+  // JwtAuthGuard as their own provider and it resolves TokenService from
+  // here via the module import.
+  exports: [JwtAuthGuard, TokenService],
 })
 export class AuthModule {}

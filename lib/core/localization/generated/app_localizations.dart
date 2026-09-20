@@ -560,18 +560,6 @@ abstract class AppLocalizations {
   /// **'ابدأ'**
   String get onboardingGetStarted;
 
-  /// No description provided for @devCredentialsTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'بيانات تجريبية (بيئة التطوير فقط)'**
-  String get devCredentialsTitle;
-
-  /// No description provided for @devCredentialsPassword.
-  ///
-  /// In ar, this message translates to:
-  /// **'كلمة المرور لجميع الحسابات: {password}'**
-  String devCredentialsPassword(String password);
-
   /// No description provided for @errorGeneric.
   ///
   /// In ar, this message translates to:

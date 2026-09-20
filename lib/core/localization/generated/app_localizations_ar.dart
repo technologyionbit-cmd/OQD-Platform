@@ -253,14 +253,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingGetStarted => 'ابدأ';
 
   @override
-  String get devCredentialsTitle => 'بيانات تجريبية (بيئة التطوير فقط)';
-
-  @override
-  String devCredentialsPassword(String password) {
-    return 'كلمة المرور لجميع الحسابات: $password';
-  }
-
-  @override
   String get errorGeneric => 'حدث خطأ غير متوقع';
 
   @override

@@ -22,13 +22,14 @@ class GovProcedureStep {
 }
 
 /// One government-documents catalog entry — required-document names and
-/// step descriptions are mock catalog content (hardcoded Arabic, same
-/// convention as `ContractsMockDataSource`'s template field labels), not
-/// l10n keys; the procedure's own identity/category *is* l10n-driven
+/// step descriptions are backend-owned catalog content (localized
+/// server-side per docs/backend/01-domain-model.md §10), not l10n keys;
+/// the procedure's own identity/category *is* l10n-driven
 /// (see `GovProcedureTypeX`), since — like [ContractCategory] — it's a
 /// small fixed taxonomy rather than free-form content.
 class GovProcedure {
   const GovProcedure({
+    required this.id,
     required this.type,
     required this.durationLabel,
     required this.accessType,
@@ -36,9 +37,27 @@ class GovProcedure {
     required this.steps,
   });
 
+  /// Backend row id — needed to address `/v1/gov-procedures/{id}/progress`.
+  /// `type` remains the stable identity used throughout the UI/routing.
+  final String id;
   final GovProcedureType type;
   final String durationLabel;
   final GovProcedureAccessType accessType;
   final List<GovRequiredDocument> requiredDocuments;
   final List<GovProcedureStep> steps;
+}
+
+/// Per-procedure progress — which required documents the user has marked
+/// ready, and whether they've tapped "Start Procedure". Persisted
+/// server-side per user+procedure (docs/backend/01-domain-model.md §10
+/// `UserGovProcedureProgress`).
+class GovProcedureProgress {
+  const GovProcedureProgress({this.checkedDocumentIds = const {}, this.started = false});
+
+  final Set<String> checkedDocumentIds;
+  final bool started;
+
+  GovProcedureProgress copyWith({Set<String>? checkedDocumentIds, bool? started}) {
+    return GovProcedureProgress(checkedDocumentIds: checkedDocumentIds ?? this.checkedDocumentIds, started: started ?? this.started);
+  }
 }

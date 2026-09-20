@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,7 +7,6 @@ import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
-import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
@@ -16,15 +14,6 @@ import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
 import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
-
-/// Demo accounts seeded into a fresh local backend for the debug-only
-/// quick-fill card. Never referenced in a release build.
-const _demoPassword = 'Password123';
-const _demoAccounts = [
-  ('عميل', 'client@aqd.test'),
-  ('محامٍ', 'lawyer@aqd.test'),
-  ('شركة', 'company@aqd.test'),
-];
 
 /// Email + password only. The account's role (returned by the backend)
 /// decides which shell the router lands on — there is no role selector,
@@ -51,16 +40,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  void _fillDemoAccount(String email) {
-    setState(() {
-      _emailController.text = email;
-      _passwordController.text = _demoPassword;
-      _emailError = null;
-      _passwordError = null;
-      _formError = null;
-    });
   }
 
   Future<void> _submit() async {
@@ -134,10 +113,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    if (kDebugMode) ...[
-                      _DevCredentialsCard(l10n: l10n, onSelect: _fillDemoAccount),
-                      const SizedBox(height: AppSpacing.lg),
-                    ],
                     AppTextField(
                       controller: _emailController,
                       label: l10n.authEmailLabel,
@@ -186,46 +161,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _DevCredentialsCard extends StatelessWidget {
-  const _DevCredentialsCard({required this.l10n, required this.onSelect});
-
-  final AppLocalizations l10n;
-  final void Function(String email) onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: const BoxDecoration(
-        color: AppColors.secondaryBackground,
-        borderRadius: AppRadii.mdRadius,
-        border: BorderDirectional(start: BorderSide(color: AppColors.secondary, width: 3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(l10n.devCredentialsTitle, style: Theme.of(context).textTheme.labelMedium),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(l10n.devCredentialsPassword(_demoPassword), style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: AppSpacing.xs),
-          Wrap(
-            spacing: AppSpacing.xs,
-            runSpacing: AppSpacing.xs,
-            children: _demoAccounts
-                .map(
-                  (account) => ActionChip(
-                    label: Text('${account.$1} — ${account.$2}', style: Theme.of(context).textTheme.labelSmall),
-                    onPressed: () => onSelect(account.$2),
-                  ),
-                )
-                .toList(),
-          ),
-        ],
       ),
     );
   }

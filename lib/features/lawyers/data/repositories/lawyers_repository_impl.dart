@@ -5,6 +5,7 @@ import 'package:aqd_ionbit/core/network/api_error_mapper.dart';
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_remote_data_source.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_specialty.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/repositories/lawyers_repository.dart';
 
 class LawyersRepositoryImpl implements LawyersRepository {
@@ -16,7 +17,8 @@ class LawyersRepositoryImpl implements LawyersRepository {
   final ApiErrorMapper _errorMapper;
 
   @override
-  Future<Result<List<LawyerProfile>>> getLawyers() => _guard(_remote.getLawyers);
+  Future<Result<List<LawyerProfile>>> getLawyers({String? query, LawyerSpecialty? specialty, double? minRating, int? page}) =>
+      _guard(() => _remote.getLawyers(query: query, specialty: specialty, minRating: minRating, page: page));
 
   @override
   Future<Result<LawyerProfile>> getLawyerById(String id) => _guard(() => _remote.getLawyerById(id));

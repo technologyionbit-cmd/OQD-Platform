@@ -69,8 +69,8 @@ class ConsultationsController extends AsyncNotifier<List<Consultation>> {
     return result;
   }
 
-  Future<Result<Consultation>> rejectRequest(String id) async {
-    final result = await _repository.rejectRequest(id);
+  Future<Result<Consultation>> rejectRequest(String id, {String? reason}) async {
+    final result = await _repository.rejectRequest(id, reason: reason);
     if (result.isSuccess) {
       await refresh();
       final consultation = result.valueOrNull!;
@@ -88,8 +88,8 @@ class ConsultationsController extends AsyncNotifier<List<Consultation>> {
     return result;
   }
 
-  Future<Result<Consultation>> cancel(String id) async {
-    final result = await _repository.cancel(id);
+  Future<Result<Consultation>> cancel(String id, {String? reason}) async {
+    final result = await _repository.cancel(id, reason: reason);
     if (result.isSuccess) {
       await refresh();
       final consultation = result.valueOrNull!;
@@ -153,16 +153,6 @@ class ConsultationsController extends AsyncNotifier<List<Consultation>> {
   /// stay `confirmed` forever in consultation lists/history.
   Future<Result<Consultation>> markFailed(String id) async {
     final result = await _repository.markFailed(id);
-    if (result.isSuccess) await refresh();
-    return result;
-  }
-
-  /// Kept only for the (already-tested) mock data layer beneath it — the
-  /// live written-chat feature (`ChatController`/`MessagesRepository`) is
-  /// the real per-consultation message thread; nothing in the UI calls this
-  /// anymore (see `ConsultationDetailsScreen`'s history for why).
-  Future<Result<Consultation>> sendMessage({required String id, required String text, required bool isFromLawyer}) async {
-    final result = await _repository.sendMessage(id: id, text: text, isFromLawyer: isFromLawyer);
     if (result.isSuccess) await refresh();
     return result;
   }

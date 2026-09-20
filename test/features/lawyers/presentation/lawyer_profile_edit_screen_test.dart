@@ -13,6 +13,7 @@ import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
 import 'package:aqd_ionbit/features/lawyers/data/repositories/lawyers_repository_impl.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/screens/lawyer_profile_edit_screen.dart';
 
 /// Covers the validation added on top of the previously-unvalidated Save
@@ -46,7 +47,7 @@ Future<ProviderContainer> _pump(WidgetTester tester, {bool isVerified = true}) a
     await tester.runAsync(() async {
       final repo = container.read(lawyersRepositoryProvider);
       final current = (await repo.getLawyerById(kDemoLawyerId)).valueOrNull!;
-      await repo.updateProfile(current.copyWith(isVerified: false, hasPendingVerification: false));
+      await repo.updateProfile(current.copyWith(verificationStatus: VerificationStatus.unverified));
     });
   }
 

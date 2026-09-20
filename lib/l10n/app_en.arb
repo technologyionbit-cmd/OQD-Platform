@@ -90,9 +90,6 @@
   "onboardingSlide3Subtitle": "Book a video, voice, or written consultation with top licensed lawyers",
   "onboardingGetStarted": "Get Started",
 
-  "devCredentialsTitle": "Demo credentials (development only)",
-  "devCredentialsPassword": "Password for all accounts: {password}",
-
   "errorGeneric": "Something went wrong",
   "errorNetwork": "Could not connect, check your internet connection",
   "errorInvalidCredentials": "Invalid email or password",

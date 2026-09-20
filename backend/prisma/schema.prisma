@@ -20,7 +20,7 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  extensions = [citext]
+  extensions = [citext, btree_gist]
 }
 
 // -----------------------------------------------------------------------------
@@ -96,6 +96,75 @@ enum OrgInvitationStatus {
   revoked
 }
 
+/// docs/backend/01-domain-model.md §10 — 4 fixed values, matches the
+/// frontend's `GovProcedureType` enum exactly.
+enum GovProcedureType {
+  companyRegistration
+  propertyRegistration
+  contractNotarization
+  lawsuitFiling
+}
+
+enum GovProcedureAccessType {
+  directLink
+  guide
+}
+
+/// docs/backend/01-domain-model.md §3 — replaces the frontend's two
+/// independent booleans (isVerified/hasPendingVerification).
+enum LawyerVerificationStatus {
+  unverified
+  pending
+  verified
+  rejected
+}
+
+/// docs/backend/01-domain-model.md §3 — mirrors the frontend's
+/// `ConsultationType` enum exactly (video, voice, written).
+enum ConsultationType {
+  video
+  voice
+  written
+}
+
+/// Booking-stage + terminal-outcome states only — the frontend's
+/// `ConsultationStatus` also has live-session states (waiting/ready/
+/// connecting/active/ended) but those belong to Part 5 (Consultation
+/// Room) and are never persisted here: they exist only in that feature's
+/// own client-local session state until Part 5 builds a real backing
+/// store for them. `confirmed` transitions straight to `completed`/
+/// `missed`/`failed` from this table's point of view.
+enum ConsultationStatus {
+  pendingApproval
+  confirmed
+  completed
+  cancelled
+  declined
+  missed
+  failed
+}
+
+/// Part 5's own state machine — mirrors the frontend's `SessionState`
+/// exactly (`waiting -> ready -> connecting -> active -> ended`, with
+/// `failed` reachable from `connecting` or `active`). Deliberately
+/// separate from `ConsultationStatus`, which stays booking/outcome-only.
+enum ConsultationRoomState {
+  waiting
+  ready
+  connecting
+  active
+  ended
+  failed
+}
+
+/// Append-only log of a participant joining, leaving, or reconnecting to
+/// a room session — never updated or deleted, only inserted.
+enum ConsultationParticipantEventType {
+  join
+  leave
+  reconnect
+}
+
 // -----------------------------------------------------------------------------
 // 1. Identity & Access — docs/backend/01-domain-model.md §1
 // -----------------------------------------------------------------------------
@@ -119,9 +188,13 @@ model User {
   lawyerRegistrationDetail LawyerRegistrationDetail?
   refreshTokens            RefreshToken[]
   verificationCodes        VerificationCode[]
-  ownedOrganizations       Organization[]            @relation("OrganizationOwner")
+  ownedOrganizations       Organization[]             @relation("OrganizationOwner")
   organizationMemberships  OrganizationMember[]
-  sentInvitations          OrganizationInvitation[]  @relation("InvitationSender")
+  sentInvitations          OrganizationInvitation[]   @relation("InvitationSender")
+  govProcedureProgress     UserGovProcedureProgress[]
+  lawyerProfile            LawyerProfile?
+  writtenReviews           Review[]
+  bookedConsultations      Consultation[]
 
   @@index([role])
   @@map("users")
@@ -259,4 +332,295 @@ model OrganizationInvitation {
   @@index([organizationId])
   @@index([email])
   @@map("organization_invitations")
+}
+
+// -----------------------------------------------------------------------------
+// 3. Government Procedures — docs/backend/01-domain-model.md §10
+//
+// A small, fixed reference catalog (4 procedures, seeded once from the
+// content the frontend currently hardcodes in
+// gov_procedures_provider.dart) plus real per-user progress persistence
+// (the frontend's GovProceduresProgressController is in-memory only today).
+// -----------------------------------------------------------------------------
+
+model GovProcedure {
+  id            String                 @id @default(uuid()) @db.Uuid
+  type          GovProcedureType       @unique
+  durationLabel Json                   @map("duration_label")
+  accessType    GovProcedureAccessType @map("access_type")
+  createdAt     DateTime               @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime               @updatedAt @map("updated_at") @db.Timestamptz
+
+  requiredDocuments GovRequiredDocument[]
+  steps             GovProcedureStep[]
+  progress          UserGovProcedureProgress[]
+
+  @@map("gov_procedures")
+}
+
+model GovRequiredDocument {
+  id          String @id @default(uuid()) @db.Uuid
+  procedureId String @map("procedure_id") @db.Uuid
+  title       Json
+  sortOrder   Int    @default(0) @map("sort_order")
+
+  procedure GovProcedure @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+
+  @@index([procedureId])
+  @@map("gov_required_documents")
+}
+
+model GovProcedureStep {
+  id          String @id @default(uuid()) @db.Uuid
+  procedureId String @map("procedure_id") @db.Uuid
+  sortOrder   Int    @map("sort_order")
+  title       Json
+  description Json
+
+  procedure GovProcedure @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+
+  @@index([procedureId])
+  @@map("gov_procedure_steps")
+}
+
+/// NEW relative to the frontend — GovProceduresProgressController resets
+/// on every app restart today; this table is the real backing store.
+model UserGovProcedureProgress {
+  id                 String    @id @default(uuid()) @db.Uuid
+  userId             String    @map("user_id") @db.Uuid
+  procedureId        String    @map("procedure_id") @db.Uuid
+  startedAt          DateTime? @map("started_at") @db.Timestamptz
+  checkedDocumentIds String[]  @default([]) @map("checked_document_ids") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  procedure GovProcedure @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, procedureId])
+  @@map("user_gov_procedure_progress")
+}
+
+// -----------------------------------------------------------------------------
+// 4. Lawyer Marketplace — docs/backend/01-domain-model.md §3,
+// docs/backend/09-lawyers-marketplace.md
+//
+// docs/plans/individual-user-rollout.md Part 3 scope: client-facing
+// search/browse only (GET endpoints). Lawyer self-service (GET/PATCH
+// /v1/lawyers/me, verification submission, admin verify/reject) is
+// lawyer-side and out of scope here — LawyerProfile.userId is unified with
+// User.id now (per 09-lawyers-marketplace.md §2) so that work is additive
+// later, not a re-migration.
+// -----------------------------------------------------------------------------
+
+model LawyerProfile {
+  id                          String                   @id @default(uuid()) @db.Uuid
+  userId                      String                   @unique @map("user_id") @db.Uuid
+  fullName                    String                   @map("full_name")
+  bio                         String                   @default("")
+  yearsOfExperience           Int                      @default(0) @map("years_of_experience")
+  barLicenseNumber            String                   @map("bar_license_number")
+  rating                      Decimal                  @default(0) @db.Decimal(3, 2)
+  reviewsCount                Int                      @default(0) @map("reviews_count")
+  verificationStatus          LawyerVerificationStatus @default(unverified) @map("verification_status")
+  verificationRejectionReason String?                  @map("verification_rejection_reason")
+  createdAt                   DateTime                 @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz
+
+  user        User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties LawyerProfileSpecialty[]
+  offerings   LawyerConsultationOffering[]
+  reviews     Review[]
+  availabilitySlots AvailabilitySlot[]
+  consultations     Consultation[]
+
+  @@index([verificationStatus])
+  @@map("lawyer_profiles")
+}
+
+/// Join table — a lawyer has many specialties from the fixed 8-value
+/// LawyerSpecialty enum (already defined above, shared with
+/// LawyerRegistrationDetail.mainSpecialty).
+model LawyerProfileSpecialty {
+  id              String          @id @default(uuid()) @db.Uuid
+  lawyerProfileId String          @map("lawyer_profile_id") @db.Uuid
+  specialty       LawyerSpecialty
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([lawyerProfileId, specialty])
+  @@map("lawyer_profile_specialties")
+}
+
+/// Normalizes the frontend's `Map<ConsultationType, double> pricing` +
+/// `List<ConsultationType> consultationTypes` into rows, so a lawyer can
+/// stop offering a type without losing price history tied to past
+/// consultations (which snapshot price at booking time — Part 4).
+model LawyerConsultationOffering {
+  id               String           @id @default(uuid()) @db.Uuid
+  lawyerProfileId  String           @map("lawyer_profile_id") @db.Uuid
+  consultationType ConsultationType @map("consultation_type")
+  price            Decimal          @db.Decimal(10, 2)
+  currency         String           @default("SAR")
+  isActive         Boolean          @default(true) @map("is_active")
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([lawyerProfileId, consultationType])
+  @@map("lawyer_consultation_offerings")
+}
+
+/// The frontend's "Reviews" section was two hardcoded static entries in
+/// Part 3 — now a real submission flow, gated on the reviewed
+/// `Consultation` being `completed` (enforced in the service, not here).
+model Review {
+  id              String   @id @default(uuid()) @db.Uuid
+  lawyerProfileId String   @map("lawyer_profile_id") @db.Uuid
+  consultationId  String   @map("consultation_id") @db.Uuid
+  reviewerUserId  String   @map("reviewer_user_id") @db.Uuid
+  rating          Int
+  comment         String?
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+  consultation  Consultation  @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  reviewer      User          @relation(fields: [reviewerUserId], references: [id], onDelete: Cascade)
+
+  @@unique([consultationId, reviewerUserId])
+  @@index([lawyerProfileId])
+  @@map("reviews")
+}
+
+// -----------------------------------------------------------------------------
+// 5. Consultations & Booking — docs/backend/01-domain-model.md §4,
+// docs/backend/06-consultations.md
+//
+// docs/plans/individual-user-rollout.md Part 4 scope: booking-stage +
+// terminal-outcome lifecycle (see ConsultationStatus doc comment above).
+// Live-session runtime (waiting/ready/connecting/active/ended,
+// ConsultationRoomSession) is Part 5, not built here.
+// -----------------------------------------------------------------------------
+
+/// A lawyer's bookable hour slot. `isBooked` + the unique 1:1 relation from
+/// `Consultation` are the application-level guard against double-booking;
+/// the `no_overlapping_booked_slots` exclusion constraint (hand-added to
+/// this model's migration SQL — Prisma DSL can't express EXCLUDE) is the
+/// DB-level guard against two *overlapping* slots both ending up booked
+/// under a race, which a single row's boolean flag alone can't catch.
+model AvailabilitySlot {
+  id              String   @id @default(uuid()) @db.Uuid
+  lawyerProfileId String   @map("lawyer_profile_id") @db.Uuid
+  startAt         DateTime @map("start_at") @db.Timestamptz
+  endAt           DateTime @map("end_at") @db.Timestamptz
+  isBooked        Boolean  @default(false) @map("is_booked")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+  consultation  Consultation?
+
+  @@index([lawyerProfileId, startAt])
+  @@map("availability_slots")
+}
+
+/// `lawyerName`/`clientName` are snapshotted at booking time (matches the
+/// frontend's `Consultation` entity, which carries both names directly
+/// rather than joining) — a display name changing later must never rewrite
+/// history on a past booking. `price` is likewise snapshotted from the
+/// matching `LawyerConsultationOffering` at booking time, computed
+/// server-side (never trusted from the client) so a tampered request body
+/// can't book below the lawyer's real price.
+model Consultation {
+  id                 String             @id @default(uuid()) @db.Uuid
+  clientUserId       String             @map("client_user_id") @db.Uuid
+  lawyerProfileId    String             @map("lawyer_profile_id") @db.Uuid
+  availabilitySlotId String             @unique @map("availability_slot_id") @db.Uuid
+  lawyerName         String             @map("lawyer_name")
+  clientName         String             @map("client_name")
+  type               ConsultationType
+  status             ConsultationStatus @default(pendingApproval)
+  scheduledAt        DateTime           @map("scheduled_at") @db.Timestamptz
+  price              Decimal            @db.Decimal(10, 2)
+  notes              String             @default("")
+  cancellationReason String?            @map("cancellation_reason")
+  createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz
+
+  client           User             @relation(fields: [clientUserId], references: [id], onDelete: Cascade)
+  lawyerProfile    LawyerProfile    @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+  availabilitySlot AvailabilitySlot @relation(fields: [availabilitySlotId], references: [id], onDelete: Restrict)
+  reviews          Review[]
+  roomSession      ConsultationRoomSession?
+
+  @@index([clientUserId])
+  @@index([lawyerProfileId])
+  @@map("consultations")
+}
+
+// -----------------------------------------------------------------------------
+// 6. Consultation Room (live session) — docs/plans/individual-user-rollout.md Part 5
+// -----------------------------------------------------------------------------
+
+/// One row per consultation — created the first time either participant
+/// calls `POST .../room/token`. `durationSeconds`/tick-by-tick call time is
+/// deliberately NOT persisted here: the frontend's `SessionController`
+/// ticks that forward client-side once a second purely in memory (see
+/// `incrementDuration()`), never round-tripping to the server — persisting
+/// it would mean one HTTP call per second per active call for no benefit
+/// this phase (no cross-device duration sync requirement yet).
+model ConsultationRoomSession {
+  id                String                @id @default(uuid()) @db.Uuid
+  consultationId    String                @unique @map("consultation_id") @db.Uuid
+  state             ConsultationRoomState @default(waiting)
+  isMuted           Boolean               @default(false) @map("is_muted")
+  isCameraOn        Boolean               @default(true) @map("is_camera_on")
+  isSpeakerOn       Boolean               @default(true) @map("is_speaker_on")
+  reconnectAttempts Int                   @default(0) @map("reconnect_attempts")
+  endedAt           DateTime?             @map("ended_at") @db.Timestamptz
+  createdAt         DateTime              @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime              @updatedAt @map("updated_at") @db.Timestamptz
+
+  consultation Consultation                   @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  tokens       ConsultationRoomToken[]
+  events       ConsultationParticipantEvent[]
+
+  @@map("consultation_room_sessions")
+}
+
+/// The mock join token's real-world backing — opaque random string, only
+/// its SHA-256 hash stored (same pattern as `RefreshToken`). Single-use
+/// (`consumedAt`), scoped to exactly one `(sessionId, userId)` pair, and
+/// short-lived (`expiresAt`, TTL <= 5 minutes) per
+/// docs/backend/14-security.md §Token security — the security shape is
+/// real from day one even though there is no real media provider behind
+/// it yet, so swapping in Agora/Twilio/LiveKit later needs no redesign
+/// here.
+model ConsultationRoomToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  sessionId  String    @map("session_id") @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  tokenHash  String    @unique @map("token_hash")
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz
+  consumedAt DateTime? @map("consumed_at") @db.Timestamptz
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  session ConsultationRoomSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, userId])
+  @@map("consultation_room_tokens")
+}
+
+/// Append-only join/leave/reconnect log — never updated, only inserted.
+/// Exists for observability/audit of the live-session runtime; nothing
+/// reads it back into an API response yet.
+model ConsultationParticipantEvent {
+  id        String                           @id @default(uuid()) @db.Uuid
+  sessionId String                           @map("session_id") @db.Uuid
+  userId    String                           @map("user_id") @db.Uuid
+  eventType ConsultationParticipantEventType @map("event_type")
+  createdAt DateTime                         @default(now()) @map("created_at") @db.Timestamptz
+
+  session ConsultationRoomSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("consultation_participant_events")
 }

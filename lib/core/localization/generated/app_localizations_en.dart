@@ -257,14 +257,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingGetStarted => 'Get Started';
 
   @override
-  String get devCredentialsTitle => 'Demo credentials (development only)';
-
-  @override
-  String devCredentialsPassword(String password) {
-    return 'Password for all accounts: $password';
-  }
-
-  @override
   String get errorGeneric => 'Something went wrong';
 
   @override

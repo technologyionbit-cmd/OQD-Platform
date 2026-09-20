@@ -10,7 +10,9 @@ import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
 import 'package:aqd_ionbit/core/widgets/app_card.dart';
 import 'package:aqd_ionbit/core/widgets/empty_state.dart';
+import 'package:aqd_ionbit/core/widgets/error_view.dart';
 import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
+import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/features/gov_documents/domain/entities/gov_procedure.dart';
 import 'package:aqd_ionbit/features/gov_documents/presentation/providers/gov_procedures_provider.dart';
 import 'package:aqd_ionbit/features/gov_documents/presentation/widgets/gov_procedure_type_x.dart';
@@ -37,11 +39,8 @@ class _GovDocumentsHubScreenState extends ConsumerState<GovDocumentsHubScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final procedures = ref.watch(govProceduresProvider);
+    final proceduresState = ref.watch(govProceduresProvider);
     final query = _query.trim().toLowerCase();
-    final filtered = query.isEmpty
-        ? procedures
-        : procedures.where((p) => p.type.title(l10n).toLowerCase().contains(query)).toList();
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.govDocumentsTitle)),
@@ -58,14 +57,29 @@ class _GovDocumentsHubScreenState extends ConsumerState<GovDocumentsHubScreen> {
               ),
             ),
             Expanded(
-              child: filtered.isEmpty
-                  ? EmptyState(icon: Icons.search_off_outlined, message: l10n.documentsSearchEmptyMessage)
-                  : ListView.separated(
+              child: switch (proceduresState) {
+                AsyncData(value: final procedures) => Builder(
+                  builder: (context) {
+                    final filtered = query.isEmpty
+                        ? procedures
+                        : procedures.where((p) => p.type.title(l10n).toLowerCase().contains(query)).toList();
+                    if (filtered.isEmpty) {
+                      return EmptyState(icon: Icons.search_off_outlined, message: l10n.documentsSearchEmptyMessage);
+                    }
+                    return ListView.separated(
                       padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xl),
                       itemCount: filtered.length,
                       separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
                       itemBuilder: (context, index) => _ProcedureCard(procedure: filtered[index]),
-                    ),
+                    );
+                  },
+                ),
+                AsyncError() => ErrorView(
+                  message: l10n.errorGeneric,
+                  onRetry: () => ref.read(govProceduresProvider.notifier).refresh(),
+                ),
+                _ => const LoadingView(),
+              },
             ),
           ],
         ),

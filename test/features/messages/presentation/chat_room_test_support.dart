@@ -82,10 +82,10 @@ class SingleConsultationDataSource implements ConsultationsRemoteDataSource {
   Future<Consultation> acceptRequest(String id) => throw UnimplementedError();
 
   @override
-  Future<Consultation> rejectRequest(String id) => throw UnimplementedError();
+  Future<Consultation> rejectRequest(String id, {String? reason}) => throw UnimplementedError();
 
   @override
-  Future<Consultation> cancel(String id) async {
+  Future<Consultation> cancel(String id, {String? reason}) async {
     _consultation = _consultation.copyWith(status: ConsultationStatus.cancelled);
     return _consultation;
   }
@@ -110,9 +110,6 @@ class SingleConsultationDataSource implements ConsultationsRemoteDataSource {
     _consultation = _consultation.copyWith(status: ConsultationStatus.failed);
     return _consultation;
   }
-
-  @override
-  Future<Consultation> sendMessage({required String id, required String text, required bool isFromLawyer}) => throw UnimplementedError();
 }
 
 class FakeImagePickerPlatform extends ImagePickerPlatform {

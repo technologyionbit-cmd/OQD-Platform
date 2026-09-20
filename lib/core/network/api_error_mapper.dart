@@ -76,13 +76,17 @@ class ApiErrorMapper {
   }
 
   Map<String, List<String>> _extractFieldErrors(dynamic data) {
-    if (data is Map && data['errors'] is Map) {
-      final raw = data['errors'] as Map;
-      return raw.map((key, value) {
-        final messages = value is List ? value.map((e) => e.toString()).toList() : <String>[value.toString()];
-        return MapEntry(key.toString(), messages);
-      });
-    }
-    return const {};
+    if (data is! Map) return const {};
+    final topLevel = data['errors'];
+    final nested = data['error'] is Map ? (data['error'] as Map)['errors'] : null;
+    // Prefer whichever candidate is actually a Map — a top-level `errors`
+    // that exists but isn't one (e.g. an unrelated list/string field) must
+    // not shadow a valid nested `error.errors` envelope.
+    final errors = topLevel is Map ? topLevel : nested;
+    if (errors is! Map) return const {};
+    return errors.map((key, value) {
+      final messages = value is List ? value.map((e) => e.toString()).toList() : <String>[value.toString()];
+      return MapEntry(key.toString(), messages);
+    });
   }
 }

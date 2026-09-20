@@ -42,15 +42,9 @@ class AuthController extends AsyncNotifier<AuthUser?> {
   }
 
   Future<Result<AuthUser>> login({required String email, required String password}) async {
-    final previous = state;
-    state = const AsyncLoading();
-
     final result = await _repository.login(email: email, password: password);
     return result.fold(
-      (failure) {
-        state = previous;
-        return Result.failure(failure);
-      },
+      Result.failure,
       (data) {
         state = AsyncData(data.user);
         return Result.success(data.user);
@@ -59,15 +53,9 @@ class AuthController extends AsyncNotifier<AuthUser?> {
   }
 
   Future<Result<AuthUser>> register(RegisterRequest request) async {
-    final previous = state;
-    state = const AsyncLoading();
-
     final result = await _repository.register(request);
     return result.fold(
-      (failure) {
-        state = previous;
-        return Result.failure(failure);
-      },
+      Result.failure,
       (data) {
         state = AsyncData(data.user);
         return Result.success(data.user);

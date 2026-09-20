@@ -16,6 +16,7 @@ import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/core/widgets/section_header.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/consultation_type.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/providers/lawyer_by_id_provider.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/consultation_type_x.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/lawyer_availability_x.dart';
@@ -71,7 +72,7 @@ class _LawyerDetailsBody extends StatelessWidget {
                           Row(
                             children: [
                               Flexible(child: Text(lawyer.fullName, style: Theme.of(context).textTheme.headlineSmall)),
-                              if (lawyer.isVerified) ...[
+                              if (lawyer.verificationStatus == VerificationStatus.verified) ...[
                                 const SizedBox(width: AppSpacing.xxs),
                                 const Icon(Icons.verified, color: AppColors.primary, size: 20),
                               ],

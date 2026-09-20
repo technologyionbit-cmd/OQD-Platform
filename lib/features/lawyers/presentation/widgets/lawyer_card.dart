@@ -7,6 +7,7 @@ import 'package:aqd_ionbit/core/widgets/app_card.dart';
 import 'package:aqd_ionbit/core/widgets/app_chip.dart';
 import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/lawyer_specialty_x.dart';
 
 /// One row in the marketplace list — also reused by the client home
@@ -43,7 +44,7 @@ class LawyerCard extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
-                        if (lawyer.isVerified) ...[
+                        if (lawyer.verificationStatus == VerificationStatus.verified) ...[
                           const SizedBox(width: AppSpacing.xxs),
                           const Icon(Icons.verified, size: 16, color: AppColors.primary),
                         ],

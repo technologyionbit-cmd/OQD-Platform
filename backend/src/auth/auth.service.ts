@@ -94,11 +94,27 @@ export class AuthService {
         }
 
         if (dto.accountType === 'lawyer') {
+          const barLicenseNumber = dto.barLicenseNumber!.trim();
           await tx.lawyerRegistrationDetail.create({
             data: {
               userId: created.id,
-              barLicenseNumber: dto.barLicenseNumber!.trim(),
+              barLicenseNumber,
               mainSpecialty: dto.mainSpecialty!,
+            },
+          });
+          // Auto-create the LawyerProfile the marketplace reads from
+          // (docs/backend/09-lawyers-marketplace.md §2) — unifies
+          // LawyerProfile.userId with User.id 1:1 from day one, seeded
+          // from the registration-time fields. Always starts `unverified`,
+          // never defaults to verified (§3) — excluded from public search
+          // until an admin verifies it.
+          await tx.lawyerProfile.create({
+            data: {
+              userId: created.id,
+              fullName: displayName,
+              barLicenseNumber,
+              verificationStatus: 'unverified',
+              specialties: { create: [{ specialty: dto.mainSpecialty! }] },
             },
           });
         }

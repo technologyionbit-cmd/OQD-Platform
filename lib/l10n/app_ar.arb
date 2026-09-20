@@ -103,14 +103,6 @@
   "onboardingSlide3Subtitle": "احجز استشارة فيديو أو صوتية أو مكتوبة مع نخبة من المحامين المرخصين",
   "onboardingGetStarted": "ابدأ",
 
-  "devCredentialsTitle": "بيانات تجريبية (بيئة التطوير فقط)",
-  "devCredentialsPassword": "كلمة المرور لجميع الحسابات: {password}",
-  "@devCredentialsPassword": {
-    "placeholders": {
-      "password": {"type": "String"}
-    }
-  },
-
   "errorGeneric": "حدث خطأ غير متوقع",
   "errorNetwork": "تعذّر الاتصال بالشبكة، تحقق من الاتصال بالإنترنت",
   "errorInvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",

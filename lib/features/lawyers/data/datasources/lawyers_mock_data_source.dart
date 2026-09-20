@@ -71,10 +71,16 @@ class LawyersMockDataSource implements LawyersRemoteDataSource {
   ];
 
   @override
-  Future<List<LawyerProfile>> getLawyers() async {
+  Future<List<LawyerProfile>> getLawyers({String? query, LawyerSpecialty? specialty, double? minRating, int? page}) async {
     await _simulateLatency();
-    final sorted = List<LawyerProfile>.of(_lawyers)..sort((a, b) => b.rating.compareTo(a.rating));
-    return sorted;
+    final filtered = _lawyers.where((lawyer) {
+      final matchesQuery = query == null || query.isEmpty || lawyer.fullName.toLowerCase().contains(query.toLowerCase());
+      final matchesSpecialty = specialty == null || lawyer.specialties.contains(specialty);
+      final matchesRating = minRating == null || lawyer.rating >= minRating;
+      return matchesQuery && matchesSpecialty && matchesRating;
+    }).toList();
+    filtered.sort((a, b) => b.rating.compareTo(a.rating));
+    return filtered;
   }
 
   @override

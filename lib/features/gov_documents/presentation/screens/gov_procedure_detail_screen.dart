@@ -9,7 +9,9 @@ import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_card.dart';
 import 'package:aqd_ionbit/core/widgets/empty_state.dart';
+import 'package:aqd_ionbit/core/widgets/error_view.dart';
 import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
+import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/core/widgets/section_header.dart';
 import 'package:aqd_ionbit/features/gov_documents/domain/entities/gov_procedure.dart';
 import 'package:aqd_ionbit/features/gov_documents/presentation/providers/gov_procedures_provider.dart';
@@ -23,9 +25,24 @@ class GovProcedureDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final procedures = ref.watch(govProceduresProvider);
-    final procedure = procedures.where((p) => p.type.name == procedureTypeName).firstOrNull;
+    final proceduresState = ref.watch(govProceduresProvider);
 
+    return switch (proceduresState) {
+      AsyncData(value: final procedures) => _buildBody(
+        context,
+        ref,
+        l10n,
+        procedures.where((p) => p.type.name == procedureTypeName).firstOrNull,
+      ),
+      AsyncError() => Scaffold(
+        appBar: AppBar(title: Text(l10n.govDocumentsTitle)),
+        body: ErrorView(message: l10n.errorGeneric, onRetry: () => ref.read(govProceduresProvider.notifier).refresh()),
+      ),
+      _ => Scaffold(appBar: AppBar(title: Text(l10n.govDocumentsTitle)), body: const LoadingView()),
+    };
+  }
+
+  Widget _buildBody(BuildContext context, WidgetRef ref, AppLocalizations l10n, GovProcedure? procedure) {
     if (procedure == null) {
       return Scaffold(
         appBar: AppBar(title: Text(l10n.govDocumentsTitle)),
@@ -33,7 +50,8 @@ class GovProcedureDetailScreen extends ConsumerWidget {
       );
     }
 
-    final progress = ref.watch(govProceduresProgressControllerProvider.select((s) => s[procedure.type] ?? const GovProcedureProgress()));
+    final progress =
+        ref.watch(govProceduresProgressControllerProvider).value?[procedure.type] ?? const GovProcedureProgress();
     final type = procedure.type;
     final checkedCount = procedure.requiredDocuments.where((d) => progress.checkedDocumentIds.contains(d.id)).length;
 

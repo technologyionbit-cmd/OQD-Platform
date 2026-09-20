@@ -9,6 +9,10 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { PrismaModule } from './prisma/prisma.module';
 import { HealthModule } from './health/health.module';
 import { AuthModule } from './auth/auth.module';
+import { GovProceduresModule } from './gov-procedures/gov-procedures.module';
+import { LawyersModule } from './lawyers/lawyers.module';
+import { ConsultationsModule } from './consultations/consultations.module';
+import { ConsultationRoomModule } from './consultation-room/consultation-room.module';
 
 @Module({
   imports: [
@@ -29,6 +33,10 @@ import { AuthModule } from './auth/auth.module';
     PrismaModule,
     HealthModule,
     AuthModule,
+    GovProceduresModule,
+    LawyersModule,
+    ConsultationsModule,
+    ConsultationRoomModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },
