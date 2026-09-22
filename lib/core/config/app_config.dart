@@ -18,10 +18,10 @@ class AppConfig {
     );
   }
 
-  /// Local NestJS backend (`backend/`, `npm run dev`). On a physical
-  /// device, override via `--dart-define=API_BASE_URL=...` with your
-  /// machine's LAN address.
-  static const _defaultApiBaseUrl = 'http://localhost:3000/v1';
+  /// Production NestJS backend on the VPS. Override via
+  /// `--dart-define=API_BASE_URL=...` for local dev against
+  /// `backend/` (`npm run dev`) or a LAN address on a physical device.
+  static const _defaultApiBaseUrl = 'https://oqdjo.com/v1';
 
   final String apiBaseUrl;
   final bool enableNetworkLogging;
