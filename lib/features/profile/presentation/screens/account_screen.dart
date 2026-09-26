@@ -196,10 +196,7 @@ class AccountScreen extends ConsumerWidget {
                             leading: const Icon(Icons.language_outlined),
                             title: Text(l10n.accountLanguage),
                             trailing: Text(locale.languageCode == 'ar' ? 'العربية' : 'English'),
-                            onTap: () {
-                              final next = locale.languageCode == 'ar' ? const Locale('en') : const Locale('ar');
-                              ref.read(localeControllerProvider.notifier).setLocale(next);
-                            },
+                            onTap: () => ref.read(localeControllerProvider.notifier).toggle(),
                           ),
                           const Divider(height: 1),
                           _MenuRow(

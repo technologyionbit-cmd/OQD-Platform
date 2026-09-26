@@ -18,6 +18,10 @@
   "commonCancel": "إلغاء",
   "commonConfirm": "تأكيد",
   "commonSkip": "تخطي",
+  "commonChangeLanguage": "تغيير اللغة",
+  "@commonChangeLanguage": {
+    "description": "Screen-reader label for the language switch button"
+  },
   "commonNext": "التالي",
   "commonViewAll": "عرض الكل",
   "commonSave": "حفظ",
@@ -110,6 +114,14 @@
   "onboardingSlide3Title": "تواصل مباشرة مع محامين موثوقين",
   "onboardingSlide3Subtitle": "احجز استشارة فيديو أو صوتية أو مكتوبة مع نخبة من المحامين المرخصين",
   "onboardingGetStarted": "ابدأ",
+  "onboardingSlideIndicator": "الشريحة {current} من {total}",
+  "@onboardingSlideIndicator": {
+    "description": "Screen-reader label for the onboarding page dots",
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
 
   "errorGeneric": "حدث خطأ غير متوقع",
   "errorNetwork": "تعذّر الاتصال بالشبكة، تحقق من الاتصال بالإنترنت",

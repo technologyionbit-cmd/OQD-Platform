@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/login_screen.dart';
-import 'package:aqd_ionbit/features/auth/presentation/screens/onboarding_screen.dart';
+import 'package:aqd_ionbit/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/otp_verification_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/register_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/reset_password_screen.dart';

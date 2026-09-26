@@ -9,6 +9,7 @@
   "commonCancel": "Cancel",
   "commonConfirm": "Confirm",
   "commonSkip": "Skip",
+  "commonChangeLanguage": "Change language",
   "commonNext": "Next",
   "commonViewAll": "View All",
   "commonSave": "Save",
@@ -91,6 +92,7 @@
   "onboardingSlide3Title": "Connect directly with verified lawyers",
   "onboardingSlide3Subtitle": "Book a video, voice, or written consultation with top licensed lawyers",
   "onboardingGetStarted": "Get Started",
+  "onboardingSlideIndicator": "Slide {current} of {total}",
 
   "errorGeneric": "Something went wrong",
   "errorNetwork": "Could not connect, check your internet connection",

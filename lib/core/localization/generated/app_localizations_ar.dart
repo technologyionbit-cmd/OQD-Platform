@@ -33,6 +33,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get commonSkip => 'تخطي';
 
   @override
+  String get commonChangeLanguage => 'تغيير اللغة';
+
+  @override
   String get commonNext => 'التالي';
 
   @override
@@ -257,6 +260,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get onboardingGetStarted => 'ابدأ';
+
+  @override
+  String onboardingSlideIndicator(int current, int total) {
+    return 'الشريحة $current من $total';
+  }
 
   @override
   String get errorGeneric => 'حدث خطأ غير متوقع';

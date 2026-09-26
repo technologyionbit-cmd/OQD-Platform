@@ -11,10 +11,10 @@ import 'package:aqd_ionbit/core/routing/routes/company_routes.dart';
 import 'package:aqd_ionbit/core/routing/routes/lawyer_extra_routes.dart';
 import 'package:aqd_ionbit/core/routing/routes/lawyer_routes.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/splash_screen.dart';
-import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/onboarding/presentation/providers/onboarding_controller.dart';
 
 /// Lives in `app/`, not `core/routing/` — unlike [RoutePaths] (plain
 /// constants, genuinely feature-agnostic), this file imports every
@@ -23,12 +23,15 @@ import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.
 /// depend on. `app/` is the composition root: it's allowed to know about
 /// everything.
 ///
-/// Single app-wide router, created once. Auth-state changes don't rebuild
-/// [GoRouter] (that would reset navigation) — instead [_authRefreshNotifier]
-/// pulses via `ref.listen`, and go_router re-evaluates [_redirect] itself.
+/// Single app-wide router, created once. State changes that affect where
+/// the user may be (auth, onboarding) don't rebuild [GoRouter] (that would
+/// reset navigation) — instead `refreshNotifier` pulses via `ref.listen`,
+/// and go_router re-evaluates [_redirect] itself.
 final routerProvider = Provider<GoRouter>((ref) {
-  final refreshNotifier = ValueNotifier(ref.read(authControllerProvider));
-  ref.listen(authControllerProvider, (_, next) => refreshNotifier.value = next);
+  final refreshNotifier = ValueNotifier(0);
+  void refresh() => refreshNotifier.value++;
+  ref.listen(authControllerProvider, (_, _) => refresh());
+  ref.listen(onboardingControllerProvider, (_, _) => refresh());
   ref.onDispose(refreshNotifier.dispose);
 
   return GoRouter(
@@ -79,14 +82,14 @@ String? _redirect(Ref ref, GoRouterState state) {
     return location == RoutePaths.splash ? null : RoutePaths.splash;
   }
 
-  final hasSeenOnboarding = ref.read(appPreferencesProvider).hasSeenOnboarding;
-  if (user == null && !hasSeenOnboarding) {
-    return location == RoutePaths.onboarding ? null : RoutePaths.onboarding;
-  }
-
+  // Signed out: onboarding until it's been seen, then only the public auth
+  // screens — landing on login by default (including straight out of
+  // onboarding, which is how onboarding "navigates" when it completes).
   if (user == null) {
-    if (location == RoutePaths.onboarding || publicAuthRoutes.contains(location)) return null;
-    return RoutePaths.login;
+    if (!ref.read(onboardingControllerProvider)) {
+      return location == RoutePaths.onboarding ? null : RoutePaths.onboarding;
+    }
+    return publicAuthRoutes.contains(location) ? null : RoutePaths.login;
   }
 
   // Authenticated: never allowed on splash/onboarding/public-auth screens,

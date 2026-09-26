@@ -39,6 +39,8 @@ Future<ProviderContainer> _pump(WidgetTester tester, {ConsultationsMockDataSourc
       container: container,
       child: MaterialApp.router(
         theme: AppTheme.light,
+        // Assertions below are written against the English strings.
+        locale: const Locale('en'),
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         routerConfig: router,

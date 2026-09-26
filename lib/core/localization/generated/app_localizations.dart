@@ -146,6 +146,12 @@ abstract class AppLocalizations {
   /// **'تخطي'**
   String get commonSkip;
 
+  /// Screen-reader label for the language switch button
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير اللغة'**
+  String get commonChangeLanguage;
+
   /// No description provided for @commonNext.
   ///
   /// In ar, this message translates to:
@@ -571,6 +577,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ابدأ'**
   String get onboardingGetStarted;
+
+  /// Screen-reader label for the onboarding page dots
+  ///
+  /// In ar, this message translates to:
+  /// **'الشريحة {current} من {total}'**
+  String onboardingSlideIndicator(int current, int total);
 
   /// No description provided for @errorGeneric.
   ///

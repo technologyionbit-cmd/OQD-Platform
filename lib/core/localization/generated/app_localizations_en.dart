@@ -33,6 +33,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonSkip => 'Skip';
 
   @override
+  String get commonChangeLanguage => 'Change language';
+
+  @override
   String get commonNext => 'Next';
 
   @override
@@ -261,6 +264,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingGetStarted => 'Get Started';
+
+  @override
+  String onboardingSlideIndicator(int current, int total) {
+    return 'Slide $current of $total';
+  }
 
   @override
   String get errorGeneric => 'Something went wrong';
