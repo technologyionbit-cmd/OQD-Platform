@@ -7,7 +7,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// top) — the only consumer is [TokenManager]; adding more indirection here
 /// would not serve a real need yet.
 class SecureStorageService {
-  SecureStorageService({FlutterSecureStorage? storage}) : _storage = storage ?? const FlutterSecureStorage();
+  SecureStorageService({FlutterSecureStorage? storage}) : _storage = storage ?? const FlutterSecureStorage(iOptions: _appleOptions, mOptions: _macOptions);
+
+  /// Readable only after the device's first unlock since boot (so a refresh
+  /// can still run in the background), and never migrated to another device
+  /// through a backup or iCloud Keychain.
+  static const _appleOptions = IOSOptions(accessibility: KeychainAccessibility.first_unlock_this_device);
+  static const _macOptions = MacOsOptions(accessibility: KeychainAccessibility.first_unlock_this_device);
 
   final FlutterSecureStorage _storage;
 

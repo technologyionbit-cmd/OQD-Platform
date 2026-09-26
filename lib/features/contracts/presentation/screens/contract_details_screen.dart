@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,7 +39,7 @@ class ContractDetailsScreen extends ConsumerWidget {
 
     ref.read(contractDraftControllerProvider.notifier).startEditing(contract: contract, template: template);
     if (!context.mounted) return;
-    context.push(RoutePaths.contractsNewFormFor(routeBase));
+    unawaited(context.push(RoutePaths.contractsNewFormFor(routeBase)));
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref) async {

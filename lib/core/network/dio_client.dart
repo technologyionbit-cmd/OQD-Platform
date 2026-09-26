@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'package:aqd_ionbit/core/config/app_config.dart';
+import 'package:aqd_ionbit/core/network/auth_session_ports.dart';
 import 'package:aqd_ionbit/core/network/interceptors/auth_interceptor.dart';
 import 'package:aqd_ionbit/core/network/interceptors/redacting_logging_interceptor.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
@@ -12,7 +13,7 @@ class DioClient {
     required AppConfig appConfig,
     required TokenManager tokenManager,
     required void Function() onSessionExpired,
-    Future<AuthTokens?> Function()? onRefreshToken,
+    required RefreshTokenFn onRefreshToken,
   }) {
     dio = Dio(
       BaseOptions(
@@ -27,10 +28,7 @@ class DioClient {
       AuthInterceptor(
         dio: dio,
         tokenManager: tokenManager,
-        // The auth feature registers the real refresh handler at startup
-        // (see AuthController.build); until then this defaults to "refresh
-        // always fails", which routes straight to onSessionExpired.
-        onRefreshToken: onRefreshToken ?? () async => null,
+        onRefreshToken: onRefreshToken,
         onSessionExpired: onSessionExpired,
       ),
     );

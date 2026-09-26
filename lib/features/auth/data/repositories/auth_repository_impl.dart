@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/network/api_error_mapper.dart';
+import 'package:aqd_ionbit/core/network/auth_session_ports.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/features/auth/data/datasources/auth_data_source_provider.dart';
@@ -48,13 +49,48 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<AuthTokens>> refreshToken(String refreshToken) {
-    return _run(() async {
+  Future<Result<AuthUser?>> restoreSession() async {
+    final stored = await _tokenManager.loadFromStorage();
+    if (stored == null) return const Result.success(null);
+
+    // An expired access token is refreshed transparently by AuthInterceptor
+    // on the way — a 401 reaching here means the refresh was rejected too.
+    final result = await currentUser();
+    switch (result) {
+      case Success(:final data):
+        return Result.success(data);
+      case ResultFailure(failure: UnauthorizedFailure() || ForbiddenFailure()):
+        await clearLocalSession();
+        return const Result.success(null);
+      case ResultFailure(:final failure):
+        return Result.failure(failure);
+    }
+  }
+
+  @override
+  Future<RefreshOutcome> refreshSession() async {
+    final refreshToken = _tokenManager.current?.refreshToken;
+    if (refreshToken == null) return const RefreshRejected();
+
+    try {
       final tokens = await _remote.refreshToken(refreshToken);
       await _tokenManager.save(tokens);
-      return tokens;
-    });
+      return RefreshSucceeded(tokens);
+    } catch (error) {
+      return _isRefusal(_errorMapper.map(error)) ? const RefreshRejected() : const RefreshUnavailable();
+    }
   }
+
+  /// Only an explicit refusal from the server ends the session. Throttling
+  /// (429), server errors and connectivity problems are all retryable.
+  bool _isRefusal(Failure failure) => switch (failure) {
+    UnauthorizedFailure() || ForbiddenFailure() || ValidationFailure() => true,
+    ServerFailure(statusCode: 400) => true,
+    _ => false,
+  };
+
+  @override
+  Future<void> clearLocalSession() => _tokenManager.clear();
 
   @override
   Future<Result<AuthUser>> currentUser() {

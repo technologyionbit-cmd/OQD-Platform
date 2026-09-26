@@ -19,7 +19,7 @@ class AiConversationsController extends AsyncNotifier<List<AiConversation>> {
 
   Future<void> refresh() async {
     final result = await _repository.getConversations();
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (conversations) => AsyncData(conversations));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 
   Future<Result<AiConversation>> sendMessage({required String text, String? conversationId}) async {

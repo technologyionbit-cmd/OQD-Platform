@@ -35,7 +35,7 @@ class _ChatTypingIndicatorState extends State<ChatTypingIndicator> with SingleTi
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-          decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.mdRadius),
+          decoration: const BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.mdRadius),
           child: AnimatedBuilder(
             animation: _controller,
             builder: (context, _) {

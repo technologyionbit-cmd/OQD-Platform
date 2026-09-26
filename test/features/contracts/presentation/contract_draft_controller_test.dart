@@ -100,7 +100,7 @@ void main() {
       ..selectTemplate(_template)
       ..setFieldValue('partyA', 'Acme')
       ..setFieldValue('amount', '1200')
-      ..setFieldValue('startDate', DateTime(2026, 1, 1).toIso8601String());
+      ..setFieldValue('startDate', DateTime(2026).toIso8601String());
 
     expect(controller().validate(l10n), isTrue);
     expect(container.read(contractDraftControllerProvider).errors, isEmpty);
@@ -112,8 +112,8 @@ void main() {
       title: _template.title,
       category: _template.category,
       status: ContractStatus.draft,
-      createdAt: DateTime(2026, 1, 1),
-      updatedAt: DateTime(2026, 1, 1),
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
       parties: const ['Acme'],
       fieldValues: const {'partyA': 'Acme'},
       templateId: _template.id,
@@ -129,7 +129,7 @@ void main() {
         ..selectTemplate(_template)
         ..setFieldValue('partyA', 'Acme');
       when(
-        () => repository.saveDraft(template: _template, fieldValues: {'partyA': 'Acme'}, contractId: null),
+        () => repository.saveDraft(template: _template, fieldValues: {'partyA': 'Acme'}),
       ).thenAnswer((_) async => Result.success(tokens));
 
       final result = await controller().saveDraft();
@@ -143,7 +143,7 @@ void main() {
         ..selectTemplate(_template)
         ..setFieldValue('partyA', 'Acme');
       when(
-        () => repository.saveDraft(template: _template, fieldValues: {'partyA': 'Acme'}, contractId: null),
+        () => repository.saveDraft(template: _template, fieldValues: {'partyA': 'Acme'}),
       ).thenAnswer((_) async => const Result.failure(ServerFailure()));
 
       final result = await controller().saveDraft();
@@ -157,7 +157,7 @@ void main() {
         ..selectTemplate(_template)
         ..setFieldValue('partyA', 'Acme');
       when(
-        () => repository.generateContract(template: _template, fieldValues: {'partyA': 'Acme'}, contractId: null),
+        () => repository.generateContract(template: _template, fieldValues: {'partyA': 'Acme'}),
       ).thenAnswer((_) async => Result.success(tokens));
       when(
         () => documentsRepository.addGeneratedContractDocument(contractId: tokens.id, title: tokens.title),
@@ -167,7 +167,7 @@ void main() {
             id: 'd1',
             title: tokens.title,
             sourceType: DocumentSourceType.generatedContract,
-            createdAt: DateTime(2026, 1, 1),
+            createdAt: DateTime(2026),
             sizeLabel: '200 KB',
             contractId: tokens.id,
           ),

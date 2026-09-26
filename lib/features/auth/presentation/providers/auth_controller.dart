@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
@@ -19,26 +20,26 @@ import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dar
 /// would incorrectly put the whole app into a global error state over what
 /// is really a form-level concern. [login] returns a [Result] so the
 /// calling screen shows the failure inline instead.
+///
+/// When the stored session can't be verified because the server is
+/// unreachable, the state becomes `AsyncError` carrying the [Failure]: the
+/// router keeps the splash screen up and offers a retry, instead of
+/// pretending the user is signed out. Retrying is `ref.invalidate` on this
+/// provider.
 class AuthController extends AsyncNotifier<AuthUser?> {
-  late final AuthRepository _repository;
+  AuthRepository get _repository => ref.read(authRepositoryProvider);
 
   @override
   FutureOr<AuthUser?> build() async {
-    _repository = ref.watch(authRepositoryProvider);
-
-    ref.read(tokenRefresherProvider).register(() async {
-      final refreshToken = ref.read(tokenManagerProvider).current?.refreshToken;
-      if (refreshToken == null) return null;
-      final result = await _repository.refreshToken(refreshToken);
-      return result.valueOrNull;
-    });
+    ref.watch(authRepositoryProvider);
+    ref.read(tokenRefresherProvider).register(_repository.refreshSession);
     ref.read(sessionExpiredNotifierProvider).registerHandler(_handleSessionExpired);
 
-    final storedTokens = await ref.read(tokenManagerProvider).loadFromStorage();
-    if (storedTokens == null) return null;
-
-    final result = await _repository.currentUser();
-    return result.valueOrNull;
+    final result = await _repository.restoreSession();
+    return switch (result) {
+      Success(:final data) => data,
+      ResultFailure(:final failure) => throw failure,
+    };
   }
 
   Future<Result<AuthUser>> login({required String email, required String password}) async {
@@ -74,9 +75,15 @@ class AuthController extends AsyncNotifier<AuthUser?> {
     return result;
   }
 
-  void _handleSessionExpired() {
+  /// Called by AuthInterceptor once the server has refused the refresh
+  /// token — the session is over, so the stored tokens go too.
+  Future<void> _handleSessionExpired() async {
+    await _repository.clearLocalSession();
     state = const AsyncData(null);
   }
 }
 
-final authControllerProvider = AsyncNotifierProvider<AuthController, AuthUser?>(AuthController.new);
+/// Automatic retry is off: a failed session restore waits on the splash
+/// screen for the user to retry, instead of silently looping in the
+/// background while the UI shows a spinner.
+final authControllerProvider = AsyncNotifierProvider<AuthController, AuthUser?>(AuthController.new, retry: (_, _) => null);

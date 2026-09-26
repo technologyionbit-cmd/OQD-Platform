@@ -39,7 +39,7 @@ class LawyerRequestsScreen extends ConsumerWidget {
                 .where((c) => c.lawyerId == kDemoLawyerId && c.status == ConsultationStatus.pendingApproval)
                 .toList();
             if (pending.isEmpty) {
-              return EmptyState(icon: Icons.inbox_outlined, title: l10n.lawyerRequestsEmptyTitle, message: l10n.lawyerRequestsEmptyMessage);
+              return EmptyState(title: l10n.lawyerRequestsEmptyTitle, message: l10n.lawyerRequestsEmptyMessage);
             }
             return RefreshIndicator(
               onRefresh: () => ref.read(consultationsControllerProvider.notifier).refresh(),

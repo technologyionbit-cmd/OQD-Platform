@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -83,7 +85,7 @@ class NotificationsScreen extends ConsumerWidget {
     if (role == null) return;
     final route = _routeFor(notification, role);
     if (route != null) {
-      context.push(route);
+      unawaited(context.push(route));
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(

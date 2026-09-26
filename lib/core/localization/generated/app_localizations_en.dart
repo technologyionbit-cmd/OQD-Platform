@@ -12,6 +12,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appName => 'Aqd';
 
   @override
+  String get splashTagline => 'Your smart legal platform';
+
+  @override
+  String get splashLoading => 'Loading';
+
+  @override
   String get commonRetry => 'Retry';
 
   @override

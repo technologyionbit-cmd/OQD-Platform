@@ -20,7 +20,7 @@ class LawyersController extends AsyncNotifier<List<LawyerProfile>> {
 
   Future<void> refresh() async {
     final result = await _repository.getLawyers();
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (lawyers) => AsyncData(lawyers));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 }
 

@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/features/contracts/data/datasources/contracts_mock_data_source.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
+import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
 
 void main() {
   late ContractsMockDataSource dataSource;
@@ -44,7 +45,7 @@ void main() {
   });
 
   group('saveDraft / generateContract', () {
-    Future<dynamic> firstTemplate() async => (await dataSource.getTemplates(const Locale('ar'))).first;
+    Future<ContractTemplate> firstTemplate() async => (await dataSource.getTemplates(const Locale('ar'))).first;
 
     test('saveDraft creates a new contract with draft status', () async {
       final template = await firstTemplate();

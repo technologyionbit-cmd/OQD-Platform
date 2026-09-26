@@ -19,7 +19,7 @@ Future<void> _pumpApp(WidgetTester tester, {required Map<String, Object> initial
   // real backend integration (that's AuthMockDataSource's job); it's the
   // standard Riverpod seam for keeping tests off platform channels.
   final tokenManager = _MockTokenManager();
-  when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => null);
+  when(tokenManager.loadFromStorage).thenAnswer((_) async => null);
   when(() => tokenManager.current).thenReturn(null);
 
   await tester.pumpWidget(

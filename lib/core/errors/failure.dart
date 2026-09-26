@@ -3,7 +3,7 @@
 /// Every repository returns [Result], never a raw exception, so the
 /// presentation layer only ever has typed failures to branch on and can
 /// never leak a raw backend/network exception message to the UI.
-sealed class Failure {
+sealed class Failure implements Exception {
   const Failure({this.message});
 
   /// Optional backend-provided message, already safe to display

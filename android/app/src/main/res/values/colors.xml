@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AppColors.navyDarkest - the native splash matches the Flutter one
+         so there is no white flash between them. -->
+    <color name="splash_background">#0C1830</color>
+</resources>

@@ -10,8 +10,13 @@ class AppPreferences {
   static const _themeModeKey = 'prefs.theme_mode';
   static const _onboardingSeenKey = 'prefs.onboarding_seen';
   static const _notificationsEnabledKey = 'prefs.notifications_enabled';
+  static const _installInitializedKey = 'prefs.install_initialized';
 
   final SharedPreferences _prefs;
+
+  /// Set once on first launch — see [FreshInstallGuard].
+  bool get isInstallInitialized => _prefs.getBool(_installInitializedKey) ?? false;
+  Future<void> markInstallInitialized() => _prefs.setBool(_installInitializedKey, true);
 
   String? get localeCode => _prefs.getString(_localeKey);
   Future<void> setLocaleCode(String code) => _prefs.setString(_localeKey, code);

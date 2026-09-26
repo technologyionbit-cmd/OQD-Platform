@@ -41,5 +41,5 @@ class ChatImageViewerScreen extends ConsumerWidget {
 void showChatImageViewer(BuildContext context, String? attachmentUrl) {
   Navigator.of(
     context,
-  ).push(MaterialPageRoute(builder: (_) => ChatImageViewerScreen(attachmentUrl: attachmentUrl), fullscreenDialog: true));
+  ).push(MaterialPageRoute<void>(builder: (_) => ChatImageViewerScreen(attachmentUrl: attachmentUrl), fullscreenDialog: true));
 }

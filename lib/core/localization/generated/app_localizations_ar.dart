@@ -12,6 +12,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appName => 'عقد';
 
   @override
+  String get splashTagline => 'منصتك القانونية الذكية';
+
+  @override
+  String get splashLoading => 'جارٍ التحميل';
+
+  @override
   String get commonRetry => 'إعادة المحاولة';
 
   @override

@@ -193,7 +193,7 @@ class _LawyerScheduleScreenState extends ConsumerState<LawyerScheduleScreen> {
                               final slot = daySlots[index];
                               return ListTile(
                                 tileColor: slot.isBooked ? context.statusColors.info.background : context.statusColors.success.background,
-                                shape: RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
+                                shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
                                 leading: Icon(
                                   slot.isBooked ? Icons.event_busy_outlined : Icons.event_available_outlined,
                                   color: slot.isBooked ? context.statusColors.info.foreground : context.statusColors.success.foreground,

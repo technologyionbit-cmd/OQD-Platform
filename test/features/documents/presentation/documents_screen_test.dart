@@ -29,7 +29,7 @@ Document _document(String id, String title, {String? contractId}) {
     id: id,
     title: title,
     sourceType: contractId != null ? DocumentSourceType.generatedContract : DocumentSourceType.uploaded,
-    createdAt: DateTime(2026, 1, 1),
+    createdAt: DateTime(2026),
     sizeLabel: '200 KB',
     contractId: contractId,
   );
@@ -42,9 +42,9 @@ Future<void> _pump(WidgetTester tester, MockDocumentsRepository repository) asyn
   // documents-only test isn't left with unmocked real mock-latency timers
   // pending.
   final aiRepository = MockAiRepository();
-  when(() => aiRepository.getAnalyses()).thenAnswer((_) async => const Result.success(<ContractAnalysis>[]));
+  when(aiRepository.getAnalyses).thenAnswer((_) async => const Result.success(<ContractAnalysis>[]));
   final contractsRepository = MockContractsRepository();
-  when(() => contractsRepository.getContracts()).thenAnswer((_) async => const Result.success(<Contract>[]));
+  when(contractsRepository.getContracts).thenAnswer((_) async => const Result.success(<Contract>[]));
 
   await tester.pumpWidget(
     ProviderScope(

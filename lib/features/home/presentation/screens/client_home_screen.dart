@@ -14,8 +14,10 @@ import 'package:aqd_ionbit/core/widgets/error_view.dart';
 import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/core/widgets/section_header.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contracts_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_card.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/providers/lawyers_controller.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/lawyer_card.dart';
 import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
@@ -185,8 +187,8 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     BuildContext context,
     AppLocalizations l10n,
     List<_ServiceTile> services,
-    AsyncValue<dynamic> contractsState,
-    AsyncValue<dynamic> lawyersState,
+    AsyncValue<List<Contract>> contractsState,
+    AsyncValue<List<LawyerProfile>> lawyersState,
   ) {
     return [
       SectionHeader(title: l10n.clientHomeServicesTitle),
@@ -210,14 +212,14 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
       ),
       const SizedBox(height: AppSpacing.sm),
       switch (contractsState) {
-        AsyncData(value: final contracts) when (contracts as List).isEmpty => EmptyState(
+        AsyncData(value: final contracts) when contracts.isEmpty => EmptyState(
           icon: Icons.description_outlined,
           title: l10n.clientHomeNoContractsTitle,
           message: l10n.clientHomeNoContractsMessage,
         ),
         AsyncData(value: final contracts) => Column(
           children: [
-            for (final contract in (contracts as List).take(4)) ...[
+            for (final contract in contracts.take(4)) ...[
               ContractCard(contract: contract, onTap: () => context.push(RoutePaths.clientContractDetails(contract.id))),
               const SizedBox(height: AppSpacing.sm),
             ],
@@ -228,7 +230,7 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
       },
       Builder(
         builder: (context) {
-          final lawyers = (lawyersState.value as List?) ?? const [];
+          final lawyers = lawyersState.value ?? const [];
           if (lawyers.isEmpty) return const SizedBox.shrink();
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -313,7 +315,7 @@ class _ClientHomeHeader extends StatelessWidget {
                   prefixIcon: const Icon(Icons.search),
                   filled: true,
                   fillColor: AppColors.onPrimary,
-                  border: OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide.none),
+                  border: const OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide.none),
                   contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                 ),
               ),

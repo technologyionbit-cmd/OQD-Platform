@@ -119,7 +119,6 @@ class MessagesMockDataSource implements MessagesRemoteDataSource {
         type: MessageType.text,
         text: 'تفضل، أرسل أي مستندات أو تفاصيل الآن وسأطلع عليها قبل موعدنا.',
         sentAt: DateTime.now().subtract(const Duration(hours: 4, minutes: 45)),
-        readAt: null,
       ),
     ],
   };

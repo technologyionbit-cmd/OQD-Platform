@@ -72,7 +72,7 @@ class _EarningsBody extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(gradient: AppGradients.navyHeader, borderRadius: AppRadii.lgRadius),
+          decoration: const BoxDecoration(gradient: AppGradients.navyHeader, borderRadius: AppRadii.lgRadius),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

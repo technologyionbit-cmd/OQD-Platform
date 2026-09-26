@@ -211,7 +211,7 @@ class _ActiveSessionBanner extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(gradient: AppGradients.navyHeader, borderRadius: AppRadii.lgRadius),
+      decoration: const BoxDecoration(gradient: AppGradients.navyHeader, borderRadius: AppRadii.lgRadius),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

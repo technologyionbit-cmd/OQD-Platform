@@ -104,6 +104,18 @@ abstract class AppLocalizations {
   /// **'عقد'**
   String get appName;
 
+  /// One-line tagline under the app name on the splash screen
+  ///
+  /// In ar, this message translates to:
+  /// **'منصتك القانونية الذكية'**
+  String get splashTagline;
+
+  /// Screen-reader label for the splash screen's loading indicator
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ التحميل'**
+  String get splashLoading;
+
   /// No description provided for @commonRetry.
   ///
   /// In ar, this message translates to:

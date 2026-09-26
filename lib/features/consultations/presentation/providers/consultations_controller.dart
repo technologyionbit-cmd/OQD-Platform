@@ -28,7 +28,7 @@ class ConsultationsController extends AsyncNotifier<List<Consultation>> {
 
   Future<void> refresh() async {
     final result = await _repository.getConsultations();
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (consultations) => AsyncData(consultations));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 
   /// Notification title/body must reflect the app's *current* locale even

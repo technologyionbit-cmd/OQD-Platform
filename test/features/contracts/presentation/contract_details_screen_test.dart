@@ -23,7 +23,7 @@ Contract _contract(ContractStatus status) => Contract(
   title: 'عقد بيع',
   category: ContractCategory.sale,
   status: status,
-  createdAt: DateTime(2026, 1, 1),
+  createdAt: DateTime(2026),
   updatedAt: DateTime(2026, 1, 2),
   parties: const ['أحمد', 'سارة'],
   fieldValues: const {'partyA': 'أحمد'},
@@ -88,7 +88,7 @@ void main() {
   testWidgets('a draft contract can be deleted after confirmation', (tester) async {
     final repository = MockContractsRepository();
     when(() => repository.getContractById('c1')).thenAnswer((_) async => Result.success(_contract(ContractStatus.draft)));
-    when(() => repository.getContracts()).thenAnswer((_) async => const Result.success(<Contract>[]));
+    when(repository.getContracts).thenAnswer((_) async => const Result.success(<Contract>[]));
     when(() => repository.deleteContract('c1')).thenAnswer((_) async => const Result.success(null));
 
     // Taller than the default 800x600 test surface — the details screen's

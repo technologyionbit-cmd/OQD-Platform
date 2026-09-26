@@ -1,6 +1,8 @@
 {
   "@@locale": "en",
   "appName": "Aqd",
+  "splashTagline": "Your smart legal platform",
+  "splashLoading": "Loading",
 
   "commonRetry": "Retry",
   "commonLogout": "Logout",

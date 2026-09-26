@@ -149,7 +149,7 @@ class _PaymentPanelState extends State<PaymentPanel> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(gradient: AppGradients.navyHeader, borderRadius: AppRadii.lgRadius),
+            decoration: const BoxDecoration(gradient: AppGradients.navyHeader, borderRadius: AppRadii.lgRadius),
             child: Row(
               children: [
                 Icon(Icons.credit_card, color: AppColors.onPrimary.withValues(alpha: 0.7)),
@@ -200,7 +200,7 @@ class _PaymentPanelState extends State<PaymentPanel> {
         ] else ...[
           Container(
             padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.lgRadius),
+            decoration: const BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.lgRadius),
             child: Column(
               children: [
                 const Icon(Icons.apple, size: 40),

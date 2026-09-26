@@ -80,12 +80,12 @@ class _OtpCodeFieldState extends State<OtpCodeField> {
                       maxLength: 1,
                       style: Theme.of(context).textTheme.titleLarge,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         counterText: '',
                         contentPadding: EdgeInsets.zero,
-                        border: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: const BorderSide(color: AppColors.border)),
-                        enabledBorder: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: const BorderSide(color: AppColors.border)),
-                        focusedBorder: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: const BorderSide(color: AppColors.primary)),
+                        border: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: BorderSide(color: AppColors.border)),
+                        enabledBorder: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: BorderSide(color: AppColors.border)),
+                        focusedBorder: OutlineInputBorder(borderRadius: AppRadii.smRadius, borderSide: BorderSide(color: AppColors.primary)),
                       ),
                       onChanged: (value) => _onDigitChanged(index, value),
                     ),

@@ -72,7 +72,7 @@ void main() {
   });
 
   testWidgets('renders in Arabic when the app locale is Arabic', (tester) async {
-    final consultation = readyConsultation(id: 'cons_ar', status: ConsultationStatus.confirmed);
+    final consultation = readyConsultation(id: 'cons_ar');
     await pumpChatRoom(
       tester,
       user: testClient,

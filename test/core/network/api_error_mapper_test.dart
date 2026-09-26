@@ -5,7 +5,7 @@ import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/network/api_error_mapper.dart';
 
 void main() {
-  final mapper = const ApiErrorMapper();
+  const mapper = ApiErrorMapper();
   final requestOptions = RequestOptions(path: '/test');
 
   test('maps connection timeout to TimeoutFailure', () {

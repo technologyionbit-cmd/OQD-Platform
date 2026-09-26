@@ -40,7 +40,7 @@ final _contractReadyNotification = AppNotification(
   type: NotificationType.contractReady,
   title: 'عقدك جاهز',
   body: 'تم إنشاء العقد بنجاح',
-  createdAt: DateTime(2026, 1, 1),
+  createdAt: DateTime(2026),
   relatedId: 'c_seed_1',
 );
 
@@ -53,7 +53,7 @@ final _aiAnalysisNotification = AppNotification(
   type: NotificationType.aiAnalysisCompleted,
   title: 'اكتمل تحليل العقد',
   body: 'تم الانتهاء من تحليل العقد',
-  createdAt: DateTime(2026, 1, 1),
+  createdAt: DateTime(2026),
   relatedId: 'c_seed_1',
 );
 
@@ -118,7 +118,7 @@ void main() {
   // instead of silently doing nothing.
   testWidgets('tapping a notification with no destination for the current role shows a fallback message', (tester) async {
     final repository = MockNotificationsRepository();
-    when(() => repository.getNotifications()).thenAnswer((_) async => Result.success([_aiAnalysisNotification]));
+    when(repository.getNotifications).thenAnswer((_) async => Result.success([_aiAnalysisNotification]));
     when(() => repository.markAsRead('n_seed_ai')).thenAnswer((_) async => const Result.success(null));
 
     await _pump(tester, user: testLawyer, repository: repository);
@@ -133,7 +133,7 @@ void main() {
 
   testWidgets('tapping a notification with a valid destination navigates there', (tester) async {
     final repository = MockNotificationsRepository();
-    when(() => repository.getNotifications()).thenAnswer((_) async => Result.success([_contractReadyNotification]));
+    when(repository.getNotifications).thenAnswer((_) async => Result.success([_contractReadyNotification]));
     when(() => repository.markAsRead('n_seed_2')).thenAnswer((_) async => const Result.success(null));
 
     await _pump(tester, user: testClient, repository: repository);
@@ -150,7 +150,7 @@ void main() {
   // unconditional null for the lawyer role.
   testWidgets('a lawyer tapping a contract notification navigates to her own contract-details route', (tester) async {
     final repository = MockNotificationsRepository();
-    when(() => repository.getNotifications()).thenAnswer((_) async => Result.success([_contractReadyNotification]));
+    when(repository.getNotifications).thenAnswer((_) async => Result.success([_contractReadyNotification]));
     when(() => repository.markAsRead('n_seed_2')).thenAnswer((_) async => const Result.success(null));
 
     await _pump(tester, user: testLawyer, repository: repository);

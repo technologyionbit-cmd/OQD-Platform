@@ -25,7 +25,7 @@ class DocumentsController extends AsyncNotifier<List<Document>> {
 
   Future<void> refresh() async {
     final result = await _repository.getDocuments();
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (documents) => AsyncData(documents));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 
   /// Called from the contracts feature once a contract is generated — see

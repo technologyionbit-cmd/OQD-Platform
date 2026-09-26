@@ -25,7 +25,7 @@ class AiAnalysesController extends AsyncNotifier<List<ContractAnalysis>> {
 
   Future<void> refresh() async {
     final result = await _repository.getAnalyses();
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (analyses) => AsyncData(analyses));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 
   Future<Result<ContractAnalysis>> analyzeDocument({required String documentTitle, String? sourceDocumentId}) async {

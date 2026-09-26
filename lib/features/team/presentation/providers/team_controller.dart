@@ -20,7 +20,7 @@ class TeamController extends AsyncNotifier<List<TeamMember>> {
 
   Future<void> refresh() async {
     final result = await _repository.getMembers();
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (members) => AsyncData(members));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 
   Future<Result<TeamMember>> addMember({required String fullName, required String email, required TeamMemberRole role}) async {

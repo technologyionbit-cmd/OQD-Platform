@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -73,7 +75,7 @@ Future<ProviderContainer> _pump(WidgetTester tester, {bool isVerified = true}) a
   // Push (not initialLocation) so context.pop() on a successful save has
   // the dashboard route underneath it to return to, matching how this
   // screen is actually reached from AccountScreen's menu.
-  router.push(RoutePaths.lawyerProfileEdit);
+  unawaited(router.push(RoutePaths.lawyerProfileEdit));
   await tester.pumpAndSettle();
   return container;
 }
@@ -126,7 +128,7 @@ void main() {
   });
 
   testWidgets('an already-verified lawyer has no upload button', (tester) async {
-    await _pump(tester, isVerified: true);
+    await _pump(tester);
 
     expect(find.text('Verified'), findsWidgets);
     expect(find.text('Upload Verification Document'), findsNothing);
@@ -178,7 +180,7 @@ void main() {
 
   testWidgets('a cancelled document pick is a silent no-op', (tester) async {
     final previous = ImagePickerPlatform.instance;
-    ImagePickerPlatform.instance = _FakeImagePickerPlatform(result: null);
+    ImagePickerPlatform.instance = _FakeImagePickerPlatform();
     addTearDown(() => ImagePickerPlatform.instance = previous);
 
     await _pump(tester, isVerified: false);

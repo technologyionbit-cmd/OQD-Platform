@@ -84,7 +84,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     // never overflows, when it doesn't.
                     return LayoutBuilder(
                       builder: (context, constraints) {
-                        final iconSize = responsiveValue(context, standard: 140.0, small: 108.0);
+                        final iconSize = responsiveValue<double>(context, standard: 140, small: 108);
                         return SingleChildScrollView(
                           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl, vertical: AppSpacing.md),
                           child: ConstrainedBox(

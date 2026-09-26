@@ -67,12 +67,13 @@ Future<RoleTestHarness> pumpAuthenticatedApp(
 
   final repository = MockAuthRepository();
   final tokenManager = MockTokenManager();
-  when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => null);
+  when(tokenManager.loadFromStorage).thenAnswer((_) async => null);
   when(() => tokenManager.current).thenReturn(null);
   when(
     () => repository.login(email: any(named: 'email'), password: any(named: 'password')),
   ).thenAnswer((_) async => Result.success((user: user, tokens: _testTokens)));
-  when(() => repository.logout()).thenAnswer((_) async {});
+  when(repository.restoreSession).thenAnswer((_) async => const Result.success(null));
+  when(repository.logout).thenAnswer((_) async {});
 
   final container = ProviderContainer(
     overrides: [

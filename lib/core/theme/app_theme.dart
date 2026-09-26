@@ -10,15 +10,12 @@ class AppTheme {
   const AppTheme._();
 
   static ThemeData get light {
-    final colorScheme = const ColorScheme.light(
+    const colorScheme = ColorScheme.light(
       primary: AppColors.primary,
-      onPrimary: AppColors.onPrimary,
       secondary: AppColors.secondary,
       onSecondary: AppColors.onPrimary,
-      surface: AppColors.surface,
       onSurface: AppColors.textPrimary,
       error: AppColors.error,
-      onError: AppColors.onPrimary,
     );
 
     return _build(
@@ -30,7 +27,7 @@ class AppTheme {
   }
 
   static ThemeData get dark {
-    final colorScheme = const ColorScheme.dark(
+    const colorScheme = ColorScheme.dark(
       primary: AppColors.primary,
       onPrimary: AppColors.onPrimary,
       secondary: AppColors.secondary,
@@ -62,7 +59,6 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: scaffoldBackground,
-      fontFamily: AppTypography.fontFamily,
       textTheme: textTheme,
       appBarTheme: AppBarTheme(
         backgroundColor: scaffoldBackground,
@@ -74,7 +70,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: colorScheme.surface,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: AppRadii.mdRadius, side: BorderSide(color: AppColors.border)),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdRadius, side: BorderSide(color: AppColors.border)),
         margin: EdgeInsets.zero,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -83,7 +79,7 @@ class AppTheme {
           foregroundColor: colorScheme.onPrimary,
           disabledBackgroundColor: AppColors.textDisabled,
           minimumSize: const Size.fromHeight(52),
-          shape: RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
+          shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
           textStyle: textTheme.labelLarge,
         ),
       ),
@@ -92,7 +88,7 @@ class AppTheme {
           foregroundColor: colorScheme.primary,
           side: BorderSide(color: colorScheme.primary),
           minimumSize: const Size.fromHeight(52),
-          shape: RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
+          shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
           textStyle: textTheme.labelLarge,
         ),
       ),
@@ -103,13 +99,13 @@ class AppTheme {
         filled: true,
         fillColor: colorScheme.surface,
         contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
-        border: OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: const BorderSide(color: AppColors.border)),
-        enabledBorder: OutlineInputBorder(
+        border: const OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide(color: AppColors.border)),
+        enabledBorder: const OutlineInputBorder(
           borderRadius: AppRadii.mdRadius,
-          borderSide: const BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide(color: colorScheme.primary)),
-        errorBorder: OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: const BorderSide(color: AppColors.error)),
+        errorBorder: const OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide(color: AppColors.error)),
         labelStyle: textTheme.bodyMedium,
         hintStyle: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
       ),

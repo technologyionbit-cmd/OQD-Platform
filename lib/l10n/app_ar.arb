@@ -4,6 +4,14 @@
   "@appName": {
     "description": "Application name shown in title bars and splash screen"
   },
+  "splashTagline": "منصتك القانونية الذكية",
+  "@splashTagline": {
+    "description": "One-line tagline under the app name on the splash screen"
+  },
+  "splashLoading": "جارٍ التحميل",
+  "@splashLoading": {
+    "description": "Screen-reader label for the splash screen's loading indicator"
+  },
 
   "commonRetry": "إعادة المحاولة",
   "commonLogout": "تسجيل الخروج",

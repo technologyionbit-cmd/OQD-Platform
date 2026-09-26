@@ -11,7 +11,7 @@ class PaymentMethodsController extends Notifier<List<PaymentMethod>> {
   ];
 
   Future<void> addCard({required String brand, required String last4, required String holderName}) async {
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future<void>.delayed(const Duration(milliseconds: 400));
     final card = PaymentMethod(
       id: 'pm_${DateTime.now().microsecondsSinceEpoch}',
       brand: brand,

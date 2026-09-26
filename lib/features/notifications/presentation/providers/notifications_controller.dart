@@ -25,7 +25,7 @@ class NotificationsController extends AsyncNotifier<List<AppNotification>> {
   FutureOr<List<AppNotification>> build() async {
     _repository = ref.watch(notificationsRepositoryProvider);
     final result = await _repository.getNotifications();
-    return result.fold((failure) => throw failure, (notifications) => _scopedToCurrentUser(notifications));
+    return result.fold((failure) => throw failure, _scopedToCurrentUser);
   }
 
   Future<void> refresh() async {

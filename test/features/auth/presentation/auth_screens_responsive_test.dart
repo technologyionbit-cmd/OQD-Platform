@@ -33,7 +33,7 @@ Future<void> _pumpAtSize(WidgetTester tester, Widget screen, Size size, {Locale 
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
   final tokenManager = _MockTokenManager();
-  when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => null);
+  when(tokenManager.loadFromStorage).thenAnswer((_) async => null);
   when(() => tokenManager.current).thenReturn(null);
 
   await tester.pumpWidget(

@@ -26,7 +26,7 @@ enum _SignTab { saved, upload, draw }
 /// `true` once the user taps confirm; the caller is responsible for
 /// actually marking the contract signed.
 Future<bool?> showContractSignatureSheet(BuildContext context) {
-  return showAppBottomSheet<bool>(context, isScrollControlled: true, builder: (sheetContext) => const _ContractSignatureSheetContent());
+  return showAppBottomSheet<bool>(context, builder: (sheetContext) => const _ContractSignatureSheetContent());
 }
 
 class _ContractSignatureSheetContent extends ConsumerStatefulWidget {

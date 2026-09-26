@@ -55,9 +55,17 @@ class TokenManager {
     await _secureStorage.write(_refreshTokenKey, tokens.refreshToken);
   }
 
+  /// The in-memory session is dropped first and unconditionally, so a
+  /// failing storage backend can never keep a signed-out user's token on
+  /// outgoing requests. Storage failures are logged rather than thrown so
+  /// sign-out always completes.
   Future<void> clear() async {
     _cached = null;
-    await _secureStorage.delete(_accessTokenKey);
-    await _secureStorage.delete(_refreshTokenKey);
+    try {
+      await _secureStorage.delete(_accessTokenKey).timeout(const Duration(seconds: 5));
+      await _secureStorage.delete(_refreshTokenKey).timeout(const Duration(seconds: 5));
+    } catch (e, stackTrace) {
+      AppLogger.error('Failed to clear session from secure storage', error: e, stackTrace: stackTrace);
+    }
   }
 }

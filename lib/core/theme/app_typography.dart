@@ -31,6 +31,6 @@ class AppTypography {
   }
 
   static TextStyle _style(double size, FontWeight weight, Color color) {
-    return TextStyle(fontFamily: fontFamily, fontSize: size, fontWeight: weight, color: color, height: 1.4);
+    return TextStyle(fontSize: size, fontWeight: weight, color: color, height: 1.4);
   }
 }

@@ -38,8 +38,8 @@ Contract _resultContract(ContractStatus status) => Contract(
   title: _template.title,
   category: _template.category,
   status: status,
-  createdAt: DateTime(2026, 1, 1),
-  updatedAt: DateTime(2026, 1, 1),
+  createdAt: DateTime(2026),
+  updatedAt: DateTime(2026),
   parties: const ['أحمد', 'سارة'],
   fieldValues: _fieldValues,
   templateId: _template.id,
@@ -98,21 +98,21 @@ void main() {
   testWidgets('save as draft persists via the repository and navigates to details', (tester) async {
     final repository = MockContractsRepository();
     when(
-      () => repository.saveDraft(template: _template, fieldValues: _fieldValues, contractId: null),
+      () => repository.saveDraft(template: _template, fieldValues: _fieldValues),
     ).thenAnswer((_) async => Result.success(_resultContract(ContractStatus.draft)));
 
     await _pump(tester, repository: repository);
     await tester.tap(find.text('حفظ كمسودة'));
     await tester.pumpAndSettle();
 
-    verify(() => repository.saveDraft(template: _template, fieldValues: _fieldValues, contractId: null)).called(1);
+    verify(() => repository.saveDraft(template: _template, fieldValues: _fieldValues)).called(1);
     expect(find.text('details c1'), findsOneWidget);
   });
 
   testWidgets('generate shows the success state with a link to the new contract', (tester) async {
     final repository = MockContractsRepository();
     when(
-      () => repository.generateContract(template: _template, fieldValues: _fieldValues, contractId: null),
+      () => repository.generateContract(template: _template, fieldValues: _fieldValues),
     ).thenAnswer((_) async => Result.success(_resultContract(ContractStatus.pendingSignature)));
 
     await _pump(tester, repository: repository);

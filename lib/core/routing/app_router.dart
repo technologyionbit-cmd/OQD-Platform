@@ -10,7 +10,7 @@ import 'package:aqd_ionbit/core/routing/routes/company_extra_routes.dart';
 import 'package:aqd_ionbit/core/routing/routes/company_routes.dart';
 import 'package:aqd_ionbit/core/routing/routes/lawyer_extra_routes.dart';
 import 'package:aqd_ionbit/core/routing/routes/lawyer_routes.dart';
-import 'package:aqd_ionbit/core/app/splash_screen.dart';
+import 'package:aqd_ionbit/features/auth/presentation/screens/splash_screen.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
@@ -72,7 +72,10 @@ String? _redirect(Ref ref, GoRouterState state) {
   final user = authState.value;
   final location = state.matchedLocation;
 
-  if (authState.isLoading) {
+  // An error here means the stored session couldn't be verified (server
+  // unreachable) — the splash screen owns the retry, so stay on it rather
+  // than treating the user as signed out.
+  if (authState.isLoading || authState.hasError) {
     return location == RoutePaths.splash ? null : RoutePaths.splash;
   }
 

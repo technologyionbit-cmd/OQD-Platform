@@ -24,7 +24,7 @@ class GovProceduresController extends AsyncNotifier<List<GovProcedure>> {
     final repository = ref.read(govDocumentsRepositoryProvider);
     final locale = ref.read(localeControllerProvider).languageCode;
     final result = await repository.getGovProcedures(locale: locale);
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (procedures) => AsyncData(procedures));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 }
 

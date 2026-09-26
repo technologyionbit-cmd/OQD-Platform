@@ -25,7 +25,7 @@ class SubscriptionController extends Notifier<SubscriptionState> {
   void setCycle(BillingCycle cycle) => state = state.copyWith(cycle: cycle);
 
   Future<void> subscribe(SubscriptionTier tier) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     state = state.copyWith(tier: tier);
   }
 }

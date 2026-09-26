@@ -25,7 +25,7 @@ class ContractsController extends AsyncNotifier<List<Contract>> {
   /// just swapping the data in once it arrives.
   Future<void> refresh() async {
     final result = await _repository.getContracts();
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (contracts) => AsyncData(contracts));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 
   Future<Result<void>> delete(String id) async {
