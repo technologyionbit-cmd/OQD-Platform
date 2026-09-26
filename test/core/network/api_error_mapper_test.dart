@@ -67,4 +67,55 @@ void main() {
   test('maps a non-Dio error to UnknownFailure', () {
     expect(mapper.map(Exception('boom')), isA<UnknownFailure>());
   });
+
+  DioException apiError(int status, {Map<String, dynamic>? body, Map<String, List<String>>? headers}) => DioException(
+    requestOptions: requestOptions,
+    type: DioExceptionType.badResponse,
+    response: Response(
+      requestOptions: requestOptions,
+      statusCode: status,
+      data: body,
+      headers: Headers.fromMap(headers ?? {}),
+    ),
+  );
+
+  test('reads the error code from the API envelope', () {
+    final failure = mapper.map(
+      apiError(
+        403,
+        body: {
+          'error': {'message': 'This account is not active.', 'code': 'ACCOUNT_INACTIVE'},
+        },
+      ),
+    );
+
+    expect(failure, isA<ForbiddenFailure>());
+    expect(failure.code, ApiErrorCodes.accountInactive);
+  });
+
+  test('maps 429 to RateLimitedFailure with the Retry-After delay', () {
+    final failure = mapper.map(
+      apiError(
+        429,
+        headers: {
+          'retry-after': ['900'],
+        },
+      ),
+    );
+
+    expect(failure, isA<RateLimitedFailure>().having((f) => f.retryAfter, 'retryAfter', const Duration(minutes: 15)));
+  });
+
+  test('maps 429 without a usable Retry-After to a RateLimitedFailure with no delay', () {
+    final failure = mapper.map(
+      apiError(
+        429,
+        headers: {
+          'retry-after': ['Wed, 21 Oct 2026 07:28:00 GMT'],
+        },
+      ),
+    );
+
+    expect(failure, isA<RateLimitedFailure>().having((f) => f.retryAfter, 'retryAfter', isNull));
+  });
 }

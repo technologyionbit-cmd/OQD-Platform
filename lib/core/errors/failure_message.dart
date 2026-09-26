@@ -8,7 +8,16 @@ extension FailureMessage on Failure {
   String localizedMessage(AppLocalizations l10n) => switch (this) {
     NetworkFailure() => l10n.errorNetwork,
     TimeoutFailure() => l10n.errorTimeout,
+    RateLimitedFailure(:final retryAfter?) => l10n.errorTooManyAttemptsRetryIn(_minutesUntil(retryAfter)),
+    RateLimitedFailure() => l10n.errorTooManyAttempts,
+    Failure(code: ApiErrorCodes.accountInactive) => l10n.errorAccountInactive,
     ServerFailure() => l10n.errorServer,
     _ => l10n.errorGeneric,
   };
+
+  /// Whole minutes, rounded up so "try again in 1 minute" is never early.
+  static int _minutesUntil(Duration wait) {
+    final minutes = (wait.inSeconds / 60).ceil();
+    return minutes < 1 ? 1 : minutes;
+  }
 }

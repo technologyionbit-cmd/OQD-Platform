@@ -614,6 +614,24 @@ abstract class AppLocalizations {
   /// **'انتهت مهلة الاتصال'**
   String get errorTimeout;
 
+  /// No description provided for @errorTooManyAttempts.
+  ///
+  /// In ar, this message translates to:
+  /// **'محاولات كثيرة، يرجى المحاولة لاحقًا'**
+  String get errorTooManyAttempts;
+
+  /// Rate-limited (HTTP 429) with a known wait time
+  ///
+  /// In ar, this message translates to:
+  /// **'{minutes, plural, =1{محاولات كثيرة، حاول مجددًا بعد دقيقة} =2{محاولات كثيرة، حاول مجددًا بعد دقيقتين} few{محاولات كثيرة، حاول مجددًا بعد {minutes} دقائق} other{محاولات كثيرة، حاول مجددًا بعد {minutes} دقيقة}}'**
+  String errorTooManyAttemptsRetryIn(int minutes);
+
+  /// No description provided for @errorAccountInactive.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الحساب غير مفعّل، يرجى التواصل مع الدعم'**
+  String get errorAccountInactive;
+
   /// No description provided for @validationRequired.
   ///
   /// In ar, this message translates to:

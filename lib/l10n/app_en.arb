@@ -99,6 +99,9 @@
   "errorInvalidCredentials": "Invalid email or password",
   "errorServer": "A server error occurred, please try again later",
   "errorTimeout": "The connection timed out",
+  "errorTooManyAttempts": "Too many attempts, please try again later",
+  "errorTooManyAttemptsRetryIn": "{minutes, plural, =1{Too many attempts, try again in 1 minute} other{Too many attempts, try again in {minutes} minutes}}",
+  "errorAccountInactive": "This account is not active, please contact support",
 
   "validationRequired": "This field is required",
   "validationInvalidEmail": "Enter a valid email address",

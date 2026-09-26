@@ -176,6 +176,54 @@ describe('Auth (e2e)', () => {
       expect(err(res).code).toBe('UNAUTHORIZED');
     });
 
+    it('answers an unknown email exactly like a wrong password', async () => {
+      const unknown = await login(`nobody.${tag}@test.com`, 'WrongPass123');
+      const wrongPassword = await login(individual.email, 'WrongPass123');
+
+      expect(unknown.status).toBe(401);
+      expect(unknown.body).toEqual(wrongPassword.body);
+    });
+
+    it('limits attempts per email regardless of IP, with Retry-After', async () => {
+      // An unknown email on purpose: the limit must behave identically for
+      // accounts that don't exist, or it would reveal which ones do.
+      const target = `bruteforce.${tag}@test.com`;
+      for (let i = 0; i < 10; i++) {
+        expect((await login(target, `Guess${i}pass`)).status).toBe(401);
+      }
+
+      const blocked = await login(target, 'Guess10pass');
+
+      expect(blocked.status).toBe(429);
+      expect(err(blocked).code).toBe('TOO_MANY_REQUESTS');
+      expect(Number(blocked.headers['retry-after'])).toBeGreaterThan(0);
+      // Other accounts are unaffected.
+      expect((await login(individual.email, individual.password)).status).toBe(
+        200,
+      );
+    });
+
+    it('refuses an inactive account with ACCOUNT_INACTIVE after a correct password', async () => {
+      await prisma.user.update({
+        where: { email: company.email },
+        data: { status: 'suspended' },
+      });
+      try {
+        const res = await login(company.email, company.password);
+        expect(res.status).toBe(403);
+        expect(err(res).code).toBe('ACCOUNT_INACTIVE');
+
+        // Without the right password it stays an indistinguishable 401.
+        const guess = await login(company.email, 'WrongPass123');
+        expect(guess.status).toBe(401);
+      } finally {
+        await prisma.user.update({
+          where: { email: company.email },
+          data: { status: 'active' },
+        });
+      }
+    });
+
     it('refreshes, rotates the refresh token, and detects reuse', async () => {
       const session = await login(individual.email, individual.password);
       const oldRefresh = ok<{ tokens: Tokens }>(session).tokens.refreshToken;

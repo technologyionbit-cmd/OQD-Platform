@@ -145,9 +145,11 @@ export class AuthService {
       where: { email: dto.email.trim().toLowerCase() },
     });
 
-    const ok =
-      user !== null &&
-      (await this.passwords.verify(dto.password, user.passwordHash));
+    // Same bcrypt work whether or not the account exists (timing-safe).
+    const ok = await this.passwords.verifyOrBurn(
+      dto.password,
+      user?.passwordHash ?? null,
+    );
 
     if (!user || !ok) {
       throw new UnauthorizedException({
@@ -159,7 +161,7 @@ export class AuthService {
     if (user.status !== 'active') {
       throw new ForbiddenException({
         message: 'This account is not active.',
-        code: ApiErrorCode.FORBIDDEN,
+        code: ApiErrorCode.ACCOUNT_INACTIVE,
       });
     }
 

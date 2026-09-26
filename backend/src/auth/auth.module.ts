@@ -5,6 +5,7 @@ import type { JwtConfig } from '../config/configuration';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LoginAttemptsGuard } from './guards/login-attempts.guard';
 import { OtpService } from './services/otp.service';
 import { PasswordService } from './services/password.service';
 import { TokenService } from './services/token.service';
@@ -34,6 +35,7 @@ import { TokenService } from './services/token.service';
     TokenService,
     OtpService,
     JwtAuthGuard,
+    LoginAttemptsGuard,
   ],
   // The auth surface other feature modules need to protect their own
   // routes (docs/plans/individual-user-rollout.md). A `@UseGuards(Class)`

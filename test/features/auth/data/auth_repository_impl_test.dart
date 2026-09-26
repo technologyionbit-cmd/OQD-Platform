@@ -152,7 +152,7 @@ void main() {
       const NetworkFailure(),
       const TimeoutFailure(),
       const ServerFailure(statusCode: 503),
-      const ServerFailure(statusCode: 429),
+      const RateLimitedFailure(retryAfter: Duration(minutes: 1)),
     ];
     for (final failure in transient) {
       test('is unavailable, not rejected, on a transient failure (${failure.runtimeType})', () async {

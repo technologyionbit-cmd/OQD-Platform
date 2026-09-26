@@ -36,6 +36,9 @@ export interface AuthConfig {
   bcryptRounds: number;
   otpTtlMinutes: number;
   otpMaxAttempts: number;
+  /** Sign-in attempts allowed per email per window, on top of per-IP limits. */
+  loginMaxAttempts: number;
+  loginAttemptWindowMinutes: number;
 }
 
 export interface Configuration {
@@ -84,6 +87,11 @@ export default (): Configuration => ({
     bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS ?? '12', 10),
     otpTtlMinutes: parseInt(process.env.OTP_TTL_MINUTES ?? '10', 10),
     otpMaxAttempts: parseInt(process.env.OTP_MAX_ATTEMPTS ?? '5', 10),
+    loginMaxAttempts: parseInt(process.env.LOGIN_MAX_ATTEMPTS ?? '10', 10),
+    loginAttemptWindowMinutes: parseInt(
+      process.env.LOGIN_ATTEMPT_WINDOW_MINUTES ?? '15',
+      10,
+    ),
   },
 });
 

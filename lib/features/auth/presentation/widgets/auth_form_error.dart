@@ -18,22 +18,25 @@ class AuthFormError extends StatelessWidget {
     if (message == null) return const SizedBox.shrink();
 
     final colors = context.statusColors.error;
-    return Container(
-      margin: const EdgeInsets.only(top: AppSpacing.sm),
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      decoration: BoxDecoration(color: colors.background, borderRadius: AppRadii.mdRadius),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.error_outline, size: 18, color: colors.foreground),
-          const SizedBox(width: AppSpacing.xs),
-          Expanded(
-            child: Text(
-              message,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.foreground),
+    // liveRegion: screen readers announce the error as soon as it appears,
+    // without the user having to find it.
+    return Semantics(
+      liveRegion: true,
+      container: true,
+      child: Container(
+        margin: const EdgeInsets.only(top: AppSpacing.sm),
+        padding: const EdgeInsets.all(AppSpacing.sm),
+        decoration: BoxDecoration(color: colors.background, borderRadius: AppRadii.mdRadius),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.error_outline, size: 18, color: colors.foreground),
+            const SizedBox(width: AppSpacing.xs),
+            Expanded(
+              child: Text(message, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.foreground)),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

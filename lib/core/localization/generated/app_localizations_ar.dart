@@ -283,6 +283,26 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorTimeout => 'انتهت مهلة الاتصال';
 
   @override
+  String get errorTooManyAttempts => 'محاولات كثيرة، يرجى المحاولة لاحقًا';
+
+  @override
+  String errorTooManyAttemptsRetryIn(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'محاولات كثيرة، حاول مجددًا بعد $minutes دقيقة',
+      few: 'محاولات كثيرة، حاول مجددًا بعد $minutes دقائق',
+      two: 'محاولات كثيرة، حاول مجددًا بعد دقيقتين',
+      one: 'محاولات كثيرة، حاول مجددًا بعد دقيقة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errorAccountInactive =>
+      'هذا الحساب غير مفعّل، يرجى التواصل مع الدعم';
+
+  @override
   String get validationRequired => 'هذا الحقل مطلوب';
 
   @override

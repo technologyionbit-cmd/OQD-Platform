@@ -43,6 +43,19 @@ class TokensPayloadDto {
   tokens!: AuthTokensDto;
 }
 
+class SessionPayloadDto {
+  @ApiProperty({ type: AuthUserDto })
+  user!: AuthUserDto;
+
+  @ApiProperty({ type: AuthTokensDto })
+  tokens!: AuthTokensDto;
+}
+
+export class SessionResponseDto {
+  @ApiProperty({ type: SessionPayloadDto })
+  data!: SessionPayloadDto;
+}
+
 export class UserResponseDto {
   @ApiProperty({ type: UserPayloadDto })
   data!: UserPayloadDto;

@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -22,7 +23,11 @@ import { Throttle } from '@nestjs/throttler';
 import { ApiErrorResponseDto } from '../common/openapi/api-error.dto';
 import { BEARER_AUTH } from '../common/openapi/setup-openapi';
 import { AuthService } from './auth.service';
-import { TokensResponseDto, UserResponseDto } from './dto/auth-responses.dto';
+import {
+  SessionResponseDto,
+  TokensResponseDto,
+  UserResponseDto,
+} from './dto/auth-responses.dto';
 import type { AuthenticatedUser } from './auth.types';
 import { ClientContext } from './decorators/client-context.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -41,6 +46,7 @@ import {
 } from './dto/password-reset.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { LoginAttemptsGuard } from './guards/login-attempts.guard';
 
 /** Tight limits for the credential-guessing surface (docs/backend/14-security.md). */
 const STRICT_THROTTLE = { default: { limit: 8, ttl: 60_000 } };
@@ -63,6 +69,23 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @Throttle(STRICT_THROTTLE)
+  @UseGuards(LoginAttemptsGuard)
+  @ApiOperation({
+    summary: 'Sign in',
+    description:
+      'Wrong email and wrong password are indistinguishable (same 401, ' +
+      'same timing). Limited per IP and per email (LOGIN_MAX_ATTEMPTS per ' +
+      'LOGIN_ATTEMPT_WINDOW_MINUTES); a 429 carries Retry-After in seconds.',
+  })
+  @ApiOkResponse({ type: SessionResponseDto })
+  @ApiUnauthorizedResponse({
+    type: ApiErrorResponseDto,
+    description: 'Invalid email or password (code UNAUTHORIZED).',
+  })
+  @ApiForbiddenResponse({
+    type: ApiErrorResponseDto,
+    description: 'Correct credentials, inactive account (ACCOUNT_INACTIVE).',
+  })
   async login(@Body() dto: LoginDto, @ClientContext() ctx: RequestContext) {
     return { data: await this.auth.login(dto, ctx) };
   }

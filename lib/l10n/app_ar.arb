@@ -128,6 +128,15 @@
   "errorInvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
   "errorServer": "حدث خطأ في الخادم، حاول لاحقًا",
   "errorTimeout": "انتهت مهلة الاتصال",
+  "errorTooManyAttempts": "محاولات كثيرة، يرجى المحاولة لاحقًا",
+  "errorTooManyAttemptsRetryIn": "{minutes, plural, =1{محاولات كثيرة، حاول مجددًا بعد دقيقة} =2{محاولات كثيرة، حاول مجددًا بعد دقيقتين} few{محاولات كثيرة، حاول مجددًا بعد {minutes} دقائق} other{محاولات كثيرة، حاول مجددًا بعد {minutes} دقيقة}}",
+  "@errorTooManyAttemptsRetryIn": {
+    "description": "Rate-limited (HTTP 429) with a known wait time",
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "errorAccountInactive": "هذا الحساب غير مفعّل، يرجى التواصل مع الدعم",
 
   "validationRequired": "هذا الحقل مطلوب",
   "validationInvalidEmail": "صيغة البريد الإلكتروني غير صحيحة",

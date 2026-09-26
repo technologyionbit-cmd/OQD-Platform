@@ -13,6 +13,8 @@ export enum ApiErrorCode {
   TIMEOUT = 'TIMEOUT',
   TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS',
   SERVER_ERROR = 'SERVER_ERROR',
+  /** Sign-in with correct credentials for a suspended/deactivated account. */
+  ACCOUNT_INACTIVE = 'ACCOUNT_INACTIVE',
 }
 
 const STATUS_TO_CODE: Readonly<Record<number, ApiErrorCode>> = {

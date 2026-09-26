@@ -32,4 +32,6 @@ export const envValidationSchema = Joi.object({
   BCRYPT_ROUNDS: Joi.number().integer().min(10).max(15).default(12),
   OTP_TTL_MINUTES: Joi.number().integer().min(1).default(10),
   OTP_MAX_ATTEMPTS: Joi.number().integer().min(1).default(5),
+  LOGIN_MAX_ATTEMPTS: Joi.number().integer().min(1).default(10),
+  LOGIN_ATTEMPT_WINDOW_MINUTES: Joi.number().integer().min(1).default(15),
 });

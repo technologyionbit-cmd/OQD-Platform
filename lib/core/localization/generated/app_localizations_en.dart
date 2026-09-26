@@ -287,6 +287,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorTimeout => 'The connection timed out';
 
   @override
+  String get errorTooManyAttempts =>
+      'Too many attempts, please try again later';
+
+  @override
+  String errorTooManyAttemptsRetryIn(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Too many attempts, try again in $minutes minutes',
+      one: 'Too many attempts, try again in 1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errorAccountInactive =>
+      'This account is not active, please contact support';
+
+  @override
   String get validationRequired => 'This field is required';
 
   @override
