@@ -199,6 +199,27 @@ describe('Auth (e2e)', () => {
       expect(afterFamilyRevoke.status).toBe(401);
     });
 
+    it('refuses an unknown or oversized refresh token without a 5xx', async () => {
+      // The app signs the user out only on these refusals (401/4xx); a 5xx
+      // would be treated as transient and retried forever.
+      const unknown = await request(http)
+        .post('/v1/auth/refresh')
+        .send({ refreshToken: 'not-a-real-token' });
+      expect(unknown.status).toBe(401);
+
+      const oversized = await request(http)
+        .post('/v1/auth/refresh')
+        .send({ refreshToken: 'x'.repeat(257) });
+      expect(oversized.status).toBe(422);
+    });
+
+    it('GET /auth/me answers a malformed bearer token with 401, not 5xx', async () => {
+      const res = await request(http)
+        .get('/v1/auth/me')
+        .set('authorization', 'Bearer not.a.jwt');
+      expect(res.status).toBe(401);
+    });
+
     it('GET /auth/me returns 401 without a token and the user with one', async () => {
       const anon = await request(http).get('/v1/auth/me');
       expect(anon.status).toBe(401);

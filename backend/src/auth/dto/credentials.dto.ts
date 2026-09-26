@@ -9,6 +9,10 @@ import {
 
 const PASSWORD_RE = /^(?=.*[A-Za-z])(?=.*\d).+$/;
 
+/** Issued tokens are 64 chars (48 random bytes, base64url); anything far
+ *  longer is not ours and is rejected before it is hashed or queried. */
+const REFRESH_TOKEN_MAX_LENGTH = 256;
+
 export class LoginDto {
   @IsEmail()
   @MaxLength(254)
@@ -23,12 +27,14 @@ export class LoginDto {
 export class RefreshDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(REFRESH_TOKEN_MAX_LENGTH)
   refreshToken!: string;
 }
 
 export class LogoutDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(REFRESH_TOKEN_MAX_LENGTH)
   refreshToken!: string;
 }
 

@@ -10,8 +10,19 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiTooManyRequestsResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { ApiErrorResponseDto } from '../common/openapi/api-error.dto';
+import { BEARER_AUTH } from '../common/openapi/setup-openapi';
 import { AuthService } from './auth.service';
+import { TokensResponseDto, UserResponseDto } from './dto/auth-responses.dto';
 import type { AuthenticatedUser } from './auth.types';
 import { ClientContext } from './decorators/client-context.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -34,6 +45,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 /** Tight limits for the credential-guessing surface (docs/backend/14-security.md). */
 const STRICT_THROTTLE = { default: { limit: 8, ttl: 60_000 } };
 
+@ApiTags('auth')
+@ApiTooManyRequestsResponse({ type: ApiErrorResponseDto })
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
@@ -56,6 +69,16 @@ export class AuthController {
 
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Rotate the session',
+    description:
+      'Exchanges a refresh token for a new pair; the presented token is ' +
+      'revoked. 401 means the session is over (expired, revoked, reused, ' +
+      'or the account is inactive) — the client must sign out. Any other ' +
+      'failure is transient and must not sign the user out.',
+  })
+  @ApiOkResponse({ type: TokensResponseDto })
+  @ApiUnauthorizedResponse({ type: ApiErrorResponseDto })
   async refresh(@Body() dto: RefreshDto, @ClientContext() ctx: RequestContext) {
     return { data: await this.auth.refresh(dto, ctx) };
   }
@@ -68,6 +91,16 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth(BEARER_AUTH)
+  @ApiOperation({
+    summary: 'Current user',
+    description:
+      'Used on app start to verify a stored session. 401 when the access ' +
+      'token is invalid/expired, the session was revoked, or the account ' +
+      'is no longer active.',
+  })
+  @ApiOkResponse({ type: UserResponseDto })
+  @ApiUnauthorizedResponse({ type: ApiErrorResponseDto })
   async me(@CurrentUser() user: AuthenticatedUser) {
     return { data: { user: await this.auth.me(user.id) } };
   }
