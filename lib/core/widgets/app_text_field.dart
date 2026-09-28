@@ -22,6 +22,8 @@ class AppTextField extends StatefulWidget {
     this.onTap,
     this.suffixIcon,
     this.hintText,
+    this.helperText,
+    this.maxLength,
   });
 
   final TextEditingController controller;
@@ -50,6 +52,14 @@ class AppTextField extends StatefulWidget {
   final VoidCallback? onTap;
   final Widget? suffixIcon;
   final String? hintText;
+
+  /// Guidance under the field (e.g. password rules); [errorText] replaces
+  /// it while shown.
+  final String? helperText;
+
+  /// Hard cap on characters typed or pasted — set to the server's limit
+  /// for the field. No counter is shown.
+  final int? maxLength;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -81,9 +91,13 @@ class _AppTextFieldState extends State<AppTextField> {
       onSubmitted: widget.onSubmitted,
       readOnly: widget.readOnly,
       onTap: widget.onTap,
+      maxLength: widget.maxLength,
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.hintText,
+        helperText: widget.helperText,
+        helperMaxLines: 2,
+        counterText: widget.maxLength == null ? null : '',
         errorText: widget.errorText,
         suffixIcon: widget.obscureText
             ? IconButton(

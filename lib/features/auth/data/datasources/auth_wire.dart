@@ -14,31 +14,27 @@ class AuthWire {
   // --- requests ------------------------------------------------------------
 
   static Map<String, dynamic> registerBody(RegisterRequest request) {
-    return switch (request) {
-      IndividualRegisterRequest(:final fullName, :final phone, :final email, :final password) => {
-        'accountType': 'individual',
-        'fullName': fullName,
-        'phone': phone,
-        'email': email,
-        'password': password,
-      },
-      CompanyRegisterRequest(:final companyName, :final commercialRegistrationNumber, :final email, :final phone, :final password) => {
+    final typeFields = switch (request) {
+      IndividualRegisterRequest(:final fullName) => {'accountType': 'individual', 'fullName': fullName},
+      CompanyRegisterRequest(:final companyName, :final commercialRegistrationNumber) => {
         'accountType': 'company',
         'companyName': companyName,
         'commercialRegistrationNumber': commercialRegistrationNumber,
-        'phone': phone,
-        'email': email,
-        'password': password,
       },
-      LawyerRegisterRequest(:final fullName, :final barLicenseNumber, :final mainSpecialty, :final email, :final phone, :final password) => {
+      LawyerRegisterRequest(:final fullName, :final barLicenseNumber, :final mainSpecialty) => {
         'accountType': 'lawyer',
         'fullName': fullName,
         'barLicenseNumber': barLicenseNumber,
         'mainSpecialty': mainSpecialty,
-        'phone': phone,
-        'email': email,
-        'password': password,
       },
+    };
+    return {
+      ...typeFields,
+      'phone': request.phone,
+      'email': request.email,
+      'password': request.password,
+      'acceptTerms': request.acceptTerms,
+      'termsVersion': request.termsVersion,
     };
   }
 
@@ -58,6 +54,7 @@ class AuthWire {
       fullName: userJson['fullName'] as String,
       email: userJson['email'] as String,
       role: UserRoleWire.fromWire(userJson['role'] as String),
+      emailVerified: userJson['emailVerified'] as bool,
     );
   }
 

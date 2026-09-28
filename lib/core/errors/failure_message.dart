@@ -11,6 +11,13 @@ extension FailureMessage on Failure {
     RateLimitedFailure(:final retryAfter?) => l10n.errorTooManyAttemptsRetryIn(_minutesUntil(retryAfter)),
     RateLimitedFailure() => l10n.errorTooManyAttempts,
     Failure(code: ApiErrorCodes.accountInactive) => l10n.errorAccountInactive,
+    Failure(code: ApiErrorCodes.emailNotVerified) => l10n.errorEmailNotVerified,
+    Failure(code: ApiErrorCodes.emailAlreadyRegistered) => l10n.errorEmailAlreadyRegistered,
+    Failure(code: ApiErrorCodes.commercialRegistrationTaken) => l10n.errorCommercialRegistrationTaken,
+    Failure(code: ApiErrorCodes.barLicenseTaken) => l10n.errorBarLicenseTaken,
+    Failure(code: ApiErrorCodes.termsVersionOutdated) => l10n.errorTermsVersionOutdated,
+    Failure(code: ApiErrorCodes.invalidVerificationCode) => l10n.authOtpInvalidCode,
+    Failure(code: ApiErrorCodes.verificationCodeLocked) => l10n.errorVerificationCodeLocked,
     ServerFailure() => l10n.errorServer,
     _ => l10n.errorGeneric,
   };

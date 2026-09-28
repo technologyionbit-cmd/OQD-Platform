@@ -374,6 +374,54 @@ abstract class AppLocalizations {
   /// **'سياسة الخصوصية'**
   String get authPrivacyPolicy;
 
+  /// No description provided for @authTermsCheckboxPrefix.
+  ///
+  /// In ar, this message translates to:
+  /// **'أوافق على '**
+  String get authTermsCheckboxPrefix;
+
+  /// No description provided for @authPasswordRulesHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'8 أحرف على الأقل، وتحتوي على حرف ورقم'**
+  String get authPasswordRulesHint;
+
+  /// No description provided for @authVerifyEmailTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد البريد الإلكتروني'**
+  String get authVerifyEmailTitle;
+
+  /// No description provided for @authVerifyEmailSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أرسلنا رمزًا مكونًا من 6 أرقام إلى {email}'**
+  String authVerifyEmailSubtitle(String email);
+
+  /// No description provided for @authVerifyEmailLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'لاحقًا'**
+  String get authVerifyEmailLater;
+
+  /// No description provided for @authVerifyEmailResent.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إرسال رمز جديد'**
+  String get authVerifyEmailResent;
+
+  /// No description provided for @emailVerificationBannerMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'بريدك الإلكتروني غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وإضافة التقييمات'**
+  String get emailVerificationBannerMessage;
+
+  /// No description provided for @emailVerificationBannerAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد الآن'**
+  String get emailVerificationBannerAction;
+
   /// No description provided for @authForgotPasswordTitle.
   ///
   /// In ar, this message translates to:
@@ -632,6 +680,48 @@ abstract class AppLocalizations {
   /// **'هذا الحساب غير مفعّل، يرجى التواصل مع الدعم'**
   String get errorAccountInactive;
 
+  /// No description provided for @errorEmailNotVerified.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكّد بريدك الإلكتروني أولًا لإتمام هذا الإجراء'**
+  String get errorEmailNotVerified;
+
+  /// No description provided for @errorEmailAlreadyRegistered.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا البريد الإلكتروني مسجَّل مسبقًا'**
+  String get errorEmailAlreadyRegistered;
+
+  /// No description provided for @errorCommercialRegistrationTaken.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم السجل التجاري مستخدم في حساب آخر'**
+  String get errorCommercialRegistrationTaken;
+
+  /// No description provided for @errorBarLicenseTaken.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم إجازة المحاماة مستخدم في حساب آخر'**
+  String get errorBarLicenseTaken;
+
+  /// No description provided for @errorTermsVersionOutdated.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تحديث شروط الخدمة، حدّث التطبيق ثم حاول مجددًا'**
+  String get errorTermsVersionOutdated;
+
+  /// No description provided for @errorVerificationCodeLocked.
+  ///
+  /// In ar, this message translates to:
+  /// **'محاولات خاطئة كثيرة، اطلب رمزًا جديدًا'**
+  String get errorVerificationCodeLocked;
+
+  /// No description provided for @errorLinkOpenFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر فتح الرابط'**
+  String get errorLinkOpenFailed;
+
   /// No description provided for @validationRequired.
   ///
   /// In ar, this message translates to:
@@ -655,6 +745,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'رقم الهاتف غير صحيح'**
   String get validationInvalidPhone;
+
+  /// No description provided for @validationInvalidValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'القيمة المدخلة غير صحيحة'**
+  String get validationInvalidValue;
+
+  /// No description provided for @validationPasswordNeedsLetterAndDigit.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور يجب أن تحتوي على حرف ورقم على الأقل'**
+  String get validationPasswordNeedsLetterAndDigit;
+
+  /// No description provided for @validationPasswordTooLong.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور طويلة جدًا'**
+  String get validationPasswordTooLong;
+
+  /// No description provided for @validationTooLong.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب ألا يزيد النص عن {max} حرفًا'**
+  String validationTooLong(int max);
+
+  /// No description provided for @validationTermsRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب الموافقة على شروط الخدمة وسياسة الخصوصية'**
+  String get validationTermsRequired;
 
   /// No description provided for @navHome.
   ///

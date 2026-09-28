@@ -27,8 +27,8 @@ import 'package:aqd_ionbit/features/messages/presentation/screens/chat_room_scre
 /// files (one file = one isolate for `flutter test`) rather than one giant
 /// file — keeps each run's Timer/AnimationController lifecycle isolated per
 /// file instead of accumulating across a long list of `testWidgets`.
-const testClient = AuthUser(id: 'u_client_1', fullName: 'أحمد العتيبي', email: 'client@aqd.test', role: UserRole.client);
-const testLawyer = AuthUser(id: 'u_lawyer_1', fullName: 'سارة المطيري', email: 'lawyer@aqd.test', role: UserRole.lawyer);
+const testClient = AuthUser(id: 'u_client_1', fullName: 'أحمد العتيبي', email: 'client@aqd.test', role: UserRole.client, emailVerified: true);
+const testLawyer = AuthUser(id: 'u_lawyer_1', fullName: 'سارة المطيري', email: 'lawyer@aqd.test', role: UserRole.lawyer, emailVerified: true);
 
 /// Fixes `authControllerProvider`'s state to a known user without needing a
 /// mock repository — mirrors `FixedLocaleController` in

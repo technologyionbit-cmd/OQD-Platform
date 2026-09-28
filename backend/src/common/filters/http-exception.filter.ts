@@ -9,6 +9,7 @@ import {
 import type { Request, Response } from 'express';
 import { resolveApiErrorCode } from '../errors/api-error-codes';
 import type { ApiErrorEnvelope } from '../errors/api-error-envelope';
+import { RateLimitedException } from '../errors/rate-limited.exception';
 
 interface KnownErrorResponseShape {
   message?: string | string[];
@@ -48,6 +49,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       this.logger.warn(logLine);
     }
 
+    if (exception instanceof RateLimitedException) {
+      response.header(
+        'Retry-After',
+        String(Math.max(1, Math.ceil(exception.retryAfterSeconds))),
+      );
+    }
     response.status(status).json(body);
   }
 

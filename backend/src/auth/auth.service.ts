@@ -5,8 +5,11 @@ import {
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { Prisma, User, UserRole } from '@prisma/client';
 import { ApiErrorCode } from '../common/errors/api-error-codes';
+import { RateLimitedException } from '../common/errors/rate-limited.exception';
+import type { AuthConfig } from '../config/configuration';
 import { PrismaService } from '../prisma/prisma.service';
 import type {
   AuthTokens,
@@ -34,12 +37,22 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 @Injectable()
 export class AuthService {
+  private readonly termsVersion: string;
+  private readonly resendCooldownSeconds: number;
+  private readonly resendMaxPerHour: number;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly passwords: PasswordService,
     private readonly tokens: TokenService,
     private readonly otp: OtpService,
-  ) {}
+    configService: ConfigService,
+  ) {
+    const auth = configService.get<AuthConfig>('auth')!;
+    this.termsVersion = auth.termsVersion;
+    this.resendCooldownSeconds = auth.emailVerificationResendCooldownSeconds;
+    this.resendMaxPerHour = auth.emailVerificationMaxPerHour;
+  }
 
   // ---------------------------------------------------------------------------
   // Registration
@@ -49,6 +62,15 @@ export class AuthService {
     dto: RegisterDto,
     ctx: RequestContext,
   ): Promise<{ user: AuthUserView; tokens: AuthTokens }> {
+    if (dto.termsVersion !== this.termsVersion) {
+      // The app showed an older terms text than the one now in force.
+      throw this.fieldError(
+        'termsVersion',
+        'The terms have changed. Review and accept the current version.',
+        ApiErrorCode.TERMS_VERSION_OUTDATED,
+      );
+    }
+
     const email = dto.email.trim().toLowerCase();
     await this.assertEmailAvailable(email);
 
@@ -68,6 +90,8 @@ export class AuthService {
             phone: dto.phone.trim(),
             passwordHash,
             role,
+            termsAcceptedAt: new Date(),
+            termsVersion: dto.termsVersion,
           },
         });
 
@@ -191,14 +215,7 @@ export class AuthService {
   // ---------------------------------------------------------------------------
 
   async me(userId: string): Promise<AuthUserView> {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || user.status !== 'active') {
-      throw new UnauthorizedException({
-        message: 'Session expired. Please sign in again.',
-        code: ApiErrorCode.UNAUTHORIZED,
-      });
-    }
-    return this.toView(user);
+    return this.toView(await this.activeUser(userId));
   }
 
   async updateProfile(
@@ -206,26 +223,108 @@ export class AuthService {
     dto: UpdateProfileDto,
   ): Promise<AuthUserView> {
     const email = dto.email.trim().toLowerCase();
-    const clash = await this.prisma.user.findUnique({ where: { email } });
-    if (clash && clash.id !== userId) {
-      throw this.fieldError('email', 'This email is already registered.');
+    const current = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!current) {
+      throw new NotFoundException({
+        message: 'Account not found.',
+        code: ApiErrorCode.NOT_FOUND,
+      });
     }
 
-    try {
-      const updated = await this.prisma.user.update({
-        where: { id: userId },
-        data: { fullName: dto.fullName.trim(), email },
-      });
-      return this.toView(updated);
-    } catch (error) {
-      if (this.isRecordNotFound(error)) {
-        throw new NotFoundException({
-          message: 'Account not found.',
-          code: ApiErrorCode.NOT_FOUND,
-        });
-      }
-      throw error;
+    const emailChanged = current.email.toLowerCase() !== email;
+    if (emailChanged) {
+      await this.assertEmailAvailable(email);
     }
+
+    const updated = await this.prisma.user
+      .update({
+        where: { id: userId },
+        data: {
+          fullName: dto.fullName.trim(),
+          email,
+          // A new address is unproven until its owner enters the code.
+          ...(emailChanged ? { emailVerifiedAt: null } : {}),
+        },
+      })
+      .catch((error: unknown) => this.rethrowUniqueViolation(error));
+
+    if (emailChanged) {
+      await this.otp
+        .issue(email, 'emailVerification', userId)
+        .catch(() => undefined);
+    }
+    return this.toView(updated);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Email verification
+  // ---------------------------------------------------------------------------
+
+  /** Marks the email verified when [code] is the account's latest code.
+   *  Idempotent: an already-verified account just gets its view back. */
+  async verifyEmail(userId: string, code: string): Promise<AuthUserView> {
+    const user = await this.activeUser(userId);
+    if (user.emailVerifiedAt) return this.toView(user);
+
+    const result = await this.otp.consume(
+      user.email,
+      code,
+      'emailVerification',
+      user.id,
+    );
+    if (!result.valid) {
+      throw this.fieldError(
+        'code',
+        'Invalid or expired code.',
+        ApiErrorCode.INVALID_VERIFICATION_CODE,
+      );
+    }
+
+    const verified = await this.prisma.user.update({
+      where: { id: user.id },
+      data: { emailVerifiedAt: new Date() },
+    });
+    return this.toView(verified);
+  }
+
+  /**
+   * Sends a new code, at most one per cooldown and a fixed number per
+   * rolling hour for each account (the registration code counts). Over the
+   * limit it is a 429 whose Retry-After says when the next send is allowed.
+   * A no-op for an account that is already verified.
+   */
+  async resendEmailVerification(userId: string): Promise<void> {
+    const user = await this.activeUser(userId);
+    if (user.emailVerifiedAt) return;
+
+    const now = Date.now();
+    const hourMs = 60 * 60 * 1000;
+    const issued = await this.otp.issuedSince(
+      user.id,
+      'emailVerification',
+      new Date(now - hourMs),
+    );
+
+    const last = issued.at(-1);
+    const cooldownMs = this.resendCooldownSeconds * 1000;
+    if (last && now - last.getTime() < cooldownMs) {
+      throw new RateLimitedException(
+        'Wait before requesting another code.',
+        (cooldownMs - (now - last.getTime())) / 1000,
+      );
+    }
+    if (issued.length >= this.resendMaxPerHour) {
+      // The send that must leave the one-hour window before another fits.
+      const blocking = issued[issued.length - this.resendMaxPerHour];
+      throw new RateLimitedException(
+        'Too many codes requested. Try again later.',
+        (blocking.getTime() + hourMs - now) / 1000,
+      );
+    }
+
+    await this.otp.issue(user.email, 'emailVerification', user.id);
   }
 
   // ---------------------------------------------------------------------------
@@ -257,7 +356,11 @@ export class AuthService {
       'passwordReset',
     );
     if (!result.valid) {
-      throw this.fieldError('code', 'Invalid or expired code.');
+      throw this.fieldError(
+        'code',
+        'Invalid or expired code.',
+        ApiErrorCode.INVALID_VERIFICATION_CODE,
+      );
     }
 
     const user =
@@ -345,7 +448,20 @@ export class AuthService {
       fullName: user.fullName,
       email: user.email,
       role: user.role,
+      emailVerified: user.emailVerifiedAt !== null,
     };
+  }
+
+  /** The caller's account, or 401 when it is gone or no longer active. */
+  private async activeUser(userId: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.status !== 'active') {
+      throw new UnauthorizedException({
+        message: 'Session expired. Please sign in again.',
+        code: ApiErrorCode.UNAUTHORIZED,
+      });
+    }
+    return user;
   }
 
   private roleFor(accountType: AccountType): UserRole {
@@ -362,8 +478,16 @@ export class AuthService {
   private async assertEmailAvailable(email: string): Promise<void> {
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) {
-      throw this.fieldError('email', 'This email is already registered.');
+      throw this.emailTaken();
     }
+  }
+
+  private emailTaken(): UnprocessableEntityException {
+    return this.fieldError(
+      'email',
+      'This email is already registered.',
+      ApiErrorCode.EMAIL_ALREADY_REGISTERED,
+    );
   }
 
   private findByDestination(destination: string): Promise<User | null> {
@@ -375,38 +499,46 @@ export class AuthService {
     return this.prisma.user.findFirst({ where: { phone: destination } });
   }
 
+  /** A 422 naming the offending field. [code] tells the app which
+   *  localized message to show; the English text is for logs only. */
   private fieldError(
     field: string,
     message: string,
+    code: ApiErrorCode = ApiErrorCode.VALIDATION_ERROR,
   ): UnprocessableEntityException {
     return new UnprocessableEntityException({
-      message: 'Validation failed',
-      code: ApiErrorCode.VALIDATION_ERROR,
+      message,
+      code,
       errors: { [field]: [message] },
     });
   }
 
+  /** Turns a unique-constraint race (two sign-ups with the same value at
+   *  once, past the pre-checks) into the same 422 the pre-check gives. */
   private rethrowUniqueViolation(error: unknown): never {
-    if (
-      this.isPrismaKnownError(error) &&
-      error.code === 'P2002' &&
-      Array.isArray(error.meta?.target)
-    ) {
-      const target = (error.meta.target as string[]).join(',');
-      if (target.includes('commercial_registration_number')) {
+    if (this.isPrismaKnownError(error) && error.code === 'P2002') {
+      const rawTarget = error.meta?.target;
+      const target = Array.isArray(rawTarget)
+        ? rawTarget.join(',')
+        : typeof rawTarget === 'string'
+          ? rawTarget
+          : '';
+      if (/commercial_?registration_?number/i.test(target)) {
         throw this.fieldError(
           'commercialRegistrationNumber',
           'This commercial registration number is already in use.',
+          ApiErrorCode.COMMERCIAL_REGISTRATION_TAKEN,
         );
       }
-      if (target.includes('bar_license_number')) {
+      if (/bar_?license_?number/i.test(target)) {
         throw this.fieldError(
           'barLicenseNumber',
           'This bar license number is already in use.',
+          ApiErrorCode.BAR_LICENSE_TAKEN,
         );
       }
       if (target.includes('email')) {
-        throw this.fieldError('email', 'This email is already registered.');
+        throw this.emailTaken();
       }
     }
     throw error as Error;
@@ -421,9 +553,5 @@ export class AuthService {
       'code' in error &&
       typeof error.code === 'string'
     );
-  }
-
-  private isRecordNotFound(error: unknown): boolean {
-    return this.isPrismaKnownError(error) && error.code === 'P2025';
   }
 }

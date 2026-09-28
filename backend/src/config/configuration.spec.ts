@@ -41,3 +41,21 @@ describe('envValidationSchema TRUST_PROXY', () => {
     },
   );
 });
+
+describe('envValidationSchema TERMS_VERSION', () => {
+  const base = {
+    DATABASE_URL: 'postgresql://u:p@localhost:5432/db',
+    JWT_ACCESS_SECRET: 'x'.repeat(32),
+  };
+
+  const validate = (value: string) =>
+    envValidationSchema.validate({ ...base, TERMS_VERSION: value }).error;
+
+  it.each(['2026-09-28', 'v2', '1.4'])('accepts %p', (value) => {
+    expect(validate(value)).toBeUndefined();
+  });
+
+  it.each(['', 'has space', 'x'.repeat(33)])('rejects %p', (value) => {
+    expect(validate(value)).toBeDefined();
+  });
+});

@@ -77,6 +77,15 @@ final class UnknownFailure extends Failure {
 /// Error codes the backend sends in `error.code` that the app reacts to
 /// specifically. Mirrors `ApiErrorCode` in backend/src/common/errors.
 abstract final class ApiErrorCodes {
+  /// A 422 whose `errors` are plain per-field rule failures.
+  static const validationError = 'VALIDATION_ERROR';
   static const accountInactive = 'ACCOUNT_INACTIVE';
   static const tooManyRequests = 'TOO_MANY_REQUESTS';
+  static const emailAlreadyRegistered = 'EMAIL_ALREADY_REGISTERED';
+  static const commercialRegistrationTaken = 'COMMERCIAL_REGISTRATION_TAKEN';
+  static const barLicenseTaken = 'BAR_LICENSE_TAKEN';
+  static const termsVersionOutdated = 'TERMS_VERSION_OUTDATED';
+  static const invalidVerificationCode = 'INVALID_VERIFICATION_CODE';
+  static const verificationCodeLocked = 'VERIFICATION_CODE_LOCKED';
+  static const emailNotVerified = 'EMAIL_NOT_VERIFIED';
 }

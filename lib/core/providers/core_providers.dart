@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:aqd_ionbit/core/config/app_config.dart';
 import 'package:aqd_ionbit/core/network/auth_session_ports.dart';
@@ -11,6 +12,21 @@ import 'package:aqd_ionbit/core/storage/app_preferences.dart';
 /// `bootstrap()` (it reads compile-time `--dart-define`s and the build
 /// mode), so this has a real default; tests may still override it.
 final appConfigProvider = Provider<AppConfig>((ref) => AppConfig.resolve());
+
+/// Opens a web page outside the app (terms, privacy policy). Returns false
+/// when no app could open it. Tests override it to record the URL instead.
+typedef LinkLauncher = Future<bool> Function(Uri url);
+
+final linkLauncherProvider = Provider<LinkLauncher>((ref) {
+  return (url) async {
+    try {
+      return await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      // No handler, or the platform refused — report it as not opened.
+      return false;
+    }
+  };
+});
 
 /// [AppPreferences] wraps an async `SharedPreferences.getInstance()` that
 /// can only be resolved once `bootstrap()` has awaited it, so this is

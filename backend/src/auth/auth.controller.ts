@@ -12,12 +12,15 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
   ApiTooManyRequestsResponse,
   ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { ApiErrorResponseDto } from '../common/openapi/api-error.dto';
@@ -44,6 +47,7 @@ import {
   ResetPasswordDto,
   VerifyOtpDto,
 } from './dto/password-reset.dto';
+import { VerifyEmailDto } from './dto/email-verification.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginAttemptsGuard } from './guards/login-attempts.guard';
@@ -59,6 +63,23 @@ export class AuthController {
 
   @Post('register')
   @Throttle(STRICT_THROTTLE)
+  @ApiOperation({
+    summary: 'Create an account',
+    description:
+      'Signs the user in at once and emails a 6-digit verification code ' +
+      '(logged on the server until an email provider exists). The account ' +
+      'works, but sensitive actions answer 403 EMAIL_NOT_VERIFIED until ' +
+      'POST /auth/email/verify succeeds. Passwords: 8+ characters, at most ' +
+      '72 bytes (UTF-8), at least one letter and one number.',
+  })
+  @ApiCreatedResponse({ type: SessionResponseDto })
+  @ApiUnprocessableEntityResponse({
+    type: ApiErrorResponseDto,
+    description:
+      'VALIDATION_ERROR (errors per field), EMAIL_ALREADY_REGISTERED, ' +
+      'COMMERCIAL_REGISTRATION_TAKEN, BAR_LICENSE_TAKEN, or ' +
+      'TERMS_VERSION_OUTDATED (termsVersion is not the current one).',
+  })
   async register(
     @Body() dto: RegisterDto,
     @ClientContext() ctx: RequestContext,
@@ -130,11 +151,67 @@ export class AuthController {
 
   @Patch('me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth(BEARER_AUTH)
+  @ApiOperation({
+    summary: 'Update name and email',
+    description:
+      'Changing the email marks it unverified and sends a new code. ' +
+      '422 EMAIL_ALREADY_REGISTERED when another account uses it.',
+  })
+  @ApiOkResponse({ type: UserResponseDto })
   async updateProfile(
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateProfileDto,
   ) {
     return { data: { user: await this.auth.updateProfile(user.id, dto) } };
+  }
+
+  @Post('email/verify')
+  @HttpCode(HttpStatus.OK)
+  @Throttle(STRICT_THROTTLE)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth(BEARER_AUTH)
+  @ApiOperation({
+    summary: 'Verify the account email',
+    description:
+      'Checks the latest code sent to the signed-in user. Already ' +
+      'verified: returns the user unchanged. OTP_MAX_ATTEMPTS wrong tries ' +
+      'lock the code (VERIFICATION_CODE_LOCKED) until a new one is sent.',
+  })
+  @ApiOkResponse({ type: UserResponseDto })
+  @ApiUnprocessableEntityResponse({
+    type: ApiErrorResponseDto,
+    description:
+      'INVALID_VERIFICATION_CODE (wrong or expired) or ' +
+      'VERIFICATION_CODE_LOCKED.',
+  })
+  @ApiUnauthorizedResponse({ type: ApiErrorResponseDto })
+  async verifyEmail(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: VerifyEmailDto,
+  ) {
+    return { data: { user: await this.auth.verifyEmail(user.id, dto.code) } };
+  }
+
+  @Post('email/resend')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Throttle(STRICT_THROTTLE)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth(BEARER_AUTH)
+  @ApiOperation({
+    summary: 'Send a new email verification code',
+    description:
+      'One code per EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS and at most ' +
+      'EMAIL_VERIFICATION_MAX_PER_HOUR per account (the sign-up code ' +
+      'counts). Over the limit: 429 with Retry-After in seconds. Does ' +
+      'nothing for an already verified account.',
+  })
+  @ApiNoContentResponse()
+  @ApiUnauthorizedResponse({ type: ApiErrorResponseDto })
+  async resendEmailVerification(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    await this.auth.resendEmailVerification(user.id);
   }
 
   @Post('password/forgot')

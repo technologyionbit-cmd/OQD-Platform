@@ -150,6 +150,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPrivacyPolicy => 'Privacy Policy';
 
   @override
+  String get authTermsCheckboxPrefix => 'I agree to the ';
+
+  @override
+  String get authPasswordRulesHint =>
+      'At least 8 characters, with a letter and a number';
+
+  @override
+  String get authVerifyEmailTitle => 'Verify your email';
+
+  @override
+  String authVerifyEmailSubtitle(String email) {
+    return 'We sent a 6-digit code to $email';
+  }
+
+  @override
+  String get authVerifyEmailLater => 'Later';
+
+  @override
+  String get authVerifyEmailResent => 'A new code has been sent';
+
+  @override
+  String get emailVerificationBannerMessage =>
+      'Your email is not verified. Verify it to book consultations and leave reviews';
+
+  @override
+  String get emailVerificationBannerAction => 'Verify now';
+
+  @override
   String get authForgotPasswordTitle => 'Forgot Password?';
 
   @override
@@ -306,6 +334,32 @@ class AppLocalizationsEn extends AppLocalizations {
       'This account is not active, please contact support';
 
   @override
+  String get errorEmailNotVerified =>
+      'Verify your email first to complete this action';
+
+  @override
+  String get errorEmailAlreadyRegistered => 'This email is already registered';
+
+  @override
+  String get errorCommercialRegistrationTaken =>
+      'This commercial registration number is used by another account';
+
+  @override
+  String get errorBarLicenseTaken =>
+      'This bar license number is used by another account';
+
+  @override
+  String get errorTermsVersionOutdated =>
+      'The terms of service have changed. Update the app and try again';
+
+  @override
+  String get errorVerificationCodeLocked =>
+      'Too many wrong attempts. Request a new code';
+
+  @override
+  String get errorLinkOpenFailed => 'Could not open the link';
+
+  @override
   String get validationRequired => 'This field is required';
 
   @override
@@ -317,6 +371,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get validationInvalidPhone => 'Enter a valid phone number';
+
+  @override
+  String get validationInvalidValue => 'Enter a valid value';
+
+  @override
+  String get validationPasswordNeedsLetterAndDigit =>
+      'Password must contain at least one letter and one number';
+
+  @override
+  String get validationPasswordTooLong => 'Password is too long';
+
+  @override
+  String validationTooLong(int max) {
+    return 'Must be at most $max characters';
+  }
+
+  @override
+  String get validationTermsRequired =>
+      'You must accept the Terms of Service and Privacy Policy';
 
   @override
   String get navHome => 'Home';

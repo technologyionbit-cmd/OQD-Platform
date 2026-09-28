@@ -10,20 +10,31 @@ import 'package:aqd_ionbit/core/utils/responsive.dart';
 /// desktop widths it switches to a side `NavigationRail` instead of
 /// squeezing a bottom bar across a wide screen.
 class AppShell extends StatelessWidget {
-  const AppShell({super.key, required this.navigationShell, required this.destinations});
+  const AppShell({super.key, required this.navigationShell, required this.destinations, this.banner});
 
   final StatefulNavigationShell navigationShell;
   final List<NavigationDestination> destinations;
+
+  /// Optional strip kept visible under every tab (e.g. an account notice).
+  /// Sits at the bottom, above the navigation bar, so it never competes
+  /// with the screens' own app bars for the status-bar inset.
+  final Widget? banner;
 
   @override
   Widget build(BuildContext context) {
     if (!context.isTabletOrWider) {
       return Scaffold(
         body: navigationShell,
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: navigationShell.currentIndex,
-          onDestinationSelected: _goBranch,
-          destinations: destinations,
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (banner case final banner?) banner,
+            NavigationBar(
+              selectedIndex: navigationShell.currentIndex,
+              onDestinationSelected: _goBranch,
+              destinations: destinations,
+            ),
+          ],
         ),
       );
     }
@@ -41,7 +52,14 @@ class AppShell extends StatelessWidget {
             ],
           ),
           const VerticalDivider(width: 1),
-          Expanded(child: navigationShell),
+          Expanded(
+            child: Column(
+              children: [
+                Expanded(child: navigationShell),
+                if (banner case final banner?) SafeArea(top: false, child: banner),
+              ],
+            ),
+          ),
         ],
       ),
     );

@@ -14,6 +14,7 @@ import 'package:aqd_ionbit/features/auth/presentation/screens/splash_screen.dart
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/email_verification_prompt.dart';
 import 'package:aqd_ionbit/features/onboarding/presentation/providers/onboarding_controller.dart';
 
 /// Lives in `app/`, not `core/routing/` — unlike [RoutePaths] (plain
@@ -32,6 +33,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   void refresh() => refreshNotifier.value++;
   ref.listen(authControllerProvider, (_, _) => refresh());
   ref.listen(onboardingControllerProvider, (_, _) => refresh());
+  ref.listen(emailVerificationPromptProvider, (_, _) => refresh());
   ref.onDispose(refreshNotifier.dispose);
 
   return GoRouter(
@@ -91,6 +93,14 @@ String? _redirect(Ref ref, GoRouterState state) {
     }
     return publicAuthRoutes.contains(location) ? null : RoutePaths.login;
   }
+
+  // Signed in with an unverified email: the code screen while the prompt
+  // is on (right after sign-up, or from the banner). Otherwise that screen
+  // is closed, whatever the reason (verified, "later", or a stale link).
+  if (!user.emailVerified && ref.read(emailVerificationPromptProvider)) {
+    return location == RoutePaths.verifyEmail ? null : RoutePaths.verifyEmail;
+  }
+  if (location == RoutePaths.verifyEmail) return _homeRouteFor(user.role);
 
   // Authenticated: never allowed on splash/onboarding/public-auth screens,
   // and confined to their own role's route subtree — a client hitting

@@ -30,6 +30,24 @@ void main() {
     expect(const ForbiddenFailure(code: ApiErrorCodes.accountInactive).localizedMessage(en), en.errorAccountInactive);
   });
 
+  test('an unverified email is explained on any gated action', () {
+    expect(const ForbiddenFailure(message: 'Verify your email', code: ApiErrorCodes.emailNotVerified).localizedMessage(ar), ar.errorEmailNotVerified);
+  });
+
+  test('registration and verification codes each get their own message', () {
+    final cases = {
+      ApiErrorCodes.emailAlreadyRegistered: ar.errorEmailAlreadyRegistered,
+      ApiErrorCodes.commercialRegistrationTaken: ar.errorCommercialRegistrationTaken,
+      ApiErrorCodes.barLicenseTaken: ar.errorBarLicenseTaken,
+      ApiErrorCodes.termsVersionOutdated: ar.errorTermsVersionOutdated,
+      ApiErrorCodes.invalidVerificationCode: ar.authOtpInvalidCode,
+      ApiErrorCodes.verificationCodeLocked: ar.errorVerificationCodeLocked,
+    };
+    cases.forEach((code, message) {
+      expect(ValidationFailure(message: 'English server text', code: code).localizedMessage(ar), message, reason: code);
+    });
+  });
+
   test('never shows the raw backend message', () {
     const failure = ForbiddenFailure(message: 'Internal English text', code: 'SOMETHING_ELSE');
     expect(failure.localizedMessage(ar), ar.errorGeneric);

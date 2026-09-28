@@ -119,6 +119,14 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Result<AuthUser>> verifyEmail({required String code}) {
+    return _run(() => _remote.verifyEmail(code: code));
+  }
+
+  @override
+  Future<Result<void>> resendEmailVerification() => _run(_remote.resendEmailVerification);
+
+  @override
   Future<Result<void>> requestOtp({required String destination}) {
     return _run(() => _remote.requestOtp(destination: destination));
   }

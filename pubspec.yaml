@@ -37,6 +37,7 @@ dependencies:
 
   # Media
   image_picker: ^1.1.2
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

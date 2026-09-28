@@ -66,6 +66,19 @@
   "authTermsOfService": "شروط الخدمة",
   "authTermsAgreementJoiner": " و",
   "authPrivacyPolicy": "سياسة الخصوصية",
+  "authTermsCheckboxPrefix": "أوافق على ",
+  "authPasswordRulesHint": "8 أحرف على الأقل، وتحتوي على حرف ورقم",
+  "authVerifyEmailTitle": "تأكيد البريد الإلكتروني",
+  "authVerifyEmailSubtitle": "أرسلنا رمزًا مكونًا من 6 أرقام إلى {email}",
+  "@authVerifyEmailSubtitle": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "authVerifyEmailLater": "لاحقًا",
+  "authVerifyEmailResent": "تم إرسال رمز جديد",
+  "emailVerificationBannerMessage": "بريدك الإلكتروني غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وإضافة التقييمات",
+  "emailVerificationBannerAction": "تأكيد الآن",
 
   "authForgotPasswordTitle": "نسيت كلمة المرور؟",
   "authForgotPasswordSubtitle": "اختر طريقة الاستعادة للمتابعة",
@@ -137,11 +150,28 @@
     }
   },
   "errorAccountInactive": "هذا الحساب غير مفعّل، يرجى التواصل مع الدعم",
+  "errorEmailNotVerified": "أكّد بريدك الإلكتروني أولًا لإتمام هذا الإجراء",
+  "errorEmailAlreadyRegistered": "هذا البريد الإلكتروني مسجَّل مسبقًا",
+  "errorCommercialRegistrationTaken": "رقم السجل التجاري مستخدم في حساب آخر",
+  "errorBarLicenseTaken": "رقم إجازة المحاماة مستخدم في حساب آخر",
+  "errorTermsVersionOutdated": "تم تحديث شروط الخدمة، حدّث التطبيق ثم حاول مجددًا",
+  "errorVerificationCodeLocked": "محاولات خاطئة كثيرة، اطلب رمزًا جديدًا",
+  "errorLinkOpenFailed": "تعذّر فتح الرابط",
 
   "validationRequired": "هذا الحقل مطلوب",
   "validationInvalidEmail": "صيغة البريد الإلكتروني غير صحيحة",
   "validationPasswordTooShort": "كلمة المرور يجب ألا تقل عن 8 أحرف",
   "validationInvalidPhone": "رقم الهاتف غير صحيح",
+  "validationInvalidValue": "القيمة المدخلة غير صحيحة",
+  "validationPasswordNeedsLetterAndDigit": "كلمة المرور يجب أن تحتوي على حرف ورقم على الأقل",
+  "validationPasswordTooLong": "كلمة المرور طويلة جدًا",
+  "validationTooLong": "يجب ألا يزيد النص عن {max} حرفًا",
+  "@validationTooLong": {
+    "placeholders": {
+      "max": {"type": "int"}
+    }
+  },
+  "validationTermsRequired": "يجب الموافقة على شروط الخدمة وسياسة الخصوصية",
 
   "navHome": "الرئيسية",
   "navAi": "AI",

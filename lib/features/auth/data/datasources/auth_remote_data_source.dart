@@ -25,6 +25,13 @@ abstract interface class AuthRemoteDataSource {
 
   Future<void> logout(String refreshToken);
 
+  /// Confirms the signed-in user's email with the emailed [code] and
+  /// returns the updated user.
+  Future<AuthUser> verifyEmail({required String code});
+
+  /// Asks the server to email a new verification code.
+  Future<void> resendEmailVerification();
+
   Future<void> requestOtp({required String destination});
 
   Future<bool> verifyOtp({required String destination, required String code});

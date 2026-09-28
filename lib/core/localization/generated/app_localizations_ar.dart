@@ -149,6 +149,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authPrivacyPolicy => 'سياسة الخصوصية';
 
   @override
+  String get authTermsCheckboxPrefix => 'أوافق على ';
+
+  @override
+  String get authPasswordRulesHint => '8 أحرف على الأقل، وتحتوي على حرف ورقم';
+
+  @override
+  String get authVerifyEmailTitle => 'تأكيد البريد الإلكتروني';
+
+  @override
+  String authVerifyEmailSubtitle(String email) {
+    return 'أرسلنا رمزًا مكونًا من 6 أرقام إلى $email';
+  }
+
+  @override
+  String get authVerifyEmailLater => 'لاحقًا';
+
+  @override
+  String get authVerifyEmailResent => 'تم إرسال رمز جديد';
+
+  @override
+  String get emailVerificationBannerMessage =>
+      'بريدك الإلكتروني غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وإضافة التقييمات';
+
+  @override
+  String get emailVerificationBannerAction => 'تأكيد الآن';
+
+  @override
   String get authForgotPasswordTitle => 'نسيت كلمة المرور؟';
 
   @override
@@ -303,6 +330,32 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذا الحساب غير مفعّل، يرجى التواصل مع الدعم';
 
   @override
+  String get errorEmailNotVerified =>
+      'أكّد بريدك الإلكتروني أولًا لإتمام هذا الإجراء';
+
+  @override
+  String get errorEmailAlreadyRegistered =>
+      'هذا البريد الإلكتروني مسجَّل مسبقًا';
+
+  @override
+  String get errorCommercialRegistrationTaken =>
+      'رقم السجل التجاري مستخدم في حساب آخر';
+
+  @override
+  String get errorBarLicenseTaken => 'رقم إجازة المحاماة مستخدم في حساب آخر';
+
+  @override
+  String get errorTermsVersionOutdated =>
+      'تم تحديث شروط الخدمة، حدّث التطبيق ثم حاول مجددًا';
+
+  @override
+  String get errorVerificationCodeLocked =>
+      'محاولات خاطئة كثيرة، اطلب رمزًا جديدًا';
+
+  @override
+  String get errorLinkOpenFailed => 'تعذّر فتح الرابط';
+
+  @override
   String get validationRequired => 'هذا الحقل مطلوب';
 
   @override
@@ -313,6 +366,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get validationInvalidPhone => 'رقم الهاتف غير صحيح';
+
+  @override
+  String get validationInvalidValue => 'القيمة المدخلة غير صحيحة';
+
+  @override
+  String get validationPasswordNeedsLetterAndDigit =>
+      'كلمة المرور يجب أن تحتوي على حرف ورقم على الأقل';
+
+  @override
+  String get validationPasswordTooLong => 'كلمة المرور طويلة جدًا';
+
+  @override
+  String validationTooLong(int max) {
+    return 'يجب ألا يزيد النص عن $max حرفًا';
+  }
+
+  @override
+  String get validationTermsRequired =>
+      'يجب الموافقة على شروط الخدمة وسياسة الخصوصية';
 
   @override
   String get navHome => 'الرئيسية';

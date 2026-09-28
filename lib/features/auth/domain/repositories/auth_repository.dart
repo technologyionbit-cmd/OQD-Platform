@@ -32,6 +32,10 @@ abstract interface class AuthRepository {
 
   Future<void> logout();
 
+  Future<Result<AuthUser>> verifyEmail({required String code});
+
+  Future<Result<void>> resendEmailVerification();
+
   Future<Result<void>> requestOtp({required String destination});
 
   Future<Result<bool>> verifyOtp({required String destination, required String code});

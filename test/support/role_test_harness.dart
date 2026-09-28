@@ -34,9 +34,9 @@ class FixedLocaleController extends LocaleController {
   Locale build() => _locale;
 }
 
-const testClient = AuthUser(id: 'u_client', fullName: 'Client User', email: 'client@aqd.test', role: UserRole.client);
-const testLawyer = AuthUser(id: 'u_lawyer', fullName: 'Lawyer User', email: 'lawyer@aqd.test', role: UserRole.lawyer);
-const testCompany = AuthUser(id: 'u_company', fullName: 'Company User', email: 'company@aqd.test', role: UserRole.company);
+const testClient = AuthUser(id: 'u_client', fullName: 'Client User', email: 'client@aqd.test', role: UserRole.client, emailVerified: true);
+const testLawyer = AuthUser(id: 'u_lawyer', fullName: 'Lawyer User', email: 'lawyer@aqd.test', role: UserRole.lawyer, emailVerified: true);
+const testCompany = AuthUser(id: 'u_company', fullName: 'Company User', email: 'company@aqd.test', role: UserRole.company, emailVerified: true);
 const _testTokens = AuthTokens(accessToken: 'access', refreshToken: 'refresh');
 
 class RoleTestHarness {

@@ -15,6 +15,20 @@ export enum ApiErrorCode {
   SERVER_ERROR = 'SERVER_ERROR',
   /** Sign-in with correct credentials for a suspended/deactivated account. */
   ACCOUNT_INACTIVE = 'ACCOUNT_INACTIVE',
+  /** 422 — registration/profile email belongs to another account. */
+  EMAIL_ALREADY_REGISTERED = 'EMAIL_ALREADY_REGISTERED',
+  /** 422 — company registration number belongs to another organization. */
+  COMMERCIAL_REGISTRATION_TAKEN = 'COMMERCIAL_REGISTRATION_TAKEN',
+  /** 422 — bar license number belongs to another lawyer. */
+  BAR_LICENSE_TAKEN = 'BAR_LICENSE_TAKEN',
+  /** 422 — the client accepted a terms version that is no longer current. */
+  TERMS_VERSION_OUTDATED = 'TERMS_VERSION_OUTDATED',
+  /** 422 — one-time code is wrong or expired. */
+  INVALID_VERIFICATION_CODE = 'INVALID_VERIFICATION_CODE',
+  /** 422 — too many wrong tries on the current code; a new one is needed. */
+  VERIFICATION_CODE_LOCKED = 'VERIFICATION_CODE_LOCKED',
+  /** 403 — the action needs a verified email address. */
+  EMAIL_NOT_VERIFIED = 'EMAIL_NOT_VERIFIED',
 }
 
 const STATUS_TO_CODE: Readonly<Record<number, ApiErrorCode>> = {

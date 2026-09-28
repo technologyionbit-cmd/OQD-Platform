@@ -19,6 +19,13 @@ export class AuthUserDto implements AuthUserView {
 
   @ApiProperty({ enum: UserRole, enumName: 'UserRole' })
   role!: UserRole;
+
+  @ApiProperty({
+    description:
+      'False until the emailed code is entered (POST /auth/email/verify). ' +
+      'Sensitive actions answer 403 EMAIL_NOT_VERIFIED until then.',
+  })
+  emailVerified!: boolean;
 }
 
 export class AuthTokensDto implements AuthTokens {

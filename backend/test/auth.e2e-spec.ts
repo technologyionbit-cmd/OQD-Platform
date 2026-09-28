@@ -4,6 +4,7 @@ import type { Server } from 'node:http';
 import request from 'supertest';
 import { createE2EApp } from './support/e2e-app';
 import { OtpService } from '../src/auth/services/otp.service';
+import { DEFAULT_TERMS_VERSION } from '../src/config/configuration';
 
 /**
  * End-to-end auth coverage (docs/backend/02-auth-and-authorization.md,
@@ -16,6 +17,7 @@ interface UserView {
   fullName: string;
   email: string;
   role: string;
+  emailVerified: boolean;
 }
 interface Tokens {
   accessToken: string;
@@ -41,12 +43,14 @@ describe('Auth (e2e)', () => {
   const prisma = new PrismaClient();
 
   const tag = Date.now();
+  const terms = { acceptTerms: true, termsVersion: DEFAULT_TERMS_VERSION };
   const individual = {
     accountType: 'individual',
     fullName: 'Ahmad Client',
     phone: '0791234567',
     email: `ahmad.${tag}@test.com`,
     password: 'Password123',
+    ...terms,
   };
   const company = {
     accountType: 'company',
@@ -55,6 +59,7 @@ describe('Auth (e2e)', () => {
     phone: '0791111111',
     email: `company.${tag}@test.com`,
     password: 'Password123',
+    ...terms,
   };
   const lawyer = {
     accountType: 'lawyer',
@@ -64,6 +69,7 @@ describe('Auth (e2e)', () => {
     phone: '0792222222',
     email: `lawyer.${tag}@test.com`,
     password: 'Password123',
+    ...terms,
   };
 
   beforeAll(async () => {
@@ -72,9 +78,8 @@ describe('Auth (e2e)', () => {
   });
 
   afterAll(async () => {
-    const emails = [individual.email, company.email, lawyer.email];
     const users = await prisma.user.findMany({
-      where: { email: { in: emails } },
+      where: { email: { endsWith: `.${tag}@test.com` } },
       select: { id: true },
     });
     const ids = users.map((u) => u.id);
@@ -102,7 +107,14 @@ describe('Auth (e2e)', () => {
         email: individual.email,
         role: 'client',
         fullName: individual.fullName,
+        emailVerified: false,
       });
+
+      const stored = await prisma.user.findUnique({
+        where: { email: individual.email },
+      });
+      expect(stored?.termsVersion).toBe(DEFAULT_TERMS_VERSION);
+      expect(stored?.termsAcceptedAt).toBeInstanceOf(Date);
       expect(typeof data.tokens.accessToken).toBe('string');
       expect(typeof data.tokens.refreshToken).toBe('string');
     });
@@ -144,12 +156,68 @@ describe('Auth (e2e)', () => {
       });
     });
 
-    it('rejects a duplicate email with a 422 field error', async () => {
+    it('rejects a duplicate email with EMAIL_ALREADY_REGISTERED on the email field', async () => {
       const res = await request(http)
         .post('/v1/auth/register')
-        .send(individual);
+        .send({ ...individual, email: individual.email.toUpperCase() });
       expect(res.status).toBe(422);
+      expect(err(res).code).toBe('EMAIL_ALREADY_REGISTERED');
       expect(err(res).errors?.email).toBeDefined();
+    });
+
+    it('rejects a taken commercial registration number with its own code', async () => {
+      const res = await request(http)
+        .post('/v1/auth/register')
+        .send({ ...company, email: `company2.${tag}@test.com` });
+      expect(res.status).toBe(422);
+      expect(err(res).code).toBe('COMMERCIAL_REGISTRATION_TAKEN');
+      expect(err(res).errors?.commercialRegistrationNumber).toBeDefined();
+    });
+
+    it('rejects a taken bar license number with its own code', async () => {
+      const res = await request(http)
+        .post('/v1/auth/register')
+        .send({ ...lawyer, email: `lawyer2.${tag}@test.com` });
+      expect(res.status).toBe(422);
+      expect(err(res).code).toBe('BAR_LICENSE_TAKEN');
+      expect(err(res).errors?.barLicenseNumber).toBeDefined();
+    });
+
+    it('requires explicit acceptance of the terms', async () => {
+      const res = await request(http)
+        .post('/v1/auth/register')
+        .send({
+          ...individual,
+          email: `noterms.${tag}@test.com`,
+          acceptTerms: false,
+        });
+      expect(res.status).toBe(422);
+      expect(err(res).errors?.acceptTerms).toBeDefined();
+    });
+
+    it('rejects an outdated terms version with TERMS_VERSION_OUTDATED', async () => {
+      const res = await request(http)
+        .post('/v1/auth/register')
+        .send({
+          ...individual,
+          email: `oldterms.${tag}@test.com`,
+          termsVersion: '2000-01-01',
+        });
+      expect(res.status).toBe(422);
+      expect(err(res).code).toBe('TERMS_VERSION_OUTDATED');
+      expect(err(res).errors?.termsVersion).toBeDefined();
+    });
+
+    it('rejects a password over 72 bytes (bcrypt would truncate it)', async () => {
+      const res = await request(http)
+        .post('/v1/auth/register')
+        .send({
+          ...individual,
+          email: `longpw.${tag}@test.com`,
+          password: 'a1' + 'ب'.repeat(36),
+        });
+      expect(res.status).toBe(422);
+      expect(err(res).errors?.password).toBeDefined();
     });
 
     it('rejects a weak password with a 422', async () => {
@@ -359,6 +427,184 @@ describe('Auth (e2e)', () => {
         .post('/v1/auth/password/forgot')
         .send({ destination: `nobody.${tag}@test.com` });
       expect(res.status).toBe(204);
+    });
+  });
+
+  describe('email verification', () => {
+    const verifier = {
+      ...individual,
+      fullName: 'Verify Me',
+      email: `verifier.${tag}@test.com`,
+    };
+    let access = '';
+    const auth = () => ({ authorization: `Bearer ${access}` });
+    const someId = '00000000-0000-4000-8000-000000000000';
+
+    /** Moves every code of this account back in time, as if the cooldown
+     *  had passed, without the spec having to wait. */
+    const ageCodes = async (email: string, seconds: number) => {
+      await prisma.$executeRaw`
+        UPDATE verification_codes
+        SET created_at = created_at - make_interval(secs => ${seconds})
+        WHERE destination = ${email}`;
+    };
+
+    beforeAll(async () => {
+      const res = await request(http).post('/v1/auth/register').send(verifier);
+      access = ok<{ tokens: Tokens }>(res).tokens.accessToken;
+    });
+
+    it('blocks sensitive actions with 403 EMAIL_NOT_VERIFIED until verified', async () => {
+      const book = await request(http)
+        .post('/v1/consultations')
+        .set(auth())
+        .send({});
+      expect(book.status).toBe(403);
+      expect(err(book).code).toBe('EMAIL_NOT_VERIFIED');
+
+      const review = await request(http)
+        .post(`/v1/consultations/${someId}/reviews`)
+        .set(auth())
+        .send({});
+      expect(review.status).toBe(403);
+      expect(err(review).code).toBe('EMAIL_NOT_VERIFIED');
+
+      // Everything else keeps working.
+      const list = await request(http).get('/v1/consultations').set(auth());
+      expect(list.status).toBe(200);
+    });
+
+    it('requires a session for verify and resend', async () => {
+      const verify = await request(http)
+        .post('/v1/auth/email/verify')
+        .send({ code: '123456' });
+      expect(verify.status).toBe(401);
+
+      const resend = await request(http).post('/v1/auth/email/resend');
+      expect(resend.status).toBe(401);
+    });
+
+    it('refuses a resend inside the cooldown with 429 + Retry-After', async () => {
+      const res = await request(http)
+        .post('/v1/auth/email/resend')
+        .set(auth());
+      expect(res.status).toBe(429);
+      expect(err(res).code).toBe('TOO_MANY_REQUESTS');
+      const retryAfter = Number(res.headers['retry-after']);
+      expect(retryAfter).toBeGreaterThan(0);
+      expect(retryAfter).toBeLessThanOrEqual(60);
+    });
+
+    it('rejects a wrong code with INVALID_VERIFICATION_CODE', async () => {
+      const signUpCode = app.get(OtpService).peekDevCode(verifier.email);
+      const wrong = signUpCode === '000000' ? '111111' : '000000';
+
+      const res = await request(http)
+        .post('/v1/auth/email/verify')
+        .set(auth())
+        .send({ code: wrong });
+      expect(res.status).toBe(422);
+      expect(err(res).code).toBe('INVALID_VERIFICATION_CODE');
+      expect(err(res).errors?.code).toBeDefined();
+    });
+
+    it('resends after the cooldown and retires the previous code', async () => {
+      const otp = app.get(OtpService);
+      const oldCode = otp.peekDevCode(verifier.email)!;
+      await ageCodes(verifier.email, 61);
+
+      const res = await request(http)
+        .post('/v1/auth/email/resend')
+        .set(auth());
+      expect(res.status).toBe(204);
+
+      const newCode = otp.peekDevCode(verifier.email)!;
+      if (newCode !== oldCode) {
+        const stale = await request(http)
+          .post('/v1/auth/email/verify')
+          .set(auth())
+          .send({ code: oldCode });
+        expect(err(stale).code).toBe('INVALID_VERIFICATION_CODE');
+      }
+    });
+
+    it('verifies with the latest code and unlocks sensitive actions', async () => {
+      const code = app.get(OtpService).peekDevCode(verifier.email)!;
+
+      const res = await request(http)
+        .post('/v1/auth/email/verify')
+        .set(auth())
+        .send({ code });
+      expect(res.status).toBe(200);
+      expect(ok<{ user: UserView }>(res).user.emailVerified).toBe(true);
+
+      const me = await request(http).get('/v1/auth/me').set(auth());
+      expect(ok<{ user: UserView }>(me).user.emailVerified).toBe(true);
+
+      // Past the gate: the unknown consultation is now a plain 404.
+      const review = await request(http)
+        .post(`/v1/consultations/${someId}/reviews`)
+        .set(auth())
+        .send({ rating: 5 });
+      expect(review.status).not.toBe(403);
+    });
+
+    it('treats verify and resend as no-ops once verified', async () => {
+      const again = await request(http)
+        .post('/v1/auth/email/verify')
+        .set(auth())
+        .send({ code: '000000' });
+      expect(again.status).toBe(200);
+      expect(ok<{ user: UserView }>(again).user.emailVerified).toBe(true);
+
+      const resend = await request(http)
+        .post('/v1/auth/email/resend')
+        .set(auth());
+      expect(resend.status).toBe(204);
+    });
+
+    it('marks a changed email unverified again', async () => {
+      const newEmail = `verifier.changed.${tag}@test.com`;
+      const res = await request(http)
+        .patch('/v1/auth/me')
+        .set(auth())
+        .send({ fullName: verifier.fullName, email: newEmail });
+      expect(res.status).toBe(200);
+      expect(ok<{ user: UserView }>(res).user.emailVerified).toBe(false);
+      expect(app.get(OtpService).peekDevCode(newEmail)).toMatch(/^\d{6}$/);
+    });
+
+    it('refuses a profile email that another account uses', async () => {
+      const res = await request(http)
+        .patch('/v1/auth/me')
+        .set(auth())
+        .send({ fullName: verifier.fullName, email: lawyer.email });
+      expect(res.status).toBe(422);
+      expect(err(res).code).toBe('EMAIL_ALREADY_REGISTERED');
+    });
+
+    it('caps codes per account per hour', async () => {
+      const capped = { ...individual, email: `capped.${tag}@test.com` };
+      const reg = await request(http).post('/v1/auth/register').send(capped);
+      const token = ok<{ tokens: Tokens }>(reg).tokens.accessToken;
+      const user = ok<{ user: UserView }>(reg).user;
+
+      // Sign-up code + 4 more = the default hourly cap of 5, all older
+      // than the cooldown.
+      for (let i = 0; i < 4; i++) {
+        await app
+          .get(OtpService)
+          .issue(capped.email, 'emailVerification', user.id);
+      }
+      await ageCodes(capped.email, 120);
+
+      const res = await request(http)
+        .post('/v1/auth/email/resend')
+        .set('authorization', `Bearer ${token}`);
+      expect(res.status).toBe(429);
+      const retryAfter = Number(res.headers['retry-after']);
+      expect(retryAfter).toBeGreaterThan(60);
+      expect(retryAfter).toBeLessThanOrEqual(3600);
     });
   });
 

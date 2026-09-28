@@ -84,6 +84,19 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
+  Future<AuthUser> verifyEmail({required String code}) {
+    return _call(() async {
+      final res = await _dio.post<Map<String, dynamic>>('/auth/email/verify', data: {'code': code});
+      return AuthWire.user(AuthWire.data(res.data)['user'] as Map<String, dynamic>);
+    });
+  }
+
+  @override
+  Future<void> resendEmailVerification() {
+    return _call(() => _dio.post<void>('/auth/email/resend'));
+  }
+
+  @override
   Future<void> requestOtp({required String destination}) {
     return _call(() async {
       await _dio.post<void>('/auth/password/forgot', data: {'destination': destination}, options: _publicOptions);

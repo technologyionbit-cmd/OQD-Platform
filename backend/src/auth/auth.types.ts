@@ -6,6 +6,9 @@ export interface AuthUserView {
   fullName: string;
   email: string;
   role: UserRole;
+  /** False until the user enters the code sent to [email]. Sensitive
+   *  actions answer 403 EMAIL_NOT_VERIFIED until then. */
+  emailVerified: boolean;
 }
 
 /** Access + refresh pair returned by login/register/refresh. */

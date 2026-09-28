@@ -6,6 +6,9 @@
  */
 export type TrustProxySetting = false | number | string[];
 
+/** Must match `AppConfig.termsVersion` in the app until TERMS_VERSION is set. */
+export const DEFAULT_TERMS_VERSION = '2026-09-28';
+
 export interface AppConfig {
   nodeEnv: string;
   port: number;
@@ -39,6 +42,13 @@ export interface AuthConfig {
   /** Sign-in attempts allowed per email per window, on top of per-IP limits. */
   loginMaxAttempts: number;
   loginAttemptWindowMinutes: number;
+  /** Minimum wait between two email-verification codes for one account. */
+  emailVerificationResendCooldownSeconds: number;
+  /** Email-verification codes one account may receive per rolling hour. */
+  emailVerificationMaxPerHour: number;
+  /** Terms/privacy version registration must accept. Bump it when the
+   *  published terms change; the app sends the version it showed. */
+  termsVersion: string;
 }
 
 export interface Configuration {
@@ -92,6 +102,15 @@ export default (): Configuration => ({
       process.env.LOGIN_ATTEMPT_WINDOW_MINUTES ?? '15',
       10,
     ),
+    emailVerificationResendCooldownSeconds: parseInt(
+      process.env.EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS ?? '60',
+      10,
+    ),
+    emailVerificationMaxPerHour: parseInt(
+      process.env.EMAIL_VERIFICATION_MAX_PER_HOUR ?? '5',
+      10,
+    ),
+    termsVersion: process.env.TERMS_VERSION ?? DEFAULT_TERMS_VERSION,
   },
 });
 

@@ -26,5 +26,9 @@ abstract class AuthUser with _$AuthUser {
     required String fullName,
     required String email,
     required UserRole role,
+
+    /// False until the user enters the code emailed at sign-up. The server
+    /// refuses sensitive actions (booking, reviews) until then.
+    required bool emailVerified,
   }) = _AuthUser;
 }

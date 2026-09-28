@@ -4,6 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import type { JwtConfig } from '../config/configuration';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { EmailVerifiedGuard } from './guards/email-verified.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginAttemptsGuard } from './guards/login-attempts.guard';
 import { OtpService } from './services/otp.service';
@@ -36,6 +37,7 @@ import { TokenService } from './services/token.service';
     OtpService,
     JwtAuthGuard,
     LoginAttemptsGuard,
+    EmailVerifiedGuard,
   ],
   // The auth surface other feature modules need to protect their own
   // routes (docs/plans/individual-user-rollout.md). A `@UseGuards(Class)`
@@ -43,6 +45,6 @@ import { TokenService } from './services/token.service';
   // TokenService must be exported too — importing modules re-declare
   // JwtAuthGuard as their own provider and it resolves TokenService from
   // here via the module import.
-  exports: [JwtAuthGuard, TokenService],
+  exports: [JwtAuthGuard, EmailVerifiedGuard, TokenService],
 })
 export class AuthModule {}

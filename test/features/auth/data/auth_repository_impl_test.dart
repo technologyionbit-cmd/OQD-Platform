@@ -16,7 +16,7 @@ class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 class MockTokenManager extends Mock implements TokenManager {}
 
 void main() {
-  const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', role: UserRole.client);
+  const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', role: UserRole.client, emailVerified: true);
   const tokens = AuthTokens(accessToken: 'access', refreshToken: 'refresh');
 
   late MockAuthRemoteDataSource remote;
@@ -65,6 +65,8 @@ void main() {
       phone: '+962700000000',
       email: 'new@aqd.test',
       password: 'Password123',
+      acceptTerms: true,
+      termsVersion: '2026-09-28',
     );
 
     test('returns success and persists the returned tokens', () async {

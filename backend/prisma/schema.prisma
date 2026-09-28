@@ -181,6 +181,10 @@ model User {
   status           UserStatus @default(active)
   twoFactorEnabled Boolean    @default(false) @map("two_factor_enabled")
   lastLoginAt      DateTime?  @map("last_login_at") @db.Timestamptz
+  /// When the user accepted the terms/privacy policy, and which version.
+  /// Null only for accounts created before acceptance was recorded.
+  termsAcceptedAt  DateTime?  @map("terms_accepted_at") @db.Timestamptz
+  termsVersion     String?    @map("terms_version")
   createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz
   updatedAt        DateTime   @updatedAt @map("updated_at") @db.Timestamptz
   deletedAt        DateTime?  @map("deleted_at") @db.Timestamptz

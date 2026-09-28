@@ -68,6 +68,8 @@ export class OtpService {
     userId: string | null,
   ): Promise<void> {
     const code = randomInt(0, 1_000_000).toString().padStart(6, '0');
+    // Only the newest code for a destination+purpose is ever checked (see
+    // latestUsable), so issuing a new one retires the previous one.
     await this.prisma.verificationCode.create({
       data: {
         userId,
@@ -84,13 +86,15 @@ export class OtpService {
     this.deliver(destination, code, purpose);
   }
 
-  /** Check a code without consuming it (the verify-otp screen step). */
+  /** Check a code without consuming it (the verify-otp screen step).
+   *  With [userId], only a code issued to that account counts. */
   async verify(
     destination: string,
     code: string,
     purpose: VerificationPurpose,
+    userId?: string,
   ): Promise<OtpVerification> {
-    const record = await this.latestUsable(destination, purpose);
+    const record = await this.latestUsable(destination, purpose, userId);
     if (!record) {
       return { valid: false, userId: null };
     }
@@ -98,7 +102,7 @@ export class OtpService {
     if (record.attemptCount >= this.maxAttempts) {
       throw new UnprocessableEntityException({
         message: 'Too many attempts. Request a new code.',
-        code: ApiErrorCode.VALIDATION_ERROR,
+        code: ApiErrorCode.VERIFICATION_CODE_LOCKED,
         errors: { code: ['Too many attempts. Request a new code.'] },
       });
     }
@@ -119,12 +123,13 @@ export class OtpService {
     destination: string,
     code: string,
     purpose: VerificationPurpose,
+    userId?: string,
   ): Promise<OtpVerification> {
-    const result = await this.verify(destination, code, purpose);
+    const result = await this.verify(destination, code, purpose, userId);
     if (!result.valid) {
       return result;
     }
-    const record = await this.latestUsable(destination, purpose);
+    const record = await this.latestUsable(destination, purpose, userId);
     if (record) {
       await this.prisma.verificationCode.update({
         where: { id: record.id },
@@ -134,11 +139,31 @@ export class OtpService {
     return result;
   }
 
-  private latestUsable(destination: string, purpose: VerificationPurpose) {
+  /** When each code for [purpose] was issued to [userId] since [since],
+   *  oldest first — the input for per-account resend limits. */
+  async issuedSince(
+    userId: string,
+    purpose: VerificationPurpose,
+    since: Date,
+  ): Promise<Date[]> {
+    const rows = await this.prisma.verificationCode.findMany({
+      where: { userId, purpose, createdAt: { gte: since } },
+      select: { createdAt: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    return rows.map((row) => row.createdAt);
+  }
+
+  private latestUsable(
+    destination: string,
+    purpose: VerificationPurpose,
+    userId?: string,
+  ) {
     return this.prisma.verificationCode.findFirst({
       where: {
         destination: destination.trim(),
         purpose,
+        ...(userId === undefined ? {} : { userId }),
         consumedAt: null,
         expiresAt: { gt: new Date() },
       },

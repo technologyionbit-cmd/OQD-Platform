@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:aqd_ionbit/core/config/app_config.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
+import 'package:aqd_ionbit/core/errors/failure_message.dart';
+import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
+import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
-import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
@@ -17,6 +20,7 @@ import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/terms_consent_field.dart';
 
 /// The 8 backend `LawyerSpecialty` values, paired with their localization
 /// key. Kept here (not imported from the lawyers feature) so auth stays
@@ -43,6 +47,15 @@ String _specialtyLabel(String value, AppLocalizations l10n) => switch (value) {
   _ => l10n.specialtyGeneral,
 };
 
+/// Backend field name -> this form's error key, where they differ.
+const _fieldKeys = {
+  'commercialRegistrationNumber': 'registrationNumber',
+  'barLicenseNumber': 'licenseNumber',
+  'mainSpecialty': 'specialty',
+  'acceptTerms': 'terms',
+  'termsVersion': 'terms',
+};
+
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -53,6 +66,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   UserRole _role = UserRole.client;
   String? _specialty;
+  bool _acceptedTerms = false;
 
   final _fullNameController = TextEditingController();
   final _companyNameController = TextEditingController();
@@ -111,7 +125,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         : !Validators.isValidEmail(_emailController.text)
         ? l10n.validationInvalidEmail
         : null;
-    errors['password'] = Validators.isPasswordLongEnough(_passwordController.text) ? null : l10n.validationPasswordTooShort;
+    errors['password'] = _passwordError(_passwordController.text, l10n);
+    errors['terms'] = _acceptedTerms ? null : l10n.validationTermsRequired;
 
     setState(() {
       _errors
@@ -122,10 +137,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return errors.values.every((error) => error == null);
   }
 
+  /// Same rules, same order, as the server's password check.
+  String? _passwordError(String password, AppLocalizations l10n) {
+    if (!Validators.isPasswordLongEnough(password)) return l10n.validationPasswordTooShort;
+    if (!Validators.isPasswordWithinByteLimit(password)) return l10n.validationPasswordTooLong;
+    if (!Validators.hasLetterAndDigit(password)) return l10n.validationPasswordNeedsLetterAndDigit;
+    return null;
+  }
+
   RegisterRequest _buildRequest() {
     final phone = _phoneController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
+    const termsVersion = AppConfig.termsVersion;
 
     return switch (_role) {
       UserRole.client => RegisterRequest.individual(
@@ -133,6 +157,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         phone: phone,
         email: email,
         password: password,
+        acceptTerms: _acceptedTerms,
+        termsVersion: termsVersion,
       ),
       UserRole.company => RegisterRequest.company(
         companyName: _companyNameController.text.trim(),
@@ -140,6 +166,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         email: email,
         phone: phone,
         password: password,
+        acceptTerms: _acceptedTerms,
+        termsVersion: termsVersion,
       ),
       UserRole.lawyer => RegisterRequest.lawyer(
         fullName: _fullNameController.text.trim(),
@@ -148,11 +176,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         email: email,
         phone: phone,
         password: password,
+        acceptTerms: _acceptedTerms,
+        termsVersion: termsVersion,
       ),
     };
   }
 
   Future<void> _submit() async {
+    // The keyboard's "done" action bypasses the button's disabled state.
+    if (_isSubmitting) return;
     final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
     if (!_validate(l10n)) return;
@@ -162,39 +194,73 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
-    // Router redirect reacts to authControllerProvider on success.
-    result.fold((failure) => setState(() => _applyFailure(failure, l10n)), (_) {});
+    // On success the router (watching authControllerProvider) moves on to
+    // email verification — this screen never navigates itself.
+    if (result case ResultFailure(:final failure)) {
+      setState(() => _applyFailure(failure, l10n));
+    }
   }
 
+  /// Puts each server error on its field, in the user's language. Server
+  /// text is never shown: a known code picks the message, and any other
+  /// field error gets a generic one for that field.
   void _applyFailure(Failure failure, AppLocalizations l10n) {
-    if (failure case ValidationFailure(:final fieldErrors) when fieldErrors.isNotEmpty) {
-      // Surface field-level errors (e.g. "email already registered") on the
-      // right input; map backend field names to this form's keys.
-      const fieldMap = {
-        'commercialRegistrationNumber': 'registrationNumber',
-        'barLicenseNumber': 'licenseNumber',
-        'mainSpecialty': 'specialty',
-      };
-      var matchedAField = false;
-      fieldErrors.forEach((backendField, messages) {
-        final key = fieldMap[backendField] ?? backendField;
-        _errors[key] = messages.first;
-        matchedAField = true;
-      });
-      _formError = matchedAField ? null : fieldErrors.values.first.first;
+    final codeField = switch (failure.code) {
+      ApiErrorCodes.emailAlreadyRegistered => 'email',
+      ApiErrorCodes.commercialRegistrationTaken => 'registrationNumber',
+      ApiErrorCodes.barLicenseTaken => 'licenseNumber',
+      _ => null,
+    };
+    if (codeField != null) {
+      _errors[codeField] = failure.localizedMessage(l10n);
       return;
     }
-    _formError = switch (failure) {
-      NetworkFailure() => l10n.errorNetwork,
-      TimeoutFailure() => l10n.errorTimeout,
-      ServerFailure() => l10n.errorServer,
-      _ => l10n.errorGeneric,
-    };
+
+    if (failure case ValidationFailure(code: ApiErrorCodes.validationError, :final fieldErrors) when fieldErrors.isNotEmpty) {
+      final visible = _visibleFieldKeys();
+      var shownOnAField = false;
+      for (final backendField in fieldErrors.keys) {
+        final key = _fieldKeys[backendField] ?? backendField;
+        if (!visible.contains(key)) continue;
+        _errors[key] = _genericFieldMessage(key, l10n);
+        shownOnAField = true;
+      }
+      if (shownOnAField) return;
+    }
+    _formError = failure.localizedMessage(l10n);
+  }
+
+  Set<String> _visibleFieldKeys() => {
+    ...switch (_role) {
+      UserRole.client => {'fullName'},
+      UserRole.company => {'companyName', 'registrationNumber'},
+      UserRole.lawyer => {'fullName', 'licenseNumber', 'specialty'},
+    },
+    'phone',
+    'email',
+    'password',
+    'terms',
+  };
+
+  String _genericFieldMessage(String key, AppLocalizations l10n) => switch (key) {
+    'email' => l10n.validationInvalidEmail,
+    'phone' => l10n.validationInvalidPhone,
+    'password' => l10n.authPasswordRulesHint,
+    'terms' => l10n.validationTermsRequired,
+    _ => l10n.validationInvalidValue,
+  };
+
+  Future<void> _openLink(String url) async {
+    final opened = await ref.read(linkLauncherProvider)(Uri.parse(url));
+    if (opened || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.errorLinkOpenFailed)));
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final config = ref.watch(appConfigProvider);
 
     return AuthScaffold(
       icon: Icons.shield_outlined,
@@ -237,16 +303,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: AppSpacing.lg),
             ..._fieldsFor(_role, l10n),
             const SizedBox(height: AppSpacing.sm),
-            Text.rich(
-              TextSpan(
-                style: Theme.of(context).textTheme.bodySmall,
-                children: [
-                  TextSpan(text: l10n.authTermsAgreementPrefix),
-                  TextSpan(text: l10n.authTermsOfService, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
-                  TextSpan(text: l10n.authTermsAgreementJoiner),
-                  TextSpan(text: l10n.authPrivacyPolicy, style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
-                ],
-              ),
+            TermsConsentField(
+              value: _acceptedTerms,
+              errorText: _errors['terms'],
+              onChanged: (value) => setState(() {
+                _acceptedTerms = value;
+                if (value) _errors['terms'] = null;
+              }),
+              onOpenTerms: () => _openLink(config.termsUrl),
+              onOpenPrivacy: () => _openLink(config.privacyUrl),
             ),
             AuthFormError(_formError),
             const SizedBox(height: AppSpacing.lg),
@@ -273,6 +338,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       controller: _fullNameController,
       label: role == UserRole.lawyer ? l10n.authFullNameTriple : l10n.authFullName,
       errorText: _errors['fullName'],
+      maxLength: Validators.nameMaxLength,
       textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.name],
     );
@@ -284,6 +350,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           controller: _companyNameController,
           label: l10n.authCompanyName,
           errorText: _errors['companyName'],
+          maxLength: Validators.companyNameMaxLength,
           textInputAction: TextInputAction.next,
         ),
         const SizedBox(height: AppSpacing.md),
@@ -291,6 +358,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           controller: _registrationNumberController,
           label: l10n.authCommercialRegistrationNumber,
           errorText: _errors['registrationNumber'],
+          maxLength: Validators.registryNumberMaxLength,
           textInputAction: TextInputAction.next,
         ),
       ],
@@ -301,6 +369,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           controller: _licenseNumberController,
           label: l10n.authBarLicenseNumber,
           errorText: _errors['licenseNumber'],
+          maxLength: Validators.registryNumberMaxLength,
           textInputAction: TextInputAction.next,
         ),
         const SizedBox(height: AppSpacing.md),
@@ -334,6 +403,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         controller: _emailController,
         label: l10n.authEmailLabel,
         errorText: _errors['email'],
+        maxLength: Validators.emailMaxLength,
         keyboardType: TextInputType.emailAddress,
         textInputAction: TextInputAction.next,
         autofillHints: const [AutofillHints.email],
@@ -343,6 +413,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         controller: _passwordController,
         label: l10n.authPasswordLabel,
         errorText: _errors['password'],
+        helperText: l10n.authPasswordRulesHint,
         obscureText: true,
         textInputAction: TextInputAction.done,
         onSubmitted: (_) => _submit(),

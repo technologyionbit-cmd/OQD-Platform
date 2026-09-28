@@ -1,3 +1,4 @@
+import { UnprocessableEntityException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHash } from 'node:crypto';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -38,12 +39,29 @@ class FakePrisma {
           (r) =>
             r.destination === where.destination &&
             r.purpose === where.purpose &&
+            (!('userId' in where) || r.userId === where.userId) &&
             r.consumedAt === null &&
             r.expiresAt.getTime() > Date.now(),
         )
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
       return Promise.resolve(match ?? null);
     },
+    findMany: ({
+      where,
+    }: {
+      where: { userId: string; purpose: string; createdAt: { gte: Date } };
+    }) =>
+      Promise.resolve(
+        this.rows
+          .filter(
+            (r) =>
+              r.userId === where.userId &&
+              r.purpose === where.purpose &&
+              r.createdAt >= where.createdAt.gte,
+          )
+          .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+          .map((r) => ({ createdAt: r.createdAt })),
+      ),
     update: ({
       where,
       data,
@@ -119,9 +137,44 @@ describe('OtpService', () => {
     }
 
     const code = service.peekDevCode('user@example.com')!;
-    await expect(
-      service.verify('user@example.com', code, 'passwordReset'),
-    ).rejects.toThrow(/too many attempts/i);
+    const locked = await service
+      .verify('user@example.com', code, 'passwordReset')
+      .catch((e: unknown) => e);
+    expect(locked).toBeInstanceOf(UnprocessableEntityException);
+    expect((locked as UnprocessableEntityException).getResponse()).toMatchObject(
+      { code: 'VERIFICATION_CODE_LOCKED' },
+    );
+  });
+
+  it('with a userId, ignores a code issued to another account', async () => {
+    const fake = new FakePrisma();
+    const service = makeService(fake);
+    await service.issue('user@example.com', 'emailVerification', 'u1');
+    const code = service.peekDevCode('user@example.com')!;
+
+    expect(
+      (await service.verify('user@example.com', code, 'emailVerification', 'u2'))
+        .valid,
+    ).toBe(false);
+    expect(
+      (await service.consume('user@example.com', code, 'emailVerification', 'u1'))
+        .valid,
+    ).toBe(true);
+  });
+
+  it('lists issue times for an account and purpose, oldest first', async () => {
+    const fake = new FakePrisma();
+    const service = makeService(fake);
+    const since = new Date(Date.now() - 1000);
+    await service.issue('a@example.com', 'emailVerification', 'u1');
+    await service.issue('a@example.com', 'passwordReset', 'u1');
+    await service.issue('a@example.com', 'emailVerification', 'u1');
+    await service.issue('b@example.com', 'emailVerification', 'u2');
+
+    const times = await service.issuedSince('u1', 'emailVerification', since);
+
+    expect(times).toHaveLength(2);
+    expect(times[0].getTime()).toBeLessThan(times[1].getTime());
   });
 
   it('treats an expired code as invalid', async () => {

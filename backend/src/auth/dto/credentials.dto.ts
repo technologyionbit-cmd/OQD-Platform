@@ -1,13 +1,5 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  Matches,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
-
-const PASSWORD_RE = /^(?=.*[A-Za-z])(?=.*\d).+$/;
+import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { StrongPassword } from './password.rules';
 
 /** Issued tokens are 64 chars (48 random bytes, base64url); anything far
  *  longer is not ours and is rejected before it is hashed or queried. */
@@ -55,11 +47,6 @@ export class ChangePasswordDto {
   @MaxLength(128)
   currentPassword!: string;
 
-  @IsString()
-  @MinLength(8, { message: 'Password must be at least 8 characters.' })
-  @MaxLength(128)
-  @Matches(PASSWORD_RE, {
-    message: 'Password must contain at least one letter and one number.',
-  })
+  @StrongPassword()
   newPassword!: string;
 }
