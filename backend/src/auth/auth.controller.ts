@@ -201,8 +201,8 @@ export class AuthController {
   @ApiOperation({
     summary: 'Send a new email verification code',
     description:
-      'One code per EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS and at most ' +
-      'EMAIL_VERIFICATION_MAX_PER_HOUR per account (the sign-up code ' +
+      'One code per OTP_RESEND_COOLDOWN_SECONDS and at most ' +
+      'OTP_MAX_PER_HOUR per account (the sign-up code ' +
       'counts). Over the limit: 429 with Retry-After in seconds. Does ' +
       'nothing for an already verified account.',
   })
@@ -217,20 +217,62 @@ export class AuthController {
   @Post('password/forgot')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Throttle(STRICT_THROTTLE)
+  @ApiOperation({
+    summary: 'Email a password reset code',
+    description:
+      'Always 204, whether or not an account uses the email, so the answer ' +
+      'reveals nothing; only an account email receives a code (logged on ' +
+      'the server until an email provider exists). Per address: one code ' +
+      'per OTP_RESEND_COOLDOWN_SECONDS and at most OTP_MAX_PER_HOUR; over ' +
+      'the limit, 429 with Retry-After in seconds.',
+  })
+  @ApiNoContentResponse()
+  @ApiUnprocessableEntityResponse({
+    type: ApiErrorResponseDto,
+    description: 'VALIDATION_ERROR (not an email address).',
+  })
   async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<void> {
     await this.auth.forgotPassword(dto);
   }
 
   @Post('password/verify-otp')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Throttle(STRICT_THROTTLE)
-  async verifyOtp(@Body() dto: VerifyOtpDto) {
-    return { data: await this.auth.verifyOtp(dto) };
+  @ApiOperation({
+    summary: 'Check a password reset code',
+    description:
+      'Lets the app confirm the code before asking for a new password. ' +
+      'The code stays usable for POST /auth/password/reset. Wrong tries ' +
+      'count: OTP_MAX_ATTEMPTS lock the code until a new one is sent.',
+  })
+  @ApiNoContentResponse({ description: 'The code is right.' })
+  @ApiUnprocessableEntityResponse({
+    type: ApiErrorResponseDto,
+    description:
+      'INVALID_VERIFICATION_CODE (wrong or expired) or ' +
+      'VERIFICATION_CODE_LOCKED.',
+  })
+  async verifyOtp(@Body() dto: VerifyOtpDto): Promise<void> {
+    await this.auth.verifyOtp(dto);
   }
 
   @Post('password/reset')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Throttle(STRICT_THROTTLE)
+  @ApiOperation({
+    summary: 'Set a new password with the emailed code',
+    description:
+      'Uses the code up, marks the email verified and revokes every ' +
+      'session, so the user signs in again with the new password. ' +
+      'Passwords follow the registration rules.',
+  })
+  @ApiNoContentResponse()
+  @ApiUnprocessableEntityResponse({
+    type: ApiErrorResponseDto,
+    description:
+      'VALIDATION_ERROR (errors per field), INVALID_VERIFICATION_CODE ' +
+      '(wrong, expired or already used) or VERIFICATION_CODE_LOCKED.',
+  })
   async resetPassword(@Body() dto: ResetPasswordDto): Promise<void> {
     await this.auth.resetPassword(dto);
   }

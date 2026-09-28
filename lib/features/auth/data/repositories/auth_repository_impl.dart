@@ -127,18 +127,18 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Result<void>> resendEmailVerification() => _run(_remote.resendEmailVerification);
 
   @override
-  Future<Result<void>> requestOtp({required String destination}) {
-    return _run(() => _remote.requestOtp(destination: destination));
+  Future<Result<void>> requestPasswordReset({required String email}) {
+    return _run(() => _remote.requestPasswordReset(email: email));
   }
 
   @override
-  Future<Result<bool>> verifyOtp({required String destination, required String code}) {
-    return _run(() => _remote.verifyOtp(destination: destination, code: code));
+  Future<Result<void>> verifyPasswordResetCode({required String email, required String code}) {
+    return _run(() => _remote.verifyPasswordResetCode(email: email, code: code));
   }
 
   @override
-  Future<Result<void>> resetPassword({required String destination, required String code, required String newPassword}) {
-    return _run(() => _remote.resetPassword(destination: destination, code: code, newPassword: newPassword));
+  Future<Result<void>> resetPassword({required String email, required String code, required String newPassword}) {
+    return _run(() => _remote.resetPassword(email: email, code: code, newPassword: newPassword));
   }
 
   @override

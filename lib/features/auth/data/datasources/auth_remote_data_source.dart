@@ -32,11 +32,11 @@ abstract interface class AuthRemoteDataSource {
   /// Asks the server to email a new verification code.
   Future<void> resendEmailVerification();
 
-  Future<void> requestOtp({required String destination});
+  Future<void> requestPasswordReset({required String email});
 
-  Future<bool> verifyOtp({required String destination, required String code});
+  Future<void> verifyPasswordResetCode({required String email, required String code});
 
-  Future<void> resetPassword({required String destination, required String code, required String newPassword});
+  Future<void> resetPassword({required String email, required String code, required String newPassword});
 
   Future<void> changePassword({required String currentPassword, required String newPassword});
 

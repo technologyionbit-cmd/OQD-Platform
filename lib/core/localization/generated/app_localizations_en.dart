@@ -182,41 +182,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authForgotPasswordSubtitle =>
-      'Choose a recovery method to continue';
-
-  @override
-  String get authMethodSms => 'SMS';
-
-  @override
-  String get authMethodEmail => 'Email';
-
-  @override
-  String get authSmsInfo =>
-      'We\'ll send a 6-digit verification code to reset your password';
+      'Enter your account email and we\'ll send you a verification code';
 
   @override
   String get authEmailInfo =>
-      'We\'ll send a verification link to reset your password';
+      'If this email has an account, a 6-digit code will arrive within minutes. Check your spam folder if you can\'t find it';
 
   @override
   String get authSendCode => 'Send Verification Code';
 
   @override
   String get authRememberPassword => 'Remember your password?';
-
-  @override
-  String get authSentTitle => 'Sent!';
-
-  @override
-  String get authSentSubtitleSms =>
-      'Check your messages and follow the instructions to reset your password';
-
-  @override
-  String get authSentSubtitleEmail =>
-      'Check your email and follow the instructions to reset your password';
-
-  @override
-  String get authEnterCode => 'Enter Verification Code';
 
   @override
   String get authResend => 'Resend';
@@ -239,6 +215,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authOtpInvalidCode => 'Invalid verification code';
+
+  @override
+  String get authResetCodeExpired =>
+      'The verification code has expired. Go back and request a new one';
 
   @override
   String get authResetPasswordTitle => 'New Password';

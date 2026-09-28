@@ -60,8 +60,8 @@ void main() {
     'LoginScreen': () => const LoginScreen(),
     'RegisterScreen': () => const RegisterScreen(),
     'ForgotPasswordScreen': () => const ForgotPasswordScreen(),
-    'OtpVerificationScreen': () => const OtpVerificationScreen(destination: 'client@aqd.test'),
-    'ResetPasswordScreen': () => const ResetPasswordScreen(destination: 'client@aqd.test', code: '1234'),
+    'OtpVerificationScreen': () => const OtpVerificationScreen(email: 'client@aqd.test'),
+    'ResetPasswordScreen': () => const ResetPasswordScreen(email: 'client@aqd.test', code: '123456'),
   };
 
   for (final entry in screens.entries) {

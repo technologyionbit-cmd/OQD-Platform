@@ -64,17 +64,10 @@
   "emailVerificationBannerAction": "Verify now",
 
   "authForgotPasswordTitle": "Forgot Password?",
-  "authForgotPasswordSubtitle": "Choose a recovery method to continue",
-  "authMethodSms": "SMS",
-  "authMethodEmail": "Email",
-  "authSmsInfo": "We'll send a 6-digit verification code to reset your password",
-  "authEmailInfo": "We'll send a verification link to reset your password",
+  "authForgotPasswordSubtitle": "Enter your account email and we'll send you a verification code",
+  "authEmailInfo": "If this email has an account, a 6-digit code will arrive within minutes. Check your spam folder if you can't find it",
   "authSendCode": "Send Verification Code",
   "authRememberPassword": "Remember your password?",
-  "authSentTitle": "Sent!",
-  "authSentSubtitleSms": "Check your messages and follow the instructions to reset your password",
-  "authSentSubtitleEmail": "Check your email and follow the instructions to reset your password",
-  "authEnterCode": "Enter Verification Code",
   "authResend": "Resend",
 
   "authOtpTitle": "Enter Verification Code",
@@ -82,6 +75,7 @@
   "authOtpConfirm": "Confirm",
   "authOtpResendIn": "Resend in {seconds}",
   "authOtpInvalidCode": "Invalid verification code",
+  "authResetCodeExpired": "The verification code has expired. Go back and request a new one",
 
   "authResetPasswordTitle": "New Password",
   "authResetPasswordSubtitle": "Create a strong password for your account",

@@ -4,7 +4,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createHash, randomInt } from 'node:crypto';
+import { createHash, randomInt, timingSafeEqual } from 'node:crypto';
 import type { VerificationChannel, VerificationPurpose } from '@prisma/client';
 import { ApiErrorCode } from '../../common/errors/api-error-codes';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -17,16 +17,19 @@ export interface OtpVerification {
   userId: string | null;
 }
 
+/** Which codes a send limit counts: an account's, or an address's. */
+export type OtpIssueFilter = { userId: string } | { destination: string };
+
 /**
  * One-time codes for password reset and email/phone verification.
  *
- * Codes are 6 numeric digits (mirrors the frontend's OtpVerificationScreen),
- * stored only as a SHA-256 hash in `verification_codes`, expire after
+ * Codes are 6 numeric digits (mirrors the frontend's OtpCodeField), stored
+ * only as a SHA-256 hash in `verification_codes`, expire after
  * `OTP_TTL_MINUTES`, and lock out after `OTP_MAX_ATTEMPTS` failed tries.
  *
  * No email/SMS provider is wired in this phase — the generated code is
- * written to the server log (dev only). Swapping in a real provider is a
- * change confined to {@link deliver}.
+ * written to the server log. Swapping in a real provider is a change
+ * confined to {@link deliver}.
  */
 @Injectable()
 export class OtpService {
@@ -60,8 +63,12 @@ export class OtpService {
     return EMAIL_RE.test(destination.trim()) ? 'email' : 'sms';
   }
 
-  /** Issue and "send" a code. Caller must not reveal whether the
-   *  destination maps to a real account. */
+  /**
+   * Issue a code and send it. A code for no account ([userId] null) is
+   * stored but never sent: the row keeps the request's cost and the send
+   * limits the same for unknown addresses, so neither reveals whether an
+   * account exists, and nobody can use the app to mail strangers.
+   */
   async issue(
     destination: string,
     purpose: VerificationPurpose,
@@ -83,7 +90,9 @@ export class OtpService {
     if (!this.isProduction) {
       this.devCodes.set(destination.trim(), code);
     }
-    this.deliver(destination, code, purpose);
+    if (userId !== null) {
+      this.deliver(destination, code, purpose);
+    }
   }
 
   /** Check a code without consuming it (the verify-otp screen step).
@@ -94,12 +103,66 @@ export class OtpService {
     purpose: VerificationPurpose,
     userId?: string,
   ): Promise<OtpVerification> {
-    const record = await this.latestUsable(destination, purpose, userId);
-    if (!record) {
+    const match = await this.check(destination, code, purpose, userId);
+    return { valid: match !== null, userId: match?.userId ?? null };
+  }
+
+  /** Validate and consume a code (the password-reset step). Of two
+   *  requests racing with the same code, only one gets `valid: true`. */
+  async consume(
+    destination: string,
+    code: string,
+    purpose: VerificationPurpose,
+    userId?: string,
+  ): Promise<OtpVerification> {
+    const match = await this.check(destination, code, purpose, userId);
+    if (!match) {
       return { valid: false, userId: null };
     }
+    const claimed = await this.prisma.verificationCode.updateMany({
+      where: { id: match.id, consumedAt: null },
+      data: { consumedAt: new Date() },
+    });
+    return claimed.count === 1
+      ? { valid: true, userId: match.userId }
+      : { valid: false, userId: null };
+  }
 
-    if (record.attemptCount >= this.maxAttempts) {
+  /** When each code for [purpose] matching [filter] was issued since
+   *  [since], oldest first — the input for send limits. */
+  async issuedSince(
+    filter: OtpIssueFilter,
+    purpose: VerificationPurpose,
+    since: Date,
+  ): Promise<Date[]> {
+    const rows = await this.prisma.verificationCode.findMany({
+      where: { ...filter, purpose, createdAt: { gte: since } },
+      select: { createdAt: true },
+      orderBy: { createdAt: 'asc' },
+    });
+    return rows.map((row) => row.createdAt);
+  }
+
+  /** The matching code's row when [code] is right, else null. Throws
+   *  VERIFICATION_CODE_LOCKED once the code has no tries left. */
+  private async check(
+    destination: string,
+    code: string,
+    purpose: VerificationPurpose,
+    userId?: string,
+  ): Promise<{ id: string; userId: string | null } | null> {
+    const record = await this.latestUsable(destination, purpose, userId);
+    if (!record) {
+      return null;
+    }
+
+    // Take a try before comparing, in one conditional update, so parallel
+    // guesses can never get past OTP_MAX_ATTEMPTS.
+    const reserved = await this.prisma.verificationCode.updateMany({
+      where: { id: record.id, attemptCount: { lt: this.maxAttempts } },
+      data: { attemptCount: { increment: 1 } },
+    });
+    if (reserved.count === 0) {
       throw new UnprocessableEntityException({
         message: 'Too many attempts. Request a new code.',
         code: ApiErrorCode.VERIFICATION_CODE_LOCKED,
@@ -107,51 +170,16 @@ export class OtpService {
       });
     }
 
-    if (record.codeHash !== this.hash(code)) {
-      await this.prisma.verificationCode.update({
-        where: { id: record.id },
-        data: { attemptCount: { increment: 1 } },
-      });
-      return { valid: false, userId: null };
+    if (!this.matches(record.codeHash, code)) {
+      return null;
     }
-
-    return { valid: true, userId: record.userId };
-  }
-
-  /** Validate and consume a code (the password-reset step). */
-  async consume(
-    destination: string,
-    code: string,
-    purpose: VerificationPurpose,
-    userId?: string,
-  ): Promise<OtpVerification> {
-    const result = await this.verify(destination, code, purpose, userId);
-    if (!result.valid) {
-      return result;
-    }
-    const record = await this.latestUsable(destination, purpose, userId);
-    if (record) {
-      await this.prisma.verificationCode.update({
-        where: { id: record.id },
-        data: { consumedAt: new Date() },
-      });
-    }
-    return result;
-  }
-
-  /** When each code for [purpose] was issued to [userId] since [since],
-   *  oldest first — the input for per-account resend limits. */
-  async issuedSince(
-    userId: string,
-    purpose: VerificationPurpose,
-    since: Date,
-  ): Promise<Date[]> {
-    const rows = await this.prisma.verificationCode.findMany({
-      where: { userId, purpose, createdAt: { gte: since } },
-      select: { createdAt: true },
-      orderBy: { createdAt: 'asc' },
+    // Only wrong codes count: checking the right one on the code screen,
+    // then again on reset, must not use up the user's tries.
+    await this.prisma.verificationCode.update({
+      where: { id: record.id },
+      data: { attemptCount: { decrement: 1 } },
     });
-    return rows.map((row) => row.createdAt);
+    return { id: record.id, userId: record.userId };
   }
 
   private latestUsable(
@@ -175,6 +203,15 @@ export class OtpService {
     return createHash('sha256').update(code).digest('hex');
   }
 
+  private matches(codeHash: string, code: string): boolean {
+    return timingSafeEqual(
+      Buffer.from(codeHash, 'hex'),
+      Buffer.from(this.hash(code), 'hex'),
+    );
+  }
+
+  /** A real provider must send in the background: awaiting it here would
+   *  make forgot-password slower for real accounts than for unknown ones. */
   private deliver(
     destination: string,
     code: string,

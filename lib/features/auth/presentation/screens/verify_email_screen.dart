@@ -23,7 +23,7 @@ import 'package:aqd_ionbit/features/auth/presentation/widgets/otp_code_field.dar
 class VerifyEmailScreen extends ConsumerStatefulWidget {
   const VerifyEmailScreen({super.key});
 
-  /// Matches the server's default EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS.
+  /// Matches the server's default OTP_RESEND_COOLDOWN_SECONDS.
   /// A 429 with Retry-After replaces it with the server's actual wait.
   static const resendCooldown = Duration(seconds: 60);
 

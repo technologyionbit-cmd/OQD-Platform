@@ -179,40 +179,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authForgotPasswordTitle => 'نسيت كلمة المرور؟';
 
   @override
-  String get authForgotPasswordSubtitle => 'اختر طريقة الاستعادة للمتابعة';
+  String get authForgotPasswordSubtitle =>
+      'أدخل البريد الإلكتروني لحسابك وسنرسل لك رمز تحقق';
 
   @override
-  String get authMethodSms => 'رسالة SMS';
-
-  @override
-  String get authMethodEmail => 'البريد الإلكتروني';
-
-  @override
-  String get authSmsInfo =>
-      'سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور';
-
-  @override
-  String get authEmailInfo => 'سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور';
+  String get authEmailInfo =>
+      'إذا كان البريد مسجلًا لدينا فسيصلك رمز من 6 أرقام خلال دقائق. إن لم تجده فتحقق من مجلد الرسائل غير المرغوب فيها';
 
   @override
   String get authSendCode => 'إرسال رمز التحقق';
 
   @override
   String get authRememberPassword => 'تذكرت كلمة المرور؟';
-
-  @override
-  String get authSentTitle => 'تم الإرسال!';
-
-  @override
-  String get authSentSubtitleSms =>
-      'تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور';
-
-  @override
-  String get authSentSubtitleEmail =>
-      'تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور';
-
-  @override
-  String get authEnterCode => 'إدخال رمز التحقق';
 
   @override
   String get authResend => 'إعادة الإرسال';
@@ -235,6 +213,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authOtpInvalidCode => 'رمز التحقق غير صحيح';
+
+  @override
+  String get authResetCodeExpired =>
+      'انتهت صلاحية رمز التحقق. ارجع واطلب رمزًا جديدًا';
 
   @override
   String get authResetPasswordTitle => 'كلمة مرور جديدة';

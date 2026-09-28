@@ -97,30 +97,25 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> requestOtp({required String destination}) {
+  Future<void> requestPasswordReset({required String email}) {
     return _call(() async {
-      await _dio.post<void>('/auth/password/forgot', data: {'destination': destination}, options: _publicOptions);
+      await _dio.post<void>('/auth/password/forgot', data: {'email': email}, options: _publicOptions);
     });
   }
 
   @override
-  Future<bool> verifyOtp({required String destination, required String code}) {
+  Future<void> verifyPasswordResetCode({required String email, required String code}) {
     return _call(() async {
-      final res = await _dio.post<Map<String, dynamic>>(
-        '/auth/password/verify-otp',
-        data: {'destination': destination, 'code': code},
-        options: _publicOptions,
-      );
-      return AuthWire.data(res.data)['valid'] as bool;
+      await _dio.post<void>('/auth/password/verify-otp', data: {'email': email, 'code': code}, options: _publicOptions);
     });
   }
 
   @override
-  Future<void> resetPassword({required String destination, required String code, required String newPassword}) {
+  Future<void> resetPassword({required String email, required String code, required String newPassword}) {
     return _call(() async {
       await _dio.post<void>(
         '/auth/password/reset',
-        data: {'destination': destination, 'code': code, 'newPassword': newPassword},
+        data: {'email': email, 'code': code, 'newPassword': newPassword},
         options: _publicOptions,
       );
     });

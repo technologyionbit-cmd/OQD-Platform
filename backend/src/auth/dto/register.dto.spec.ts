@@ -77,7 +77,7 @@ describe('password byte limit on change and reset', () => {
   it('applies to ResetPasswordDto.newPassword', async () => {
     const errors = await validate(
       plainToInstance(ResetPasswordDto, {
-        destination: 'a@test.com',
+        email: 'a@test.com',
         code: '123456',
         newPassword: tooLong,
       }),

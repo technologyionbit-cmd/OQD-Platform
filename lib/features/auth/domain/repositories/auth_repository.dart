@@ -36,11 +36,15 @@ abstract interface class AuthRepository {
 
   Future<Result<void>> resendEmailVerification();
 
-  Future<Result<void>> requestOtp({required String destination});
+  /// Emails a reset code. Succeeds the same whether or not [email] has an
+  /// account; a [RateLimitedFailure] means too many codes were requested.
+  Future<Result<void>> requestPasswordReset({required String email});
 
-  Future<Result<bool>> verifyOtp({required String destination, required String code});
+  /// Checks [code] without using it up. A wrong or expired code is a
+  /// [ValidationFailure] with code `INVALID_VERIFICATION_CODE`.
+  Future<Result<void>> verifyPasswordResetCode({required String email, required String code});
 
-  Future<Result<void>> resetPassword({required String destination, required String code, required String newPassword});
+  Future<Result<void>> resetPassword({required String email, required String code, required String newPassword});
 
   Future<Result<void>> changePassword({required String currentPassword, required String newPassword});
 

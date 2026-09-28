@@ -102,9 +102,9 @@ Returns `200` with `status: "ok"` when PostgreSQL is reachable, `503` otherwise.
 | `POST /logout` | — | `{ refreshToken }` → 204 |
 | `GET /me` | Bearer | Current user |
 | `PATCH /me` | Bearer | `{ fullName, email }` → updated user |
-| `POST /password/forgot` | — | `{ destination }` → 204 (always; anti-enumeration) |
-| `POST /password/verify-otp` | — | `{ destination, code }` → `{ valid }` |
-| `POST /password/reset` | — | `{ destination, code, newPassword }` → 204 (revokes all sessions) |
+| `POST /password/forgot` | — | `{ email }` → 204 (always; anti-enumeration), 429 over the per-address send limit |
+| `POST /password/verify-otp` | — | `{ email, code }` → 204, or 422 `INVALID_VERIFICATION_CODE` / `VERIFICATION_CODE_LOCKED` |
+| `POST /password/reset` | — | `{ email, code, newPassword }` → 204 (marks the email verified, revokes all sessions) |
 | `POST /password/change` | Bearer | `{ currentPassword, newPassword }` → 204 (revokes other sessions) |
 | `GET /sessions` | Bearer | Active sessions with a `current` flag |
 | `DELETE /sessions/:id` | Bearer | Revoke one session |

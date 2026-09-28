@@ -42,10 +42,11 @@ export interface AuthConfig {
   /** Sign-in attempts allowed per email per window, on top of per-IP limits. */
   loginMaxAttempts: number;
   loginAttemptWindowMinutes: number;
-  /** Minimum wait between two email-verification codes for one account. */
-  emailVerificationResendCooldownSeconds: number;
-  /** Email-verification codes one account may receive per rolling hour. */
-  emailVerificationMaxPerHour: number;
+  /** Minimum wait between two emailed codes (verification or reset). */
+  otpResendCooldownSeconds: number;
+  /** Emailed codes allowed per rolling hour — per account for
+   *  verification, per address for password reset. */
+  otpMaxPerHour: number;
   /** Terms/privacy version registration must accept. Bump it when the
    *  published terms change; the app sends the version it showed. */
   termsVersion: string;
@@ -102,12 +103,12 @@ export default (): Configuration => ({
       process.env.LOGIN_ATTEMPT_WINDOW_MINUTES ?? '15',
       10,
     ),
-    emailVerificationResendCooldownSeconds: parseInt(
-      process.env.EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS ?? '60',
+    otpResendCooldownSeconds: parseInt(
+      process.env.OTP_RESEND_COOLDOWN_SECONDS ?? '60',
       10,
     ),
-    emailVerificationMaxPerHour: parseInt(
-      process.env.EMAIL_VERIFICATION_MAX_PER_HOUR ?? '5',
+    otpMaxPerHour: parseInt(
+      process.env.OTP_MAX_PER_HOUR ?? '5',
       10,
     ),
     termsVersion: process.env.TERMS_VERSION ?? DEFAULT_TERMS_VERSION,

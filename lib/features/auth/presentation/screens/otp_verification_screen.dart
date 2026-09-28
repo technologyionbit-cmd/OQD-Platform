@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:aqd_ionbit/core/errors/failure.dart';
+import 'package:aqd_ionbit/core/errors/failure_message.dart';
+import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
@@ -14,10 +17,16 @@ import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.da
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/otp_code_field.dart';
 
+/// Step 2 of the password reset: the 6-digit code emailed to [email]. A
+/// right code opens the new-password screen, which sends it again.
 class OtpVerificationScreen extends ConsumerStatefulWidget {
-  const OtpVerificationScreen({super.key, required this.destination});
+  const OtpVerificationScreen({super.key, required this.email});
 
-  final String destination;
+  final String email;
+
+  /// Matches the server's default OTP_RESEND_COOLDOWN_SECONDS. A 429 with
+  /// Retry-After replaces it with the server's actual wait.
+  static const resendCooldown = Duration(seconds: 60);
 
   @override
   ConsumerState<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
@@ -25,18 +34,19 @@ class OtpVerificationScreen extends ConsumerStatefulWidget {
 
 class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   static const _codeLength = 6;
-  static const _resendCooldown = 30;
 
   String _code = '';
   String? _error;
   bool _isSubmitting = false;
-  int _secondsRemaining = _resendCooldown;
+  bool _isResending = false;
+  int _secondsRemaining = 0;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _startCooldown();
+    // The previous screen just sent a code.
+    _startCooldown(OtpVerificationScreen.resendCooldown);
   }
 
   @override
@@ -45,9 +55,9 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     super.dispose();
   }
 
-  void _startCooldown() {
-    _secondsRemaining = _resendCooldown;
+  void _startCooldown(Duration wait) {
     _timer?.cancel();
+    _secondsRemaining = wait.inSeconds;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining <= 1) {
         timer.cancel();
@@ -58,33 +68,62 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     });
   }
 
-  Future<void> _resend() async {
-    if (_secondsRemaining > 0) return;
-    await ref.read(authRepositoryProvider).requestOtp(destination: widget.destination);
-    if (!mounted) return;
-    _startCooldown();
-  }
-
   Future<void> _confirm() async {
+    if (_isSubmitting || _code.length != _codeLength) return;
     final l10n = AppLocalizations.of(context)!;
-    if (_code.length != _codeLength) return;
     FocusScope.of(context).unfocus();
 
+    final code = _code;
     setState(() {
       _isSubmitting = true;
       _error = null;
     });
-    final result = await ref.read(authRepositoryProvider).verifyOtp(destination: widget.destination, code: _code);
+    final result = await ref.read(authRepositoryProvider).verifyPasswordResetCode(email: widget.email, code: code);
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
-    result.fold((_) => setState(() => _error = l10n.errorGeneric), (verified) {
-      if (!verified) {
-        setState(() => _error = l10n.authOtpInvalidCode);
-        return;
-      }
-      context.pushReplacement(RoutePaths.resetPassword, extra: (destination: widget.destination, code: _code));
+    switch (result) {
+      case Success():
+        context.pushReplacement(RoutePaths.resetPassword, extra: (email: widget.email, code: code));
+      case ResultFailure(:final failure):
+        setState(() => _error = _messageFor(failure, l10n));
+    }
+  }
+
+  Future<void> _resend() async {
+    if (_isResending || _secondsRemaining > 0) return;
+    final l10n = AppLocalizations.of(context)!;
+
+    setState(() {
+      _isResending = true;
+      _error = null;
     });
+    final result = await ref.read(authRepositoryProvider).requestPasswordReset(email: widget.email);
+    if (!mounted) return;
+    setState(() => _isResending = false);
+
+    switch (result) {
+      case Success():
+        setState(() => _startCooldown(OtpVerificationScreen.resendCooldown));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.authVerifyEmailResent)));
+      case ResultFailure(failure: RateLimitedFailure(:final retryAfter?)):
+        // The server knows the real wait; the countdown shows it.
+        setState(() => _startCooldown(retryAfter));
+      case ResultFailure(:final failure):
+        setState(() => _error = failure.localizedMessage(l10n));
+    }
+  }
+
+  /// A malformed code (plain 422) reads the same as a wrong one.
+  String _messageFor(Failure failure, AppLocalizations l10n) => switch (failure) {
+    ValidationFailure(code: ApiErrorCodes.validationError) => l10n.authOtpInvalidCode,
+    _ => failure.localizedMessage(l10n),
+  };
+
+  String _countdownLabel() {
+    final minutes = (_secondsRemaining ~/ 60).toString().padLeft(2, '0');
+    final seconds = (_secondsRemaining % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 
   @override
@@ -92,9 +131,9 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return AuthScaffold(
-      icon: Icons.phonelink_lock_outlined,
+      icon: Icons.mark_email_read_outlined,
       title: l10n.authOtpTitle,
-      subtitle: l10n.authOtpSubtitle(widget.destination),
+      subtitle: l10n.authOtpSubtitle(widget.email),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -110,10 +149,10 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
           Center(
             child: _secondsRemaining > 0
                 ? Text(
-                    l10n.authOtpResendIn('00:${_secondsRemaining.toString().padLeft(2, '0')}'),
+                    l10n.authOtpResendIn(_countdownLabel()),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
                   )
-                : TextButton(onPressed: _resend, child: Text(l10n.authResend)),
+                : TextButton(onPressed: _isResending ? null : _resend, child: Text(l10n.authResend)),
           ),
         ],
       ),

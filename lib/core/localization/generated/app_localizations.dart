@@ -431,31 +431,13 @@ abstract class AppLocalizations {
   /// No description provided for @authForgotPasswordSubtitle.
   ///
   /// In ar, this message translates to:
-  /// **'اختر طريقة الاستعادة للمتابعة'**
+  /// **'أدخل البريد الإلكتروني لحسابك وسنرسل لك رمز تحقق'**
   String get authForgotPasswordSubtitle;
-
-  /// No description provided for @authMethodSms.
-  ///
-  /// In ar, this message translates to:
-  /// **'رسالة SMS'**
-  String get authMethodSms;
-
-  /// No description provided for @authMethodEmail.
-  ///
-  /// In ar, this message translates to:
-  /// **'البريد الإلكتروني'**
-  String get authMethodEmail;
-
-  /// No description provided for @authSmsInfo.
-  ///
-  /// In ar, this message translates to:
-  /// **'سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور'**
-  String get authSmsInfo;
 
   /// No description provided for @authEmailInfo.
   ///
   /// In ar, this message translates to:
-  /// **'سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور'**
+  /// **'إذا كان البريد مسجلًا لدينا فسيصلك رمز من 6 أرقام خلال دقائق. إن لم تجده فتحقق من مجلد الرسائل غير المرغوب فيها'**
   String get authEmailInfo;
 
   /// No description provided for @authSendCode.
@@ -469,30 +451,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تذكرت كلمة المرور؟'**
   String get authRememberPassword;
-
-  /// No description provided for @authSentTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم الإرسال!'**
-  String get authSentTitle;
-
-  /// No description provided for @authSentSubtitleSms.
-  ///
-  /// In ar, this message translates to:
-  /// **'تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور'**
-  String get authSentSubtitleSms;
-
-  /// No description provided for @authSentSubtitleEmail.
-  ///
-  /// In ar, this message translates to:
-  /// **'تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور'**
-  String get authSentSubtitleEmail;
-
-  /// No description provided for @authEnterCode.
-  ///
-  /// In ar, this message translates to:
-  /// **'إدخال رمز التحقق'**
-  String get authEnterCode;
 
   /// No description provided for @authResend.
   ///
@@ -529,6 +487,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'رمز التحقق غير صحيح'**
   String get authOtpInvalidCode;
+
+  /// No description provided for @authResetCodeExpired.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت صلاحية رمز التحقق. ارجع واطلب رمزًا جديدًا'**
+  String get authResetCodeExpired;
 
   /// No description provided for @authResetPasswordTitle.
   ///

@@ -34,11 +34,11 @@ export const envValidationSchema = Joi.object({
   OTP_MAX_ATTEMPTS: Joi.number().integer().min(1).default(5),
   LOGIN_MAX_ATTEMPTS: Joi.number().integer().min(1).default(10),
   LOGIN_ATTEMPT_WINDOW_MINUTES: Joi.number().integer().min(1).default(15),
-  EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS: Joi.number()
+  OTP_RESEND_COOLDOWN_SECONDS: Joi.number()
     .integer()
     .min(0)
     .default(60),
-  EMAIL_VERIFICATION_MAX_PER_HOUR: Joi.number().integer().min(1).default(5),
+  OTP_MAX_PER_HOUR: Joi.number().integer().min(1).default(5),
   TERMS_VERSION: Joi.string()
     .max(32)
     .pattern(/^[\w.-]+$/),

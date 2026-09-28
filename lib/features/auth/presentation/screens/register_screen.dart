@@ -17,6 +17,7 @@ import 'package:aqd_ionbit/core/widgets/app_dropdown.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
+import 'package:aqd_ionbit/features/auth/presentation/password_rules.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_scaffold.dart';
@@ -125,7 +126,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         : !Validators.isValidEmail(_emailController.text)
         ? l10n.validationInvalidEmail
         : null;
-    errors['password'] = _passwordError(_passwordController.text, l10n);
+    errors['password'] = newPasswordError(_passwordController.text, l10n);
     errors['terms'] = _acceptedTerms ? null : l10n.validationTermsRequired;
 
     setState(() {
@@ -135,14 +136,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _formError = null;
     });
     return errors.values.every((error) => error == null);
-  }
-
-  /// Same rules, same order, as the server's password check.
-  String? _passwordError(String password, AppLocalizations l10n) {
-    if (!Validators.isPasswordLongEnough(password)) return l10n.validationPasswordTooShort;
-    if (!Validators.isPasswordWithinByteLimit(password)) return l10n.validationPasswordTooLong;
-    if (!Validators.hasLetterAndDigit(password)) return l10n.validationPasswordNeedsLetterAndDigit;
-    return null;
   }
 
   RegisterRequest _buildRequest() {

@@ -375,32 +375,37 @@ describe('Auth (e2e)', () => {
     });
   });
 
-  describe('password reset (OTP)', () => {
-    it('runs forgot -> verify -> reset and invalidates old sessions', async () => {
+  describe('password reset (emailed code)', () => {
+    const forgot = (email: string) =>
+      request(http).post('/v1/auth/password/forgot').send({ email });
+
+    it('runs forgot -> verify -> reset, verifies the email and ends old sessions', async () => {
       const session = await login(company.email, company.password);
       const staleAccess = ok<{ tokens: Tokens }>(session).tokens.accessToken;
+      expect(ok<{ user: UserView }>(session).user.emailVerified).toBe(false);
 
-      const forgot = await request(http)
-        .post('/v1/auth/password/forgot')
-        .send({ destination: company.email });
-      expect(forgot.status).toBe(204);
+      // Addresses are matched case-insensitively.
+      const sent = await forgot(company.email.toUpperCase());
+      expect(sent.status).toBe(204);
 
-      const code = app.get(OtpService).peekDevCode(company.email);
+      const code = app.get(OtpService).peekDevCode(company.email)!;
       expect(code).toMatch(/^\d{6}$/);
+      const wrong = code === '000000' ? '111111' : '000000';
 
       const badVerify = await request(http)
         .post('/v1/auth/password/verify-otp')
-        .send({ destination: company.email, code: '000000' });
-      expect(ok<{ valid: boolean }>(badVerify).valid).toBe(false);
+        .send({ email: company.email, code: wrong });
+      expect(badVerify.status).toBe(422);
+      expect(err(badVerify).code).toBe('INVALID_VERIFICATION_CODE');
 
       const goodVerify = await request(http)
         .post('/v1/auth/password/verify-otp')
-        .send({ destination: company.email, code });
-      expect(ok<{ valid: boolean }>(goodVerify).valid).toBe(true);
+        .send({ email: company.email, code });
+      expect(goodVerify.status).toBe(204);
 
       const reset = await request(http)
         .post('/v1/auth/password/reset')
-        .send({ destination: company.email, code, newPassword: 'Rotated123' });
+        .send({ email: company.email, code, newPassword: 'Rotated123' });
       expect(reset.status).toBe(204);
       company.password = 'Rotated123';
 
@@ -411,22 +416,53 @@ describe('Auth (e2e)', () => {
 
       const fresh = await login(company.email, 'Rotated123');
       expect(fresh.status).toBe(200);
+      expect(ok<{ user: UserView }>(fresh).user.emailVerified).toBe(true);
+
+      // The code is used up.
+      const reused = await request(http)
+        .post('/v1/auth/password/reset')
+        .send({ email: company.email, code, newPassword: 'Rotated456' });
+      expect(reused.status).toBe(422);
+      expect(err(reused).code).toBe('INVALID_VERIFICATION_CODE');
     });
 
-    it('rejects a reset with a wrong code (422)', async () => {
+    it('rejects a reset with a wrong code (422 INVALID_VERIFICATION_CODE)', async () => {
       const res = await request(http).post('/v1/auth/password/reset').send({
-        destination: company.email,
+        email: company.email,
         code: '000000',
         newPassword: 'Rotated999',
       });
       expect(res.status).toBe(422);
+      expect(err(res).code).toBe('INVALID_VERIFICATION_CODE');
     });
 
-    it('always returns 204 for forgot-password on an unknown destination', async () => {
+    it('answers an unknown address with 204 and sends it nothing usable', async () => {
+      const email = `nobody.${tag}@test.com`;
+      expect((await forgot(email)).status).toBe(204);
+
+      // Even the stored code resets nothing: no account owns the address.
+      const code = app.get(OtpService).peekDevCode(email)!;
       const res = await request(http)
-        .post('/v1/auth/password/forgot')
-        .send({ destination: `nobody.${tag}@test.com` });
-      expect(res.status).toBe(204);
+        .post('/v1/auth/password/reset')
+        .send({ email, code, newPassword: 'Rotated123' });
+      expect(res.status).toBe(422);
+      expect(err(res).code).toBe('INVALID_VERIFICATION_CODE');
+    });
+
+    it('limits sends per address the same way for unknown addresses', async () => {
+      const email = `nobody.limit.${tag}@test.com`;
+      expect((await forgot(email)).status).toBe(204);
+
+      const again = await forgot(email);
+      expect(again.status).toBe(429);
+      expect(Number(again.headers['retry-after'])).toBeGreaterThan(0);
+    });
+
+    it('refuses anything but an email address', async () => {
+      const res = await forgot('+962790000000');
+      expect(res.status).toBe(422);
+      expect(err(res).code).toBe('VALIDATION_ERROR');
+      expect(err(res).errors?.email).toBeDefined();
     });
   });
 

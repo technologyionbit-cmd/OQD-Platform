@@ -28,13 +28,17 @@ final authRoutes = [
   GoRoute(path: RoutePaths.verifyEmail, builder: (context, state) => const VerifyEmailScreen()),
   GoRoute(
     path: RoutePaths.otpVerification,
-    builder: (context, state) => OtpVerificationScreen(destination: state.extra! as String),
+    // The email travels as `extra`, which a reload or deep link drops —
+    // start the reset over rather than crash.
+    redirect: (context, state) => state.extra is String ? null : RoutePaths.forgotPassword,
+    builder: (context, state) => OtpVerificationScreen(email: state.extra! as String),
   ),
   GoRoute(
     path: RoutePaths.resetPassword,
+    redirect: (context, state) => state.extra is ({String email, String code}) ? null : RoutePaths.forgotPassword,
     builder: (context, state) {
-      final args = state.extra! as ({String destination, String code});
-      return ResetPasswordScreen(destination: args.destination, code: args.code);
+      final args = state.extra! as ({String email, String code});
+      return ResetPasswordScreen(email: args.email, code: args.code);
     },
   ),
 ];

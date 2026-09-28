@@ -6,7 +6,12 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Prisma, User, UserRole } from '@prisma/client';
+import type {
+  Prisma,
+  User,
+  UserRole,
+  VerificationPurpose,
+} from '@prisma/client';
 import { ApiErrorCode } from '../common/errors/api-error-codes';
 import { RateLimitedException } from '../common/errors/rate-limited.exception';
 import type { AuthConfig } from '../config/configuration';
@@ -30,10 +35,8 @@ import type {
 } from './dto/password-reset.dto';
 import type { AccountType, RegisterDto } from './dto/register.dto';
 import { PasswordService } from './services/password.service';
-import { OtpService } from './services/otp.service';
+import { OtpService, type OtpIssueFilter } from './services/otp.service';
 import { TokenService } from './services/token.service';
-
-const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 @Injectable()
 export class AuthService {
@@ -50,8 +53,8 @@ export class AuthService {
   ) {
     const auth = configService.get<AuthConfig>('auth')!;
     this.termsVersion = auth.termsVersion;
-    this.resendCooldownSeconds = auth.emailVerificationResendCooldownSeconds;
-    this.resendMaxPerHour = auth.emailVerificationMaxPerHour;
+    this.resendCooldownSeconds = auth.otpResendCooldownSeconds;
+    this.resendMaxPerHour = auth.otpMaxPerHour;
   }
 
   // ---------------------------------------------------------------------------
@@ -275,11 +278,7 @@ export class AuthService {
       user.id,
     );
     if (!result.valid) {
-      throw this.fieldError(
-        'code',
-        'Invalid or expired code.',
-        ApiErrorCode.INVALID_VERIFICATION_CODE,
-      );
+      throw this.invalidCode();
     }
 
     const verified = await this.prisma.user.update({
@@ -289,21 +288,88 @@ export class AuthService {
     return this.toView(verified);
   }
 
-  /**
-   * Sends a new code, at most one per cooldown and a fixed number per
-   * rolling hour for each account (the registration code counts). Over the
-   * limit it is a 429 whose Retry-After says when the next send is allowed.
-   * A no-op for an account that is already verified.
-   */
+  /** Sends a new code within the send limits (see {@link assertCanSendCode};
+   *  the registration code counts). A no-op for an already verified account. */
   async resendEmailVerification(userId: string): Promise<void> {
     const user = await this.activeUser(userId);
     if (user.emailVerifiedAt) return;
 
+    await this.assertCanSendCode({ userId: user.id }, 'emailVerification');
+    await this.otp.issue(user.email, 'emailVerification', user.id);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Password reset (emailed code)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Emails a reset code when [email] belongs to an account. Known and
+   * unknown addresses get the same 204, the same work and the same send
+   * limits, so the answer never reveals whether an account exists.
+   */
+  async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
+    const email = dto.email.trim().toLowerCase();
+    await this.assertCanSendCode({ destination: email }, 'passwordReset');
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    await this.otp.issue(email, 'passwordReset', user?.id ?? null);
+  }
+
+  /** Checks the code before the app asks for a new password. Does not
+   *  use the code up; wrong tries count toward its lock. */
+  async verifyOtp(dto: VerifyOtpDto): Promise<void> {
+    const result = await this.otp.verify(
+      dto.email.trim().toLowerCase(),
+      dto.code,
+      'passwordReset',
+    );
+    if (!result.valid) {
+      throw this.invalidCode();
+    }
+  }
+
+  /**
+   * Sets the new password, marks the email verified (the code proved the
+   * user reads it) and signs the account out everywhere.
+   */
+  async resetPassword(dto: ResetPasswordDto): Promise<void> {
+    const email = dto.email.trim().toLowerCase();
+    const result = await this.otp.consume(email, dto.code, 'passwordReset');
+    const user =
+      result.valid && result.userId
+        ? await this.prisma.user.findUnique({ where: { id: result.userId } })
+        : null;
+    // The code proves control of this address only while it is still the
+    // account's email; after an email change it resets nothing.
+    if (!user || user.email !== email) {
+      throw this.invalidCode();
+    }
+
+    const passwordHash = await this.passwords.hash(dto.newPassword);
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash,
+        ...(user.emailVerifiedAt ? {} : { emailVerifiedAt: new Date() }),
+      },
+    });
+    // Security-sensitive change: force re-login everywhere (docs §4).
+    await this.tokens.revokeAllForUser(user.id);
+  }
+
+  /**
+   * Send limits for emailed codes: one per cooldown, and a fixed number
+   * per rolling hour for [filter] (an account or an address). Over the
+   * limit it is a 429 whose Retry-After says when the next send fits.
+   */
+  private async assertCanSendCode(
+    filter: OtpIssueFilter,
+    purpose: VerificationPurpose,
+  ): Promise<void> {
     const now = Date.now();
     const hourMs = 60 * 60 * 1000;
     const issued = await this.otp.issuedSince(
-      user.id,
-      'emailVerification',
+      filter,
+      purpose,
       new Date(now - hourMs),
     );
 
@@ -323,64 +389,6 @@ export class AuthService {
         (blocking.getTime() + hourMs - now) / 1000,
       );
     }
-
-    await this.otp.issue(user.email, 'emailVerification', user.id);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Password reset (OTP)
-  // ---------------------------------------------------------------------------
-
-  async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
-    const destination = dto.destination.trim();
-    const user = await this.findByDestination(destination);
-    // Always issue against the destination (even with no user) so response
-    // timing/shape can't be used to enumerate accounts (docs §4).
-    await this.otp.issue(destination, 'passwordReset', user?.id ?? null);
-  }
-
-  async verifyOtp(dto: VerifyOtpDto): Promise<{ valid: boolean }> {
-    const result = await this.otp.verify(
-      dto.destination.trim(),
-      dto.code,
-      'passwordReset',
-    );
-    return { valid: result.valid };
-  }
-
-  async resetPassword(dto: ResetPasswordDto): Promise<void> {
-    const destination = dto.destination.trim();
-    const result = await this.otp.consume(
-      destination,
-      dto.code,
-      'passwordReset',
-    );
-    if (!result.valid) {
-      throw this.fieldError(
-        'code',
-        'Invalid or expired code.',
-        ApiErrorCode.INVALID_VERIFICATION_CODE,
-      );
-    }
-
-    const user =
-      (result.userId
-        ? await this.prisma.user.findUnique({ where: { id: result.userId } })
-        : null) ?? (await this.findByDestination(destination));
-
-    if (!user) {
-      // Valid code but no account (shouldn't normally happen) — succeed
-      // silently rather than leak that the destination is unknown.
-      return;
-    }
-
-    const passwordHash = await this.passwords.hash(dto.newPassword);
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { passwordHash },
-    });
-    // Security-sensitive change: force re-login everywhere (docs §4).
-    await this.tokens.revokeAllForUser(user.id);
   }
 
   async changePassword(
@@ -490,13 +498,12 @@ export class AuthService {
     );
   }
 
-  private findByDestination(destination: string): Promise<User | null> {
-    if (EMAIL_RE.test(destination)) {
-      return this.prisma.user.findUnique({
-        where: { email: destination.toLowerCase() },
-      });
-    }
-    return this.prisma.user.findFirst({ where: { phone: destination } });
+  private invalidCode(): UnprocessableEntityException {
+    return this.fieldError(
+      'code',
+      'Invalid or expired code.',
+      ApiErrorCode.INVALID_VERIFICATION_CODE,
+    );
   }
 
   /** A 422 naming the offending field. [code] tells the app which

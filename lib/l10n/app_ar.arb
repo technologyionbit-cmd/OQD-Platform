@@ -81,17 +81,10 @@
   "emailVerificationBannerAction": "تأكيد الآن",
 
   "authForgotPasswordTitle": "نسيت كلمة المرور؟",
-  "authForgotPasswordSubtitle": "اختر طريقة الاستعادة للمتابعة",
-  "authMethodSms": "رسالة SMS",
-  "authMethodEmail": "البريد الإلكتروني",
-  "authSmsInfo": "سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور",
-  "authEmailInfo": "سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور",
+  "authForgotPasswordSubtitle": "أدخل البريد الإلكتروني لحسابك وسنرسل لك رمز تحقق",
+  "authEmailInfo": "إذا كان البريد مسجلًا لدينا فسيصلك رمز من 6 أرقام خلال دقائق. إن لم تجده فتحقق من مجلد الرسائل غير المرغوب فيها",
   "authSendCode": "إرسال رمز التحقق",
   "authRememberPassword": "تذكرت كلمة المرور؟",
-  "authSentTitle": "تم الإرسال!",
-  "authSentSubtitleSms": "تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور",
-  "authSentSubtitleEmail": "تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور",
-  "authEnterCode": "إدخال رمز التحقق",
   "authResend": "إعادة الإرسال",
 
   "authOtpTitle": "أدخل رمز التحقق",
@@ -109,6 +102,7 @@
     }
   },
   "authOtpInvalidCode": "رمز التحقق غير صحيح",
+  "authResetCodeExpired": "انتهت صلاحية رمز التحقق. ارجع واطلب رمزًا جديدًا",
 
   "authResetPasswordTitle": "كلمة مرور جديدة",
   "authResetPasswordSubtitle": "أنشئ كلمة مرور قوية لحسابك",
