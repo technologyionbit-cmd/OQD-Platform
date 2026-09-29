@@ -22,6 +22,7 @@ import 'package:aqd_ionbit/features/notifications/domain/repositories/notificati
 import 'package:aqd_ionbit/features/notifications/presentation/screens/notifications_screen.dart';
 
 import '../../../support/role_test_harness.dart' show testClient, testLawyer;
+import '../../../support/signed_in_override.dart';
 
 class MockNotificationsRepository extends Mock implements NotificationsRepository {}
 
@@ -66,7 +67,7 @@ Future<ProviderContainer> _pump(
   final prefs = await SharedPreferences.getInstance();
 
   final container = ProviderContainer(
-    overrides: [
+    overrides: [signedInOverride, 
       authControllerProvider.overrideWith(() => FixedAuthController(user)),
       notificationsRepositoryProvider.overrideWithValue(repository),
       // NotificationsScreen now also renders the push-notifications toggle

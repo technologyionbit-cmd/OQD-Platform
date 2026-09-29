@@ -17,6 +17,7 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.
 import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_type_selection_screen.dart';
+import '../../../support/signed_in_override.dart';
 
 class MockContractsRepository extends Mock implements ContractsRepository {}
 
@@ -45,7 +46,7 @@ Future<ProviderContainer> _pump(WidgetTester tester) async {
   when(() => repository.getTemplates(locale: any(named: 'locale'))).thenAnswer((_) async => Result.success(_templates));
 
   final container = ProviderContainer(
-    overrides: [
+    overrides: [signedInOverride, 
       contractsRepositoryProvider.overrideWithValue(repository),
       localeControllerProvider.overrideWith(_FixedLocaleController.new),
     ],

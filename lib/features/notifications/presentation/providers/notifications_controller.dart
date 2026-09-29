@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/notifications/data/repositories/notifications_repository_impl.dart';
 import 'package:aqd_ionbit/features/notifications/domain/entities/app_notification.dart';
 import 'package:aqd_ionbit/features/notifications/domain/entities/notification_type.dart';
@@ -19,11 +20,12 @@ import 'package:aqd_ionbit/features/notifications/domain/repositories/notificati
 /// recipient at all, i.e. legacy/broadcast) so a lawyer never sees a
 /// client-only notification and vice versa.
 class NotificationsController extends AsyncNotifier<List<AppNotification>> {
-  late final NotificationsRepository _repository;
+  NotificationsRepository get _repository => ref.read(notificationsRepositoryProvider);
 
   @override
   FutureOr<List<AppNotification>> build() async {
-    _repository = ref.watch(notificationsRepositoryProvider);
+    ref.watch(notificationsRepositoryProvider);
+    if (ref.watch(currentUserIdProvider) == null) return const []; // Signed out: no one's data.
     final result = await _repository.getNotifications();
     return result.fold((failure) => throw failure, _scopedToCurrentUser);
   }

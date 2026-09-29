@@ -680,6 +680,12 @@ abstract class AppLocalizations {
   /// **'محاولات خاطئة كثيرة، اطلب رمزًا جديدًا'**
   String get errorVerificationCodeLocked;
 
+  /// No description provided for @errorContractStatusConflict.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن تنفيذ هذا الإجراء على العقد بحالته الحالية. حدّث الصفحة وحاول مجددًا'**
+  String get errorContractStatusConflict;
+
   /// No description provided for @errorLinkOpenFailed.
   ///
   /// In ar, this message translates to:

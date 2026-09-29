@@ -150,6 +150,7 @@
   "errorBarLicenseTaken": "رقم إجازة المحاماة مستخدم في حساب آخر",
   "errorTermsVersionOutdated": "تم تحديث شروط الخدمة، حدّث التطبيق ثم حاول مجددًا",
   "errorVerificationCodeLocked": "محاولات خاطئة كثيرة، اطلب رمزًا جديدًا",
+  "errorContractStatusConflict": "لا يمكن تنفيذ هذا الإجراء على العقد بحالته الحالية. حدّث الصفحة وحاول مجددًا",
   "errorLinkOpenFailed": "تعذّر فتح الرابط",
 
   "validationRequired": "هذا الحقل مطلوب",

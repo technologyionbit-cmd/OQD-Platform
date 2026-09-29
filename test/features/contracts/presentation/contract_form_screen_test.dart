@@ -15,6 +15,7 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.
 import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_form_screen.dart';
+import '../../../support/signed_in_override.dart';
 
 class MockContractsRepository extends Mock implements ContractsRepository {}
 
@@ -29,7 +30,7 @@ const _template = ContractTemplate(
 );
 
 Future<ProviderContainer> _pump(WidgetTester tester, {bool preselectTemplate = true}) async {
-  final container = ProviderContainer(overrides: [contractsRepositoryProvider.overrideWithValue(MockContractsRepository())]);
+  final container = ProviderContainer(overrides: [signedInOverride, contractsRepositoryProvider.overrideWithValue(MockContractsRepository())]);
   addTearDown(container.dispose);
   if (preselectTemplate) {
     container.read(contractDraftControllerProvider.notifier).selectTemplate(_template);

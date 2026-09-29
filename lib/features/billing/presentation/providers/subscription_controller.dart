@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/billing/domain/entities/subscription_tier.dart';
 
 class SubscriptionState {
@@ -20,7 +21,10 @@ class SubscriptionState {
 /// shows.
 class SubscriptionController extends Notifier<SubscriptionState> {
   @override
-  SubscriptionState build() => const SubscriptionState();
+  SubscriptionState build() {
+    ref.watch(currentUserIdProvider); // Fresh state for each account.
+    return const SubscriptionState();
+  }
 
   void setCycle(BillingCycle cycle) => state = state.copyWith(cycle: cycle);
 

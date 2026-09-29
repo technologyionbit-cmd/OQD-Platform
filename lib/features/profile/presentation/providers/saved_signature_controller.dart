@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/profile/domain/entities/saved_signature.dart';
 
 /// The account's one saved signature (Account → Saved Signature, and later
@@ -10,7 +11,10 @@ import 'package:aqd_ionbit/features/profile/domain/entities/saved_signature.dart
 /// memory for the session.
 class SavedSignatureController extends Notifier<SavedSignatureState> {
   @override
-  SavedSignatureState build() => const SavedSignatureState();
+  SavedSignatureState build() {
+    ref.watch(currentUserIdProvider); // Fresh state for each account.
+    return const SavedSignatureState();
+  }
 
   void saveDrawn(List<List<Offset>> strokes) {
     state = SavedSignatureState(type: SavedSignatureType.drawn, savedAt: DateTime.now(), strokes: strokes);

@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_session.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 
 /// Loads the signed-in user's active sessions and revokes them, refreshing
 /// the list after each change. Backed by the real `/auth/sessions` API.
 class ActiveSessionsController extends AsyncNotifier<List<AuthSession>> {
   @override
   Future<List<AuthSession>> build() async {
+    if (ref.watch(currentUserIdProvider) == null) return const []; // Signed out: no one's data.
     final result = await ref.watch(authRepositoryProvider).listSessions();
     return switch (result) {
       Success(:final data) => data,

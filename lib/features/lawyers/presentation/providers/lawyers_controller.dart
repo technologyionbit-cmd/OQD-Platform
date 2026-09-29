@@ -9,11 +9,11 @@ import 'package:aqd_ionbit/features/lawyers/domain/repositories/lawyers_reposito
 /// The marketplace's full lawyer list — screens filter/search over this
 /// client-side rather than each filter combination being its own fetch.
 class LawyersController extends AsyncNotifier<List<LawyerProfile>> {
-  late final LawyersRepository _repository;
+  LawyersRepository get _repository => ref.read(lawyersRepositoryProvider);
 
   @override
   FutureOr<List<LawyerProfile>> build() async {
-    _repository = ref.watch(lawyersRepositoryProvider);
+    ref.watch(lawyersRepositoryProvider);
     final result = await _repository.getLawyers();
     return result.fold((failure) => throw failure, (lawyers) => lawyers);
   }

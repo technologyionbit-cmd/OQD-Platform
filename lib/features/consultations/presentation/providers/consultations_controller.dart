@@ -7,6 +7,7 @@ import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/consultations/data/repositories/consultations_repository_impl.dart';
 import 'package:aqd_ionbit/features/consultations/domain/entities/consultation.dart';
 import 'package:aqd_ionbit/features/consultations/domain/repositories/consultations_repository.dart';
@@ -17,11 +18,12 @@ import 'package:aqd_ionbit/features/notifications/presentation/providers/notific
 /// client/lawyer/company screens all filter this by status client-side,
 /// mirroring `ContractsController`.
 class ConsultationsController extends AsyncNotifier<List<Consultation>> {
-  late final ConsultationsRepository _repository;
+  ConsultationsRepository get _repository => ref.read(consultationsRepositoryProvider);
 
   @override
   FutureOr<List<Consultation>> build() async {
-    _repository = ref.watch(consultationsRepositoryProvider);
+    ref.watch(consultationsRepositoryProvider);
+    if (ref.watch(currentUserIdProvider) == null) return const []; // Signed out: no one's data.
     final result = await _repository.getConsultations();
     return result.fold((failure) => throw failure, (consultations) => consultations);
   }

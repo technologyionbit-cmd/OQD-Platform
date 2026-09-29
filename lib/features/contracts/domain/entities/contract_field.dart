@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_option.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 
 part 'contract_field.freezed.dart';
@@ -15,7 +16,7 @@ abstract class ContractField with _$ContractField {
     required String label,
     required ContractFieldType type,
     required bool isRequired,
-    @Default(<String>[]) List<String> options,
+    @Default(<ContractFieldOption>[]) List<ContractFieldOption> options,
     String? hint,
   }) = _ContractField;
 }

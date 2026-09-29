@@ -3,17 +3,19 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aqd_ionbit/core/errors/result.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/team/data/repositories/team_repository_impl.dart';
 import 'package:aqd_ionbit/features/team/domain/entities/team_member.dart';
 import 'package:aqd_ionbit/features/team/domain/entities/team_member_role.dart';
 import 'package:aqd_ionbit/features/team/domain/repositories/team_repository.dart';
 
 class TeamController extends AsyncNotifier<List<TeamMember>> {
-  late final TeamRepository _repository;
+  TeamRepository get _repository => ref.read(teamRepositoryProvider);
 
   @override
   FutureOr<List<TeamMember>> build() async {
-    _repository = ref.watch(teamRepositoryProvider);
+    ref.watch(teamRepositoryProvider);
+    if (ref.watch(currentUserIdProvider) == null) return const []; // Signed out: no one's data.
     final result = await _repository.getMembers();
     return result.fold((failure) => throw failure, (members) => members);
   }

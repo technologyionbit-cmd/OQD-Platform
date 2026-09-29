@@ -337,6 +337,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Too many wrong attempts. Request a new code';
 
   @override
+  String get errorContractStatusConflict =>
+      'This can\'t be done to the contract in its current state. Refresh and try again';
+
+  @override
   String get errorLinkOpenFailed => 'Could not open the link';
 
   @override

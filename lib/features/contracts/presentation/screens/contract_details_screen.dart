@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
+import 'package:aqd_ionbit/core/errors/failure_message.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
@@ -56,7 +57,7 @@ class ContractDetailsScreen extends ConsumerWidget {
 
     final result = await ref.read(contractsControllerProvider.notifier).delete(contractId);
     if (!context.mounted) return;
-    result.fold((failure) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.errorGeneric))), (_) {
+    result.fold((failure) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(failure.localizedMessage(l10n)))), (_) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.contractDetailsDeletedMessage)));
       // Guard against a deep-linked details screen with no back-stack
       // (e.g. a future notification tap) rather than assuming a caller
@@ -83,7 +84,7 @@ class ContractDetailsScreen extends ConsumerWidget {
     final result = await ref.read(contractsControllerProvider.notifier).sign(contractId);
     if (!context.mounted) return;
 
-    result.fold((failure) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.errorGeneric))), (_) {
+    result.fold((failure) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(failure.localizedMessage(l10n)))), (_) {
       // The details screen watches contractByIdProvider, a separate fetch
       // from contractsControllerProvider's list (which sign() already
       // refreshes) — without this it keeps showing the pre-sign status

@@ -20,7 +20,6 @@ import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_card
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/providers/lawyers_controller.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/lawyer_card.dart';
-import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
 
 /// One tile in the "your legal services" grid — [gradientColors] stands in
 /// for the reference's photography (no bundled image assets in this repo),
@@ -92,6 +91,12 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     ),
   ];
 
+  /// Pull-to-refresh reloads every section the home shows, not just one.
+  Future<void> _refresh() => Future.wait([
+    ref.read(contractsControllerProvider.notifier).refresh(),
+    ref.read(lawyersControllerProvider.notifier).refresh(),
+  ]);
+
   void _openService(_ServiceTile tile) {
     if (tile.route == RoutePaths.clientLawyers) {
       context.go(tile.route);
@@ -106,7 +111,6 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     final user = ref.watch(authControllerProvider).value;
     final contractsState = ref.watch(contractsControllerProvider);
     final lawyersState = ref.watch(lawyersControllerProvider);
-    final unreadCount = ref.watch(unreadNotificationsCountProvider);
     final services = _services(l10n);
     final isSearching = _query.trim().isNotEmpty;
     final filteredServices = isSearching
@@ -115,12 +119,15 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(contractsControllerProvider.notifier).refresh(),
+        onRefresh: _refresh,
         child: ListView(
           children: [
             _ClientHomeHeader(
               greetingName: user?.fullName,
-              unreadCount: unreadCount,
+              // Notifications are still mock data, so real accounts would see a
+              // made-up count. The badge comes back (watching
+              // unreadNotificationsCountProvider) with the notifications backend.
+              unreadCount: 0,
               searchController: _searchController,
               onSearchChanged: (value) => setState(() => _query = value),
             ),
@@ -292,7 +299,7 @@ class _ClientHomeHeader extends StatelessWidget {
                   ),
                   Badge(
                     isLabelVisible: unreadCount > 0,
-                    label: Text('$unreadCount'),
+                    label: Text(unreadCount > 99 ? '99+' : '$unreadCount'),
                     child: IconButton(
                       icon: const Icon(Icons.notifications_outlined, color: AppColors.onPrimary),
                       tooltip: l10n.clientNotificationsTitle,

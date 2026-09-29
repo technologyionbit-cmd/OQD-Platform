@@ -18,6 +18,7 @@ import 'package:aqd_ionbit/features/notifications/presentation/providers/notific
 import 'package:aqd_ionbit/features/notifications/presentation/screens/notifications_screen.dart';
 
 import '../../messages/presentation/chat_room_test_support.dart' show FixedAuthController, testClient, testLawyer;
+import '../../../support/signed_in_override.dart';
 
 /// Exercises the *real*, shared `NotificationsMockDataSource` across two
 /// simulated auth sessions (not two independently-stubbed mocks) — the gap
@@ -35,7 +36,7 @@ Future<ProviderContainer> _pumpFor(
   final prefs = await SharedPreferences.getInstance();
 
   final container = ProviderContainer(
-    overrides: [
+    overrides: [signedInOverride, 
       authControllerProvider.overrideWith(() => FixedAuthController(user)),
       notificationsRemoteDataSourceProvider.overrideWithValue(dataSource),
       appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),

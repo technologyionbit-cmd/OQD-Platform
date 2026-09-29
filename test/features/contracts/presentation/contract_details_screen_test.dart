@@ -15,6 +15,7 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_category.
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
 import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_details_screen.dart';
+import '../../../support/signed_in_override.dart';
 
 class MockContractsRepository extends Mock implements ContractsRepository {}
 
@@ -32,7 +33,7 @@ Contract _contract(ContractStatus status) => Contract(
 );
 
 Future<ProviderContainer> _pump(WidgetTester tester, {required MockContractsRepository repository}) async {
-  final container = ProviderContainer(overrides: [contractsRepositoryProvider.overrideWithValue(repository)]);
+  final container = ProviderContainer(overrides: [signedInOverride, contractsRepositoryProvider.overrideWithValue(repository)]);
   addTearDown(container.dispose);
 
   final router = GoRouter(

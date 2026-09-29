@@ -165,6 +165,27 @@ enum ConsultationParticipantEventType {
   reconnect
 }
 
+/// Contract lifecycle (docs/backend/08-contracts-documents-signatures.md).
+/// `signed` is the final successful state in v1; `completed` exists for
+/// the app's enum but nothing moves a contract there yet.
+enum ContractStatus {
+  draft
+  pendingSignature
+  signed
+  completed
+  cancelled
+}
+
+enum ContractCategory {
+  employment
+  sale
+  rental
+  partnership
+  nda
+  serviceAgreement
+  other
+}
+
 // -----------------------------------------------------------------------------
 // 1. Identity & Access — docs/backend/01-domain-model.md §1
 // -----------------------------------------------------------------------------
@@ -199,6 +220,8 @@ model User {
   lawyerProfile            LawyerProfile?
   writtenReviews           Review[]
   bookedConsultations      Consultation[]
+  contracts                Contract[]
+  contractSignatures       ContractSignature[]
 
   @@index([role])
   @@map("users")
@@ -431,10 +454,10 @@ model LawyerProfile {
   createdAt                   DateTime                 @default(now()) @map("created_at") @db.Timestamptz
   updatedAt                   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz
 
-  user        User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  specialties LawyerProfileSpecialty[]
-  offerings   LawyerConsultationOffering[]
-  reviews     Review[]
+  user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties       LawyerProfileSpecialty[]
+  offerings         LawyerConsultationOffering[]
+  reviews           Review[]
   availabilitySlots AvailabilitySlot[]
   consultations     Consultation[]
 
@@ -549,9 +572,9 @@ model Consultation {
   createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz
   updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz
 
-  client           User             @relation(fields: [clientUserId], references: [id], onDelete: Cascade)
-  lawyerProfile    LawyerProfile    @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
-  availabilitySlot AvailabilitySlot @relation(fields: [availabilitySlotId], references: [id], onDelete: Restrict)
+  client           User                     @relation(fields: [clientUserId], references: [id], onDelete: Cascade)
+  lawyerProfile    LawyerProfile            @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+  availabilitySlot AvailabilitySlot         @relation(fields: [availabilitySlotId], references: [id], onDelete: Restrict)
   reviews          Review[]
   roomSession      ConsultationRoomSession?
 
@@ -627,4 +650,56 @@ model ConsultationParticipantEvent {
 
   @@index([sessionId])
   @@map("consultation_participant_events")
+}
+
+// -----------------------------------------------------------------------------
+// 7. Contracts — docs/backend/08-contracts-documents-signatures.md
+// -----------------------------------------------------------------------------
+
+/// A contract built from a template in the code catalog
+/// (src/contracts/contract-templates.ts). `templateKey` + `templateVersion`
+/// record which template text it was made from, so later template edits
+/// never change a generated or signed contract. `locale` is the language
+/// of `title` and `generatedContent`.
+model Contract {
+  id               String           @id @default(uuid()) @db.Uuid
+  ownerUserId      String           @map("owner_user_id") @db.Uuid
+  templateKey      String           @map("template_key")
+  templateVersion  Int              @map("template_version")
+  category         ContractCategory
+  locale           String
+  title            String
+  status           ContractStatus   @default(draft)
+  /// Field id -> value as the user entered it (strings only).
+  fieldValues      Json             @map("field_values")
+  parties          String[]
+  generatedContent String?          @map("generated_content")
+  generatedAt      DateTime?        @map("generated_at") @db.Timestamptz
+  signedAt         DateTime?        @map("signed_at") @db.Timestamptz
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+
+  owner      User                @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  signatures ContractSignature[]
+
+  @@index([ownerUserId, updatedAt])
+  @@map("contracts")
+}
+
+/// Evidence of one account signing one contract: when, and from which IP
+/// and client. One row per signer; append-only.
+model ContractSignature {
+  id         String   @id @default(uuid()) @db.Uuid
+  contractId String   @map("contract_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  signedAt   DateTime @default(now()) @map("signed_at") @db.Timestamptz
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([contractId, userId])
+  @@index([userId])
+  @@map("contract_signatures")
 }

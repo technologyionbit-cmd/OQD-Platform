@@ -5,6 +5,7 @@ import 'package:aqd_ionbit/features/contracts/data/datasources/contracts_remote_
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_category.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dart';
+import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_option.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
@@ -63,12 +64,12 @@ class ContractsMockDataSource implements ContractsRemoteDataSource {
   }
 
   @override
-  Future<Contract> saveDraft({required ContractTemplate template, required Map<String, String> fieldValues, String? contractId}) {
+  Future<Contract> saveDraft({required ContractTemplate template, required Map<String, String> fieldValues, required Locale locale, String? contractId}) {
     return _save(template: template, fieldValues: fieldValues, status: ContractStatus.draft, contractId: contractId);
   }
 
   @override
-  Future<Contract> generateContract({required ContractTemplate template, required Map<String, String> fieldValues, String? contractId}) {
+  Future<Contract> generateContract({required ContractTemplate template, required Map<String, String> fieldValues, required Locale locale, String? contractId}) {
     return _save(template: template, fieldValues: fieldValues, status: ContractStatus.pendingSignature, contractId: contractId);
   }
 
@@ -166,7 +167,11 @@ final _arTemplates = <ContractTemplate>[
         label: 'نوع الدوام',
         type: ContractFieldType.dropdown,
         isRequired: true,
-        options: ['دوام كامل', 'دوام جزئي', 'عن بعد'],
+        options: [
+          ContractFieldOption(value: 'fullTime', label: 'دوام كامل'),
+          ContractFieldOption(value: 'partTime', label: 'دوام جزئي'),
+          ContractFieldOption(value: 'remote', label: 'عن بعد'),
+        ],
       ),
       ContractField(id: 'salary', label: 'الراتب الشهري', type: ContractFieldType.currency, isRequired: true),
       ContractField(id: 'startDate', label: 'تاريخ بداية العمل', type: ContractFieldType.date, isRequired: true),
@@ -199,7 +204,12 @@ final _arTemplates = <ContractTemplate>[
         label: 'نوع العقار',
         type: ContractFieldType.dropdown,
         isRequired: true,
-        options: ['شقة', 'فيلا', 'مكتب', 'محل تجاري'],
+        options: [
+          ContractFieldOption(value: 'apartment', label: 'شقة'),
+          ContractFieldOption(value: 'villa', label: 'فيلا'),
+          ContractFieldOption(value: 'office', label: 'مكتب'),
+          ContractFieldOption(value: 'retailShop', label: 'محل تجاري'),
+        ],
       ),
       ContractField(id: 'propertyAddress', label: 'عنوان العقار', type: ContractFieldType.multiline, isRequired: true),
       ContractField(id: 'rentAmount', label: 'قيمة الإيجار الشهري', type: ContractFieldType.currency, isRequired: true),
@@ -270,7 +280,11 @@ final _enTemplates = <ContractTemplate>[
         label: 'Employment Type',
         type: ContractFieldType.dropdown,
         isRequired: true,
-        options: ['Full-time', 'Part-time', 'Remote'],
+        options: [
+          ContractFieldOption(value: 'fullTime', label: 'Full-time'),
+          ContractFieldOption(value: 'partTime', label: 'Part-time'),
+          ContractFieldOption(value: 'remote', label: 'Remote'),
+        ],
       ),
       ContractField(id: 'salary', label: 'Monthly Salary', type: ContractFieldType.currency, isRequired: true),
       ContractField(id: 'startDate', label: 'Start Date', type: ContractFieldType.date, isRequired: true),
@@ -303,7 +317,12 @@ final _enTemplates = <ContractTemplate>[
         label: 'Property Type',
         type: ContractFieldType.dropdown,
         isRequired: true,
-        options: ['Apartment', 'Villa', 'Office', 'Retail Shop'],
+        options: [
+          ContractFieldOption(value: 'apartment', label: 'Apartment'),
+          ContractFieldOption(value: 'villa', label: 'Villa'),
+          ContractFieldOption(value: 'office', label: 'Office'),
+          ContractFieldOption(value: 'retailShop', label: 'Retail Shop'),
+        ],
       ),
       ContractField(id: 'propertyAddress', label: 'Property Address', type: ContractFieldType.multiline, isRequired: true),
       ContractField(id: 'rentAmount', label: 'Monthly Rent', type: ContractFieldType.currency, isRequired: true),

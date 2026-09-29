@@ -110,6 +110,7 @@
   "errorBarLicenseTaken": "This bar license number is used by another account",
   "errorTermsVersionOutdated": "The terms of service have changed. Update the app and try again",
   "errorVerificationCodeLocked": "Too many wrong attempts. Request a new code",
+  "errorContractStatusConflict": "This can't be done to the contract in its current state. Refresh and try again",
   "errorLinkOpenFailed": "Could not open the link",
 
   "validationRequired": "This field is required",

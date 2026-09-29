@@ -335,6 +335,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'محاولات خاطئة كثيرة، اطلب رمزًا جديدًا';
 
   @override
+  String get errorContractStatusConflict =>
+      'لا يمكن تنفيذ هذا الإجراء على العقد بحالته الحالية. حدّث الصفحة وحاول مجددًا';
+
+  @override
   String get errorLinkOpenFailed => 'تعذّر فتح الرابط';
 
   @override

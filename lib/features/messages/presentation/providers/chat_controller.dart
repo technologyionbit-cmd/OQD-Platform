@@ -9,6 +9,7 @@ import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/messages/data/repositories/messages_repository_impl.dart';
 import 'package:aqd_ionbit/features/messages/domain/entities/message.dart';
 import 'package:aqd_ionbit/features/messages/domain/entities/message_type.dart';
@@ -31,11 +32,12 @@ class ChatController extends AsyncNotifier<ChatState> {
   ChatController(this.consultationId);
 
   final String consultationId;
-  late final MessagesRepository _repository;
+  MessagesRepository get _repository => ref.read(messagesRepositoryProvider);
 
   @override
   FutureOr<ChatState> build() async {
-    _repository = ref.watch(messagesRepositoryProvider);
+    ref.watch(messagesRepositoryProvider);
+    ref.watch(currentUserIdProvider);
     final result = await _repository.getMessages(consultationId);
     return result.fold((failure) => throw failure, (messages) => ChatState(messages: messages));
   }

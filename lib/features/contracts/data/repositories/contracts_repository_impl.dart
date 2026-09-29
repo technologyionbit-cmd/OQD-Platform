@@ -30,17 +30,23 @@ class ContractsRepositoryImpl implements ContractsRepository {
   Future<Result<Contract>> getContractById(String id) => _guard(() => _remote.getContractById(id));
 
   @override
-  Future<Result<Contract>> saveDraft({required ContractTemplate template, required Map<String, String> fieldValues, String? contractId}) {
-    return _guard(() => _remote.saveDraft(template: template, fieldValues: fieldValues, contractId: contractId));
+  Future<Result<Contract>> saveDraft({
+    required ContractTemplate template,
+    required Map<String, String> fieldValues,
+    required Locale locale,
+    String? contractId,
+  }) {
+    return _guard(() => _remote.saveDraft(template: template, fieldValues: fieldValues, locale: locale, contractId: contractId));
   }
 
   @override
   Future<Result<Contract>> generateContract({
     required ContractTemplate template,
     required Map<String, String> fieldValues,
+    required Locale locale,
     String? contractId,
   }) {
-    return _guard(() => _remote.generateContract(template: template, fieldValues: fieldValues, contractId: contractId));
+    return _guard(() => _remote.generateContract(template: template, fieldValues: fieldValues, locale: locale, contractId: contractId));
   }
 
   @override

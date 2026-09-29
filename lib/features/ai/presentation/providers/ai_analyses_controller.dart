@@ -7,18 +7,20 @@ import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/features/ai/data/repositories/ai_repository_impl.dart';
-import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/ai/domain/entities/contract_analysis.dart';
 import 'package:aqd_ionbit/features/ai/domain/repositories/ai_repository.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/notifications/domain/entities/notification_type.dart';
 import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
 
 class AiAnalysesController extends AsyncNotifier<List<ContractAnalysis>> {
-  late final AiRepository _repository;
+  AiRepository get _repository => ref.read(aiRepositoryProvider);
 
   @override
   FutureOr<List<ContractAnalysis>> build() async {
-    _repository = ref.watch(aiRepositoryProvider);
+    ref.watch(aiRepositoryProvider);
+    if (ref.watch(currentUserIdProvider) == null) return const []; // Signed out: no one's data.
     final result = await _repository.getAnalyses();
     return result.fold((failure) => throw failure, (analyses) => analyses);
   }

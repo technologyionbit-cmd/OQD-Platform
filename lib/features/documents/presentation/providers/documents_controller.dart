@@ -7,6 +7,7 @@ import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/documents/data/repositories/documents_repository_impl.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document.dart';
 import 'package:aqd_ionbit/features/documents/domain/repositories/documents_repository.dart';
@@ -14,11 +15,12 @@ import 'package:aqd_ionbit/features/notifications/domain/entities/notification_t
 import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
 
 class DocumentsController extends AsyncNotifier<List<Document>> {
-  late final DocumentsRepository _repository;
+  DocumentsRepository get _repository => ref.read(documentsRepositoryProvider);
 
   @override
   FutureOr<List<Document>> build() async {
-    _repository = ref.watch(documentsRepositoryProvider);
+    ref.watch(documentsRepositoryProvider);
+    if (ref.watch(currentUserIdProvider) == null) return const []; // Signed out: no one's data.
     final result = await _repository.getDocuments();
     return result.fold((failure) => throw failure, (documents) => documents);
   }

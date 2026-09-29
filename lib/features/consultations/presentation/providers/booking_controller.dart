@@ -5,6 +5,7 @@ import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/consultations/data/repositories/consultations_repository_impl.dart';
 import 'package:aqd_ionbit/features/consultations/domain/entities/consultation.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/providers/availability_provider.dart';
@@ -18,7 +19,10 @@ import 'package:aqd_ionbit/features/notifications/presentation/providers/notific
 /// `ContractDraftController`.
 class BookingController extends Notifier<BookingState> {
   @override
-  BookingState build() => const BookingState();
+  BookingState build() {
+    ref.watch(currentUserIdProvider); // Fresh state for each account.
+    return const BookingState();
+  }
 
   void startBooking({required String lawyerId, required String lawyerName}) {
     state = BookingState(lawyerId: lawyerId, lawyerName: lawyerName);

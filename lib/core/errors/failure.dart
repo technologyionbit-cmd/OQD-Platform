@@ -88,4 +88,5 @@ abstract final class ApiErrorCodes {
   static const invalidVerificationCode = 'INVALID_VERIFICATION_CODE';
   static const verificationCodeLocked = 'VERIFICATION_CODE_LOCKED';
   static const emailNotVerified = 'EMAIL_NOT_VERIFIED';
+  static const contractStatusConflict = 'CONTRACT_STATUS_CONFLICT';
 }

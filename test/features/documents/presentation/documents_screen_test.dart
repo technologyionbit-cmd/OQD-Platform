@@ -17,6 +17,7 @@ import 'package:aqd_ionbit/features/documents/domain/entities/document.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document_source_type.dart';
 import 'package:aqd_ionbit/features/documents/domain/repositories/documents_repository.dart';
 import 'package:aqd_ionbit/features/documents/presentation/screens/documents_screen.dart';
+import '../../../support/signed_in_override.dart';
 
 class MockDocumentsRepository extends Mock implements DocumentsRepository {}
 
@@ -48,7 +49,7 @@ Future<void> _pump(WidgetTester tester, MockDocumentsRepository repository) asyn
 
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [
+      overrides: [signedInOverride, 
         documentsRepositoryProvider.overrideWithValue(repository),
         aiRepositoryProvider.overrideWithValue(aiRepository),
         contractsRepositoryProvider.overrideWithValue(contractsRepository),

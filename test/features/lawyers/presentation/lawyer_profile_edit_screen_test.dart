@@ -17,6 +17,7 @@ import 'package:aqd_ionbit/features/lawyers/data/repositories/lawyers_repository
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/screens/lawyer_profile_edit_screen.dart';
+import '../../../support/signed_in_override.dart';
 
 /// Covers the validation added on top of the previously-unvalidated Save
 /// flow: a blank bio (or an invalid experience/price) must block the save
@@ -35,7 +36,7 @@ const _kTransparentPng = <int>[
 
 Future<ProviderContainer> _pump(WidgetTester tester, {bool isVerified = true}) async {
   final container = ProviderContainer(
-    overrides: [lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource())],
+    overrides: [signedInOverride, lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource())],
   );
   addTearDown(container.dispose);
 

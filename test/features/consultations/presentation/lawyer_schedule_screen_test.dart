@@ -10,6 +10,7 @@ import 'package:aqd_ionbit/features/consultations/data/datasources/consultations
 import 'package:aqd_ionbit/features/consultations/data/datasources/consultations_mock_data_source.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/screens/lawyer_schedule_screen.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart' show kDemoLawyerId;
+import '../../../support/signed_in_override.dart';
 
 /// Covers the booked-slot -> consultation deep link fix: `AvailabilitySlot`
 /// now carries a `consultationId` (populated for live bookings and
@@ -18,7 +19,7 @@ import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart'
 /// rather than always falling back to the generic consultations list.
 Future<ProviderContainer> _pump(WidgetTester tester, {ConsultationsMockDataSource? dataSource}) async {
   final container = ProviderContainer(
-    overrides: [consultationsRemoteDataSourceProvider.overrideWithValue(dataSource ?? ConsultationsMockDataSource())],
+    overrides: [signedInOverride, consultationsRemoteDataSourceProvider.overrideWithValue(dataSource ?? ConsultationsMockDataSource())],
   );
   addTearDown(container.dispose);
 

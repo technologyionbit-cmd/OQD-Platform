@@ -2,7 +2,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
+import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/contracts/data/repositories/contracts_repository_impl.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
@@ -16,7 +18,10 @@ import 'package:aqd_ionbit/features/documents/presentation/providers/documents_c
 /// must survive navigating between those three screens.
 class ContractDraftController extends Notifier<ContractDraftState> {
   @override
-  ContractDraftState build() => const ContractDraftState();
+  ContractDraftState build() {
+    ref.watch(currentUserIdProvider); // Fresh state for each account.
+    return const ContractDraftState();
+  }
 
   void selectTemplate(ContractTemplate template) {
     state = ContractDraftState(template: template);
@@ -81,9 +86,11 @@ class ContractDraftController extends Notifier<ContractDraftState> {
     }
 
     final repository = ref.read(contractsRepositoryProvider);
+    // The contract text is written in the language the user is using.
+    final locale = ref.read(localeControllerProvider);
     final result = generate
-        ? await repository.generateContract(template: template, fieldValues: state.fieldValues, contractId: state.editingContractId)
-        : await repository.saveDraft(template: template, fieldValues: state.fieldValues, contractId: state.editingContractId);
+        ? await repository.generateContract(template: template, fieldValues: state.fieldValues, locale: locale, contractId: state.editingContractId)
+        : await repository.saveDraft(template: template, fieldValues: state.fieldValues, locale: locale, contractId: state.editingContractId);
 
     if (result.isSuccess) {
       await ref.read(contractsControllerProvider.notifier).refresh();

@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:aqd_ionbit/app.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
+import 'package:aqd_ionbit/core/providers/provider_retry.dart';
 import 'package:aqd_ionbit/core/security/fresh_install_guard.dart';
 import 'package:aqd_ionbit/core/security/secure_storage_service.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
@@ -33,6 +34,7 @@ Future<void> bootstrap() async {
 
       runApp(
         ProviderScope(
+          retry: providerRetry,
           overrides: [
             appPreferencesProvider.overrideWithValue(preferences),
             secureStorageServiceProvider.overrideWithValue(secureStorage),

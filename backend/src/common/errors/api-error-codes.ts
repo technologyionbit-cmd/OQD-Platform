@@ -29,6 +29,9 @@ export enum ApiErrorCode {
   VERIFICATION_CODE_LOCKED = 'VERIFICATION_CODE_LOCKED',
   /** 403 — the action needs a verified email address. */
   EMAIL_NOT_VERIFIED = 'EMAIL_NOT_VERIFIED',
+  /** 409 — the contract's status does not allow this action (e.g. editing
+   *  a contract that is no longer a draft, signing twice). */
+  CONTRACT_STATUS_CONFLICT = 'CONTRACT_STATUS_CONFLICT',
 }
 
 const STATUS_TO_CODE: Readonly<Record<number, ApiErrorCode>> = {
