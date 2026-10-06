@@ -32,3 +32,6 @@ lerna-debug.log*
 
 # prisma
 prisma/*.db
+
+# Uploaded files (UPLOADS_DIR default)
+/storage

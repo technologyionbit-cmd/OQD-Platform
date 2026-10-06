@@ -12,23 +12,21 @@ import 'package:aqd_ionbit/core/routing/app_router.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/login_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/otp_verification_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/otp_code_field.dart';
-
-class _MockAuthRepository extends Mock implements AuthRepository {}
+import '../../../support/test_doubles.dart';
 
 const _email = 'user@aqd.test';
 
 void main() {
-  late _MockAuthRepository repository;
+  late MockAuthRepository repository;
   late ProviderContainer container;
 
   setUp(() {
-    repository = _MockAuthRepository();
+    repository = MockAuthRepository();
     when(repository.restoreSession).thenAnswer((_) async => const Result.success(null));
     when(() => repository.requestPasswordReset(email: any(named: 'email'))).thenAnswer((_) async => const Result.success(null));
   });

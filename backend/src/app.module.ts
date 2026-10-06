@@ -14,6 +14,8 @@ import { LawyersModule } from './lawyers/lawyers.module';
 import { ConsultationsModule } from './consultations/consultations.module';
 import { ConsultationRoomModule } from './consultation-room/consultation-room.module';
 import { ContractsModule } from './contracts/contracts.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { ContractsModule } from './contracts/contracts.module';
     ConsultationsModule,
     ConsultationRoomModule,
     ContractsModule,
+    NotificationsModule,
+    AdminModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },

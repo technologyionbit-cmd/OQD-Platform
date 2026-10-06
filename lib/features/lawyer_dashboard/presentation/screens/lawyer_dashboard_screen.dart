@@ -21,7 +21,9 @@ import 'package:aqd_ionbit/features/consultations/domain/entities/consultation.d
 import 'package:aqd_ionbit/features/consultations/domain/entities/consultation_status.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/providers/consultations_controller.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/widgets/consultation_card.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
+import 'package:aqd_ionbit/features/consultation_room/domain/entities/consultation_room_timing.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
+import 'package:aqd_ionbit/features/lawyers/presentation/providers/my_lawyer_profile_provider.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/consultation_type_x.dart';
 import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
 
@@ -34,10 +36,15 @@ class LawyerDashboardScreen extends ConsumerWidget {
     final user = ref.watch(authControllerProvider).value;
     final consultationsState = ref.watch(consultationsControllerProvider);
     final unreadCount = ref.watch(unreadNotificationsCountProvider);
+    final verificationStatus = ref.watch(myLawyerProfileProvider).value?.verificationStatus;
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(consultationsControllerProvider.notifier).refresh(),
+        onRefresh: () => Future.wait([
+          ref.read(consultationsControllerProvider.notifier).refresh(),
+          ref.read(notificationsControllerProvider.notifier).refresh(),
+          ref.refresh(myLawyerProfileProvider.future),
+        ]),
         child: ListView(
           children: [
             HomeGreetingHeader(
@@ -45,15 +52,22 @@ class LawyerDashboardScreen extends ConsumerWidget {
               icon: Icons.gavel_outlined,
               trailing: Badge(
                 isLabelVisible: unreadCount > 0,
-                label: Text('$unreadCount'),
+                label: Text(unreadCount > 99 ? '99+' : '$unreadCount'),
                 child: IconButton(
                   icon: const Icon(Icons.notifications_outlined, color: AppColors.onPrimary),
+                  tooltip: l10n.clientNotificationsTitle,
                   onPressed: () => context.push(RoutePaths.lawyerNotifications),
                 ),
               ),
             ),
+            if (verificationStatus != null && verificationStatus != VerificationStatus.verified)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, 0),
+                child: _VerificationBanner(status: verificationStatus),
+              ),
             switch (consultationsState) {
-              AsyncData(value: final consultations) => _DashboardBody(consultations: consultations.where((c) => c.lawyerId == kDemoLawyerId).toList()),
+              // The server returns only this lawyer's own consultations.
+              AsyncData(value: final consultations) => _DashboardBody(consultations: consultations),
               AsyncError() => ErrorView(message: l10n.errorGeneric, onRetry: () => ref.read(consultationsControllerProvider.notifier).refresh()),
               _ => const Padding(padding: EdgeInsets.all(AppSpacing.xxl), child: LoadingView()),
             },
@@ -90,11 +104,16 @@ class _DashboardBody extends StatelessWidget {
     final monthEarnings = completed
         .where((c) => c.scheduledAt.year == now.year && c.scheduledAt.month == now.month)
         .fold<double>(0, (sum, c) => sum + c.price);
-    // "Active now" — the nearest upcoming consultation starting within the
-    // next half hour (or already due), matching the reference's prominent
-    // urgent-session banner. Outside that window, nothing is shown.
+    // "Active now" — the nearest confirmed consultation that starts within
+    // the next half hour or is still inside its session time, so the start
+    // button stays reachable for the whole session, not only its first
+    // minutes.
     final activeSession = upcoming
-        .where((c) => c.scheduledAt.isAfter(now.subtract(const Duration(minutes: 15))) && c.scheduledAt.isBefore(now.add(const Duration(minutes: 30))))
+        .where(
+          (c) =>
+              c.scheduledAt.isBefore(now.add(const Duration(minutes: 30))) &&
+              c.scheduledAt.add(ConsultationRoomTiming.maxSessionDuration).isAfter(now),
+        )
         .firstOrNull;
 
     return Padding(
@@ -269,6 +288,68 @@ class _ActiveSessionBanner extends StatelessWidget {
             icon: consultation.type.icon,
             onPressed: () => context.push(RoutePaths.lawyerConsultationDetails(consultation.id)),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Tells a lawyer who is not verified yet why clients cannot find or book
+/// them, and where to fix it.
+class _VerificationBanner extends StatelessWidget {
+  const _VerificationBanner({required this.status});
+
+  final VerificationStatus status;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final (tone, icon, title, message) = switch (status) {
+      VerificationStatus.pending => (
+        context.statusColors.info,
+        Icons.hourglass_top_outlined,
+        l10n.dashboardVerificationPendingTitle,
+        l10n.dashboardVerificationPendingMessage,
+      ),
+      VerificationStatus.rejected => (
+        context.statusColors.error,
+        Icons.gpp_bad_outlined,
+        l10n.dashboardVerificationRejectedTitle,
+        l10n.dashboardVerificationRejectedMessage,
+      ),
+      _ => (
+        context.statusColors.warning,
+        Icons.verified_user_outlined,
+        l10n.dashboardVerificationUnverifiedTitle,
+        l10n.dashboardVerificationUnverifiedMessage,
+      ),
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(color: tone.background, borderRadius: AppRadii.lgRadius),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: tone.foreground, size: 20),
+              const SizedBox(width: AppSpacing.xs),
+              Expanded(
+                child: Text(title, style: Theme.of(context).textTheme.titleSmall?.copyWith(color: tone.foreground, fontWeight: FontWeight.w700)),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(message, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: tone.foreground)),
+          if (status != VerificationStatus.pending)
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: TextButton(
+                onPressed: () => context.push(RoutePaths.lawyerProfileEdit),
+                child: Text(l10n.dashboardVerificationAction),
+              ),
+            ),
         ],
       ),
     );

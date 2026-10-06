@@ -1934,17 +1934,17 @@ abstract class AppLocalizations {
   /// **'اكتب رسالة...'**
   String get consultationMessageHint;
 
-  /// No description provided for @notificationConsultationBookedTitle.
+  /// No description provided for @notificationConsultationRequestedTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تم إرسال طلب الاستشارة'**
-  String get notificationConsultationBookedTitle;
+  /// **'طلب استشارة جديد'**
+  String get notificationConsultationRequestedTitle;
 
-  /// No description provided for @notificationConsultationBookedBody.
+  /// No description provided for @notificationConsultationRequestedBody.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار موافقة المحامي {lawyerName} على طلب استشارتك'**
-  String notificationConsultationBookedBody(String lawyerName);
+  /// **'أرسل لك {name} طلب استشارة'**
+  String notificationConsultationRequestedBody(String name);
 
   /// No description provided for @notificationConsultationAcceptedTitle.
   ///
@@ -1955,8 +1955,8 @@ abstract class AppLocalizations {
   /// No description provided for @notificationConsultationAcceptedBody.
   ///
   /// In ar, this message translates to:
-  /// **'وافق المحامي {lawyerName} على طلب استشارتك'**
-  String notificationConsultationAcceptedBody(String lawyerName);
+  /// **'وافق {name} على طلب استشارتك'**
+  String notificationConsultationAcceptedBody(String name);
 
   /// No description provided for @notificationConsultationRejectedTitle.
   ///
@@ -1967,8 +1967,8 @@ abstract class AppLocalizations {
   /// No description provided for @notificationConsultationRejectedBody.
   ///
   /// In ar, this message translates to:
-  /// **'اعتذر المحامي {lawyerName} عن طلب استشارتك'**
-  String notificationConsultationRejectedBody(String lawyerName);
+  /// **'اعتذر {name} عن طلب استشارتك'**
+  String notificationConsultationRejectedBody(String name);
 
   /// No description provided for @notificationConsultationCancelledTitle.
   ///
@@ -1979,8 +1979,8 @@ abstract class AppLocalizations {
   /// No description provided for @notificationConsultationCancelledBody.
   ///
   /// In ar, this message translates to:
-  /// **'تم إلغاء موعد استشارتك'**
-  String get notificationConsultationCancelledBody;
+  /// **'ألغى {name} موعد الاستشارة'**
+  String notificationConsultationCancelledBody(String name);
 
   /// No description provided for @notificationConsultationCompletedTitle.
   ///
@@ -1991,44 +1991,20 @@ abstract class AppLocalizations {
   /// No description provided for @notificationConsultationCompletedBody.
   ///
   /// In ar, this message translates to:
-  /// **'انتهت جلسة استشارتك بنجاح'**
-  String get notificationConsultationCompletedBody;
+  /// **'انتهت استشارتك مع {name}'**
+  String notificationConsultationCompletedBody(String name);
 
-  /// No description provided for @notificationNewMessageTitle.
+  /// No description provided for @notificationConsultationRescheduledTitle.
   ///
   /// In ar, this message translates to:
-  /// **'رسالة جديدة'**
-  String get notificationNewMessageTitle;
+  /// **'تم تغيير موعد الاستشارة'**
+  String get notificationConsultationRescheduledTitle;
 
-  /// No description provided for @notificationNewAttachmentBody.
+  /// No description provided for @notificationConsultationRescheduledBody.
   ///
   /// In ar, this message translates to:
-  /// **'أرسل لك مرفقًا جديدًا'**
-  String get notificationNewAttachmentBody;
-
-  /// No description provided for @notificationDocumentUploadedTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم رفع مستند'**
-  String get notificationDocumentUploadedTitle;
-
-  /// No description provided for @notificationDocumentUploadedBody.
-  ///
-  /// In ar, this message translates to:
-  /// **'\"{title}\" أُضيف إلى خزنتك الرقمية'**
-  String notificationDocumentUploadedBody(String title);
-
-  /// No description provided for @notificationAiAnalysisTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'اكتمل تحليل العقد'**
-  String get notificationAiAnalysisTitle;
-
-  /// No description provided for @notificationAiAnalysisBody.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم الانتهاء من تحليل \"{documentTitle}\"'**
-  String notificationAiAnalysisBody(String documentTitle);
+  /// **'غيّر {name} موعد الاستشارة'**
+  String notificationConsultationRescheduledBody(String name);
 
   /// No description provided for @consultationRoomTitle.
   ///
@@ -2960,6 +2936,48 @@ abstract class AppLocalizations {
   /// **'بدء الجلسة'**
   String get dashboardStartSession;
 
+  /// No description provided for @dashboardVerificationUnverifiedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسابك غير موثّق بعد'**
+  String get dashboardVerificationUnverifiedTitle;
+
+  /// No description provided for @dashboardVerificationUnverifiedMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'لن يظهر ملفك للعملاء ولن يتمكنوا من حجز استشارة معك قبل توثيق حسابك'**
+  String get dashboardVerificationUnverifiedMessage;
+
+  /// No description provided for @dashboardVerificationPendingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب التوثيق قيد المراجعة'**
+  String get dashboardVerificationPendingTitle;
+
+  /// No description provided for @dashboardVerificationPendingMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'سنراجع مستنداتك قريبًا، وسيظهر ملفك للعملاء بعد الموافقة'**
+  String get dashboardVerificationPendingMessage;
+
+  /// No description provided for @dashboardVerificationRejectedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم رفض طلب التوثيق'**
+  String get dashboardVerificationRejectedTitle;
+
+  /// No description provided for @dashboardVerificationRejectedMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'راجع ملفك وأعد رفع مستندات التوثيق'**
+  String get dashboardVerificationRejectedMessage;
+
+  /// No description provided for @dashboardVerificationAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'إكمال التوثيق'**
+  String get dashboardVerificationAction;
+
   /// No description provided for @earningsBalance.
   ///
   /// In ar, this message translates to:
@@ -3103,6 +3121,66 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم إرسال المستند للمراجعة'**
   String get lawyerVerificationSubmittedMessage;
+
+  /// No description provided for @lawyerVerificationDocumentsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ارفع صورة هويتك وبطاقة النقابة: JPG أو PNG أو PDF، حتى 3 ملفات، و10 ميغابايت لكل ملف'**
+  String get lawyerVerificationDocumentsHint;
+
+  /// No description provided for @lawyerVerificationRejectedReason.
+  ///
+  /// In ar, this message translates to:
+  /// **'سبب الرفض: {reason}'**
+  String lawyerVerificationRejectedReason(String reason);
+
+  /// No description provided for @lawyerVerificationFileTooLarge.
+  ///
+  /// In ar, this message translates to:
+  /// **'حجم أحد الملفات أكبر من 10 ميغابايت'**
+  String get lawyerVerificationFileTooLarge;
+
+  /// No description provided for @lawyerVerificationTooManyFiles.
+  ///
+  /// In ar, this message translates to:
+  /// **'يمكنك رفع 3 ملفات كحد أقصى'**
+  String get lawyerVerificationTooManyFiles;
+
+  /// No description provided for @lawyerVerificationInvalidFile.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقبل فقط ملفات JPG أو PNG أو PDF'**
+  String get lawyerVerificationInvalidFile;
+
+  /// No description provided for @lawyerVerificationAlreadyPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'مستنداتك قيد المراجعة بالفعل'**
+  String get lawyerVerificationAlreadyPending;
+
+  /// No description provided for @notificationVerificationApprovedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم توثيق حسابك'**
+  String get notificationVerificationApprovedTitle;
+
+  /// No description provided for @notificationVerificationApprovedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أصبح ملفك ظاهرًا للعملاء ويمكنهم حجز استشارات معك'**
+  String get notificationVerificationApprovedBody;
+
+  /// No description provided for @notificationVerificationRejectedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم رفض طلب التوثيق'**
+  String get notificationVerificationRejectedTitle;
+
+  /// No description provided for @notificationVerificationRejectedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'السبب: {reason}'**
+  String notificationVerificationRejectedBody(String reason);
 
   /// No description provided for @lawyerPriceLabel.
   ///

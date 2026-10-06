@@ -1,12 +1,9 @@
-import {
-  Injectable,
-  Logger,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { ApiErrorCode } from '../../common/errors/api-error-codes';
 import { ConfigService } from '@nestjs/config';
 import { createHash, randomInt, timingSafeEqual } from 'node:crypto';
 import type { VerificationChannel, VerificationPurpose } from '@prisma/client';
-import { ApiErrorCode } from '../../common/errors/api-error-codes';
+import { validationFailed } from '../../common/errors/api-exceptions';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { AuthConfig } from '../../config/configuration';
 
@@ -163,11 +160,7 @@ export class OtpService {
       data: { attemptCount: { increment: 1 } },
     });
     if (reserved.count === 0) {
-      throw new UnprocessableEntityException({
-        message: 'Too many attempts. Request a new code.',
-        code: ApiErrorCode.VERIFICATION_CODE_LOCKED,
-        errors: { code: ['Too many attempts. Request a new code.'] },
-      });
+      throw validationFailed({ code: ['Too many attempts. Request a new code.'] }, 'Too many attempts. Request a new code.', ApiErrorCode.VERIFICATION_CODE_LOCKED);
     }
 
     if (!this.matches(record.codeHash, code)) {

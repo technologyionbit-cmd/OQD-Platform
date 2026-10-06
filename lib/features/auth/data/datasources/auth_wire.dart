@@ -59,18 +59,12 @@ class AuthWire {
   }
 
   static AuthTokens tokens(Map<String, dynamic> tokensJson) {
-    return AuthTokens(
-      accessToken: tokensJson['accessToken'] as String,
-      refreshToken: tokensJson['refreshToken'] as String,
-    );
+    return AuthTokens(accessToken: tokensJson['accessToken'] as String, refreshToken: tokensJson['refreshToken'] as String);
   }
 
   static ({AuthUser user, AuthTokens tokens}) session(Object? body) {
     final data = AuthWire.data(body);
-    return (
-      user: user(data['user'] as Map<String, dynamic>),
-      tokens: tokens(data['tokens'] as Map<String, dynamic>),
-    );
+    return (user: user(data['user'] as Map<String, dynamic>), tokens: tokens(data['tokens'] as Map<String, dynamic>));
   }
 
   static AuthSession sessionSummary(Map<String, dynamic> json) {

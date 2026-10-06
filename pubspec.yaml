@@ -38,6 +38,7 @@ dependencies:
   # Media
   image_picker: ^1.1.2
   url_launcher: ^6.3.2
+  file_picker: ^13.1.0
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +53,7 @@ dev_dependencies:
   # Test-only: lets chat_room_screen widget tests fake ImagePicker.pickImage
   # without touching a real gallery/platform channel.
   image_picker_platform_interface: ^2.11.1
+  file_picker_platform_interface: ^4.0.0
 
 flutter:
   uses-material-design: true

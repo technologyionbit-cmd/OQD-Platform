@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mocktail/mocktail.dart';
 
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
@@ -12,12 +11,10 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_category.
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_form_screen.dart';
 import '../../../support/signed_in_override.dart';
-
-class MockContractsRepository extends Mock implements ContractsRepository {}
+import '../../../support/test_doubles.dart';
 
 const _template = ContractTemplate(
   id: 'sale',

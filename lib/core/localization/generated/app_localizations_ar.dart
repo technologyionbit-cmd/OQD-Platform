@@ -999,62 +999,52 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consultationMessageHint => 'اكتب رسالة...';
 
   @override
-  String get notificationConsultationBookedTitle => 'تم إرسال طلب الاستشارة';
+  String get notificationConsultationRequestedTitle => 'طلب استشارة جديد';
 
   @override
-  String notificationConsultationBookedBody(String lawyerName) {
-    return 'بانتظار موافقة المحامي $lawyerName على طلب استشارتك';
+  String notificationConsultationRequestedBody(String name) {
+    return 'أرسل لك $name طلب استشارة';
   }
 
   @override
   String get notificationConsultationAcceptedTitle => 'تم قبول طلب الاستشارة';
 
   @override
-  String notificationConsultationAcceptedBody(String lawyerName) {
-    return 'وافق المحامي $lawyerName على طلب استشارتك';
+  String notificationConsultationAcceptedBody(String name) {
+    return 'وافق $name على طلب استشارتك';
   }
 
   @override
   String get notificationConsultationRejectedTitle => 'تم رفض طلب الاستشارة';
 
   @override
-  String notificationConsultationRejectedBody(String lawyerName) {
-    return 'اعتذر المحامي $lawyerName عن طلب استشارتك';
+  String notificationConsultationRejectedBody(String name) {
+    return 'اعتذر $name عن طلب استشارتك';
   }
 
   @override
   String get notificationConsultationCancelledTitle => 'تم إلغاء الاستشارة';
 
   @override
-  String get notificationConsultationCancelledBody => 'تم إلغاء موعد استشارتك';
+  String notificationConsultationCancelledBody(String name) {
+    return 'ألغى $name موعد الاستشارة';
+  }
 
   @override
   String get notificationConsultationCompletedTitle => 'انتهت الاستشارة';
 
   @override
-  String get notificationConsultationCompletedBody =>
-      'انتهت جلسة استشارتك بنجاح';
-
-  @override
-  String get notificationNewMessageTitle => 'رسالة جديدة';
-
-  @override
-  String get notificationNewAttachmentBody => 'أرسل لك مرفقًا جديدًا';
-
-  @override
-  String get notificationDocumentUploadedTitle => 'تم رفع مستند';
-
-  @override
-  String notificationDocumentUploadedBody(String title) {
-    return '\"$title\" أُضيف إلى خزنتك الرقمية';
+  String notificationConsultationCompletedBody(String name) {
+    return 'انتهت استشارتك مع $name';
   }
 
   @override
-  String get notificationAiAnalysisTitle => 'اكتمل تحليل العقد';
+  String get notificationConsultationRescheduledTitle =>
+      'تم تغيير موعد الاستشارة';
 
   @override
-  String notificationAiAnalysisBody(String documentTitle) {
-    return 'تم الانتهاء من تحليل \"$documentTitle\"';
+  String notificationConsultationRescheduledBody(String name) {
+    return 'غيّر $name موعد الاستشارة';
   }
 
   @override
@@ -1589,6 +1579,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboardStartSession => 'بدء الجلسة';
 
   @override
+  String get dashboardVerificationUnverifiedTitle => 'حسابك غير موثّق بعد';
+
+  @override
+  String get dashboardVerificationUnverifiedMessage =>
+      'لن يظهر ملفك للعملاء ولن يتمكنوا من حجز استشارة معك قبل توثيق حسابك';
+
+  @override
+  String get dashboardVerificationPendingTitle => 'طلب التوثيق قيد المراجعة';
+
+  @override
+  String get dashboardVerificationPendingMessage =>
+      'سنراجع مستنداتك قريبًا، وسيظهر ملفك للعملاء بعد الموافقة';
+
+  @override
+  String get dashboardVerificationRejectedTitle => 'تم رفض طلب التوثيق';
+
+  @override
+  String get dashboardVerificationRejectedMessage =>
+      'راجع ملفك وأعد رفع مستندات التوثيق';
+
+  @override
+  String get dashboardVerificationAction => 'إكمال التوثيق';
+
+  @override
   String get earningsBalance => 'إجمالي الأرباح';
 
   @override
@@ -1665,6 +1679,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get lawyerVerificationSubmittedMessage => 'تم إرسال المستند للمراجعة';
+
+  @override
+  String get lawyerVerificationDocumentsHint =>
+      'ارفع صورة هويتك وبطاقة النقابة: JPG أو PNG أو PDF، حتى 3 ملفات، و10 ميغابايت لكل ملف';
+
+  @override
+  String lawyerVerificationRejectedReason(String reason) {
+    return 'سبب الرفض: $reason';
+  }
+
+  @override
+  String get lawyerVerificationFileTooLarge =>
+      'حجم أحد الملفات أكبر من 10 ميغابايت';
+
+  @override
+  String get lawyerVerificationTooManyFiles => 'يمكنك رفع 3 ملفات كحد أقصى';
+
+  @override
+  String get lawyerVerificationInvalidFile =>
+      'نقبل فقط ملفات JPG أو PNG أو PDF';
+
+  @override
+  String get lawyerVerificationAlreadyPending => 'مستنداتك قيد المراجعة بالفعل';
+
+  @override
+  String get notificationVerificationApprovedTitle => 'تم توثيق حسابك';
+
+  @override
+  String get notificationVerificationApprovedBody =>
+      'أصبح ملفك ظاهرًا للعملاء ويمكنهم حجز استشارات معك';
+
+  @override
+  String get notificationVerificationRejectedTitle => 'تم رفض طلب التوثيق';
+
+  @override
+  String notificationVerificationRejectedBody(String reason) {
+    return 'السبب: $reason';
+  }
 
   @override
   String get lawyerPriceLabel => 'السعر';

@@ -3,18 +3,19 @@ import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_remote_data
 import 'package:aqd_ionbit/features/lawyers/domain/entities/consultation_type.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_specialty.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_document_upload.dart';
 
-/// Temporary, isolated stand-in for the real backend — no lawyer-directory
-/// API is available yet. `lwr_seed_1` (سارة المطيري) is the one lawyer
-/// profile that matches the demo `lawyer@aqd.test` account — it's the
-/// profile the lawyer-side schedule/earnings/profile screens read/write,
-/// and the one whose availability the consultations feature seeds slots
-/// for, so booking her from the client side and managing her schedule
-/// from the lawyer side are genuinely the same underlying data.
+/// The seeded lawyer that tests sign in as (سارة المطيري). The consultations
+/// mock seeds her slots and bookings, so the client and lawyer sides of a
+/// test share the same data.
+const kDemoLawyerId = 'lwr_seed_1';
+
+/// In-memory stand-in for tests.
 class LawyersMockDataSource implements LawyersRemoteDataSource {
   final List<LawyerProfile> _lawyers = [
     const LawyerProfile(
-      id: 'lwr_seed_1',
+      id: kDemoLawyerId,
       fullName: 'سارة المطيري',
       specialties: [LawyerSpecialty.commercial, LawyerSpecialty.corporate],
       bio: 'محامية متخصصة في القانون التجاري والشركات مع خبرة تمتد لأكثر من 9 سنوات في صياغة العقود التجارية وتأسيس الشركات.',
@@ -73,12 +74,13 @@ class LawyersMockDataSource implements LawyersRemoteDataSource {
   @override
   Future<List<LawyerProfile>> getLawyers({String? query, LawyerSpecialty? specialty, double? minRating, int? page}) async {
     await _simulateLatency();
-    final filtered = _lawyers.where((lawyer) {
-      final matchesQuery = query == null || query.isEmpty || lawyer.fullName.toLowerCase().contains(query.toLowerCase());
-      final matchesSpecialty = specialty == null || lawyer.specialties.contains(specialty);
-      final matchesRating = minRating == null || lawyer.rating >= minRating;
-      return matchesQuery && matchesSpecialty && matchesRating;
-    }).toList();
+    final filtered =
+        _lawyers.where((lawyer) {
+          final matchesQuery = query == null || query.isEmpty || lawyer.fullName.toLowerCase().contains(query.toLowerCase());
+          final matchesSpecialty = specialty == null || lawyer.specialties.contains(specialty);
+          final matchesRating = minRating == null || lawyer.rating >= minRating;
+          return matchesQuery && matchesSpecialty && matchesRating;
+        }).toList();
     filtered.sort((a, b) => b.rating.compareTo(a.rating));
     return filtered;
   }
@@ -89,6 +91,10 @@ class LawyersMockDataSource implements LawyersRemoteDataSource {
     return _lawyers.firstWhere((lawyer) => lawyer.id == id, orElse: () => throw const NotFoundFailure());
   }
 
+  /// Tests sign in as the seeded lawyer [kDemoLawyerId].
+  @override
+  Future<LawyerProfile> getMyProfile() => getLawyerById(kDemoLawyerId);
+
   @override
   Future<LawyerProfile> updateProfile(LawyerProfile profile) async {
     await _simulateLatency();
@@ -96,6 +102,12 @@ class LawyersMockDataSource implements LawyersRemoteDataSource {
     if (index == -1) throw const NotFoundFailure();
     _lawyers[index] = profile;
     return profile;
+  }
+
+  @override
+  Future<LawyerProfile> submitVerification(List<VerificationDocumentUpload> documents) async {
+    final current = await getMyProfile();
+    return updateProfile(current.copyWith(verificationStatus: VerificationStatus.pending, verificationRejectionReason: null));
   }
 
   Future<void> _simulateLatency() => Future.delayed(const Duration(milliseconds: 450));

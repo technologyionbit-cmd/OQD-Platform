@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import type { Server } from 'node:http';
 import request from 'supertest';
 import { createE2EApp } from './support/e2e-app';
+import { apiError, ok } from './support/e2e-helpers';
 import { OtpService } from '../src/auth/services/otp.service';
 import { DEFAULT_TERMS_VERSION } from '../src/config/configuration';
 
@@ -27,15 +28,6 @@ interface SessionView {
   id: string;
   current: boolean;
 }
-interface ErrorBody {
-  message: string;
-  code: string;
-  errors?: Record<string, string[]>;
-}
-
-const ok = <T>(res: request.Response): T => (res.body as { data: T }).data;
-const err = (res: request.Response): ErrorBody =>
-  (res.body as { error: ErrorBody }).error;
 
 describe('Auth (e2e)', () => {
   let app: INestApplication;
@@ -161,8 +153,8 @@ describe('Auth (e2e)', () => {
         .post('/v1/auth/register')
         .send({ ...individual, email: individual.email.toUpperCase() });
       expect(res.status).toBe(422);
-      expect(err(res).code).toBe('EMAIL_ALREADY_REGISTERED');
-      expect(err(res).errors?.email).toBeDefined();
+      expect(apiError(res).code).toBe('EMAIL_ALREADY_REGISTERED');
+      expect(apiError(res).errors?.email).toBeDefined();
     });
 
     it('rejects a taken commercial registration number with its own code', async () => {
@@ -170,8 +162,8 @@ describe('Auth (e2e)', () => {
         .post('/v1/auth/register')
         .send({ ...company, email: `company2.${tag}@test.com` });
       expect(res.status).toBe(422);
-      expect(err(res).code).toBe('COMMERCIAL_REGISTRATION_TAKEN');
-      expect(err(res).errors?.commercialRegistrationNumber).toBeDefined();
+      expect(apiError(res).code).toBe('COMMERCIAL_REGISTRATION_TAKEN');
+      expect(apiError(res).errors?.commercialRegistrationNumber).toBeDefined();
     });
 
     it('rejects a taken bar license number with its own code', async () => {
@@ -179,8 +171,8 @@ describe('Auth (e2e)', () => {
         .post('/v1/auth/register')
         .send({ ...lawyer, email: `lawyer2.${tag}@test.com` });
       expect(res.status).toBe(422);
-      expect(err(res).code).toBe('BAR_LICENSE_TAKEN');
-      expect(err(res).errors?.barLicenseNumber).toBeDefined();
+      expect(apiError(res).code).toBe('BAR_LICENSE_TAKEN');
+      expect(apiError(res).errors?.barLicenseNumber).toBeDefined();
     });
 
     it('requires explicit acceptance of the terms', async () => {
@@ -192,7 +184,7 @@ describe('Auth (e2e)', () => {
           acceptTerms: false,
         });
       expect(res.status).toBe(422);
-      expect(err(res).errors?.acceptTerms).toBeDefined();
+      expect(apiError(res).errors?.acceptTerms).toBeDefined();
     });
 
     it('rejects an outdated terms version with TERMS_VERSION_OUTDATED', async () => {
@@ -204,8 +196,8 @@ describe('Auth (e2e)', () => {
           termsVersion: '2000-01-01',
         });
       expect(res.status).toBe(422);
-      expect(err(res).code).toBe('TERMS_VERSION_OUTDATED');
-      expect(err(res).errors?.termsVersion).toBeDefined();
+      expect(apiError(res).code).toBe('TERMS_VERSION_OUTDATED');
+      expect(apiError(res).errors?.termsVersion).toBeDefined();
     });
 
     it('rejects a password over 72 bytes (bcrypt would truncate it)', async () => {
@@ -217,17 +209,19 @@ describe('Auth (e2e)', () => {
           password: 'a1' + 'ب'.repeat(36),
         });
       expect(res.status).toBe(422);
-      expect(err(res).errors?.password).toBeDefined();
+      expect(apiError(res).errors?.password).toBeDefined();
     });
 
     it('rejects a weak password with a 422', async () => {
-      const res = await request(http).post('/v1/auth/register').send({
-        ...individual,
-        email: `weak.${tag}@test.com`,
-        password: 'short',
-      });
+      const res = await request(http)
+        .post('/v1/auth/register')
+        .send({
+          ...individual,
+          email: `weak.${tag}@test.com`,
+          password: 'short',
+        });
       expect(res.status).toBe(422);
-      expect(err(res).errors?.password).toBeDefined();
+      expect(apiError(res).errors?.password).toBeDefined();
     });
   });
 
@@ -241,7 +235,7 @@ describe('Auth (e2e)', () => {
     it('returns a generic 401 for a bad password', async () => {
       const res = await login(individual.email, 'WrongPass123');
       expect(res.status).toBe(401);
-      expect(err(res).code).toBe('UNAUTHORIZED');
+      expect(apiError(res).code).toBe('UNAUTHORIZED');
     });
 
     it('answers an unknown email exactly like a wrong password', async () => {
@@ -263,7 +257,7 @@ describe('Auth (e2e)', () => {
       const blocked = await login(target, 'Guess10pass');
 
       expect(blocked.status).toBe(429);
-      expect(err(blocked).code).toBe('TOO_MANY_REQUESTS');
+      expect(apiError(blocked).code).toBe('TOO_MANY_REQUESTS');
       expect(Number(blocked.headers['retry-after'])).toBeGreaterThan(0);
       // Other accounts are unaffected.
       expect((await login(individual.email, individual.password)).status).toBe(
@@ -279,7 +273,7 @@ describe('Auth (e2e)', () => {
       try {
         const res = await login(company.email, company.password);
         expect(res.status).toBe(403);
-        expect(err(res).code).toBe('ACCOUNT_INACTIVE');
+        expect(apiError(res).code).toBe('ACCOUNT_INACTIVE');
 
         // Without the right password it stays an indistinguishable 401.
         const guess = await login(company.email, 'WrongPass123');
@@ -396,7 +390,7 @@ describe('Auth (e2e)', () => {
         .post('/v1/auth/password/verify-otp')
         .send({ email: company.email, code: wrong });
       expect(badVerify.status).toBe(422);
-      expect(err(badVerify).code).toBe('INVALID_VERIFICATION_CODE');
+      expect(apiError(badVerify).code).toBe('INVALID_VERIFICATION_CODE');
 
       const goodVerify = await request(http)
         .post('/v1/auth/password/verify-otp')
@@ -423,7 +417,7 @@ describe('Auth (e2e)', () => {
         .post('/v1/auth/password/reset')
         .send({ email: company.email, code, newPassword: 'Rotated456' });
       expect(reused.status).toBe(422);
-      expect(err(reused).code).toBe('INVALID_VERIFICATION_CODE');
+      expect(apiError(reused).code).toBe('INVALID_VERIFICATION_CODE');
     });
 
     it('rejects a reset with a wrong code (422 INVALID_VERIFICATION_CODE)', async () => {
@@ -433,7 +427,7 @@ describe('Auth (e2e)', () => {
         newPassword: 'Rotated999',
       });
       expect(res.status).toBe(422);
-      expect(err(res).code).toBe('INVALID_VERIFICATION_CODE');
+      expect(apiError(res).code).toBe('INVALID_VERIFICATION_CODE');
     });
 
     it('answers an unknown address with 204 and sends it nothing usable', async () => {
@@ -446,7 +440,7 @@ describe('Auth (e2e)', () => {
         .post('/v1/auth/password/reset')
         .send({ email, code, newPassword: 'Rotated123' });
       expect(res.status).toBe(422);
-      expect(err(res).code).toBe('INVALID_VERIFICATION_CODE');
+      expect(apiError(res).code).toBe('INVALID_VERIFICATION_CODE');
     });
 
     it('limits sends per address the same way for unknown addresses', async () => {
@@ -461,8 +455,8 @@ describe('Auth (e2e)', () => {
     it('refuses anything but an email address', async () => {
       const res = await forgot('+962790000000');
       expect(res.status).toBe(422);
-      expect(err(res).code).toBe('VALIDATION_ERROR');
-      expect(err(res).errors?.email).toBeDefined();
+      expect(apiError(res).code).toBe('VALIDATION_ERROR');
+      expect(apiError(res).errors?.email).toBeDefined();
     });
   });
 
@@ -496,14 +490,14 @@ describe('Auth (e2e)', () => {
         .set(auth())
         .send({});
       expect(book.status).toBe(403);
-      expect(err(book).code).toBe('EMAIL_NOT_VERIFIED');
+      expect(apiError(book).code).toBe('EMAIL_NOT_VERIFIED');
 
       const review = await request(http)
         .post(`/v1/consultations/${someId}/reviews`)
         .set(auth())
         .send({});
       expect(review.status).toBe(403);
-      expect(err(review).code).toBe('EMAIL_NOT_VERIFIED');
+      expect(apiError(review).code).toBe('EMAIL_NOT_VERIFIED');
 
       // Everything else keeps working.
       const list = await request(http).get('/v1/consultations').set(auth());
@@ -521,11 +515,9 @@ describe('Auth (e2e)', () => {
     });
 
     it('refuses a resend inside the cooldown with 429 + Retry-After', async () => {
-      const res = await request(http)
-        .post('/v1/auth/email/resend')
-        .set(auth());
+      const res = await request(http).post('/v1/auth/email/resend').set(auth());
       expect(res.status).toBe(429);
-      expect(err(res).code).toBe('TOO_MANY_REQUESTS');
+      expect(apiError(res).code).toBe('TOO_MANY_REQUESTS');
       const retryAfter = Number(res.headers['retry-after']);
       expect(retryAfter).toBeGreaterThan(0);
       expect(retryAfter).toBeLessThanOrEqual(60);
@@ -540,8 +532,8 @@ describe('Auth (e2e)', () => {
         .set(auth())
         .send({ code: wrong });
       expect(res.status).toBe(422);
-      expect(err(res).code).toBe('INVALID_VERIFICATION_CODE');
-      expect(err(res).errors?.code).toBeDefined();
+      expect(apiError(res).code).toBe('INVALID_VERIFICATION_CODE');
+      expect(apiError(res).errors?.code).toBeDefined();
     });
 
     it('resends after the cooldown and retires the previous code', async () => {
@@ -549,9 +541,7 @@ describe('Auth (e2e)', () => {
       const oldCode = otp.peekDevCode(verifier.email)!;
       await ageCodes(verifier.email, 61);
 
-      const res = await request(http)
-        .post('/v1/auth/email/resend')
-        .set(auth());
+      const res = await request(http).post('/v1/auth/email/resend').set(auth());
       expect(res.status).toBe(204);
 
       const newCode = otp.peekDevCode(verifier.email)!;
@@ -560,7 +550,7 @@ describe('Auth (e2e)', () => {
           .post('/v1/auth/email/verify')
           .set(auth())
           .send({ code: oldCode });
-        expect(err(stale).code).toBe('INVALID_VERIFICATION_CODE');
+        expect(apiError(stale).code).toBe('INVALID_VERIFICATION_CODE');
       }
     });
 
@@ -616,7 +606,7 @@ describe('Auth (e2e)', () => {
         .set(auth())
         .send({ fullName: verifier.fullName, email: lawyer.email });
       expect(res.status).toBe(422);
-      expect(err(res).code).toBe('EMAIL_ALREADY_REGISTERED');
+      expect(apiError(res).code).toBe('EMAIL_ALREADY_REGISTERED');
     });
 
     it('caps codes per account per hour', async () => {

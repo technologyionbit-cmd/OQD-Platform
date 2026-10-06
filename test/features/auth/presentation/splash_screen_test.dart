@@ -12,12 +12,10 @@ import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
-import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
-
-class _MockAuthRepository extends Mock implements AuthRepository {}
+import '../../../support/test_doubles.dart';
 
 void main() {
-  late _MockAuthRepository repository;
+  late MockAuthRepository repository;
 
   Future<void> pumpApp(WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({'prefs.onboarding_seen': true});
@@ -33,7 +31,7 @@ void main() {
     );
   }
 
-  setUp(() => repository = _MockAuthRepository());
+  setUp(() => repository = MockAuthRepository());
 
   testWidgets('shows the brand and a loader while the session resolves', (tester) async {
     final pending = Completer<Result<AuthUser?>>();

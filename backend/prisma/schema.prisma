@@ -33,6 +33,9 @@ enum UserRole {
   client
   lawyer
   company
+  /// Staff. Never self-registered: promote an existing account in the DB.
+  /// Reviews lawyer verification through /v1/admin.
+  admin
 }
 
 enum UserStatus {
@@ -222,6 +225,7 @@ model User {
   bookedConsultations      Consultation[]
   contracts                Contract[]
   contractSignatures       ContractSignature[]
+  notifications            Notification[]
 
   @@index([role])
   @@map("users")
@@ -451,15 +455,21 @@ model LawyerProfile {
   reviewsCount                Int                      @default(0) @map("reviews_count")
   verificationStatus          LawyerVerificationStatus @default(unverified) @map("verification_status")
   verificationRejectionReason String?                  @map("verification_rejection_reason")
+  /// When the lawyer last sent documents for review.
+  verificationSubmittedAt     DateTime?                @map("verification_submitted_at") @db.Timestamptz
+  /// The admin who approved or rejected the latest submission, and when.
+  verificationReviewedById    String?                  @map("verification_reviewed_by_id") @db.Uuid
+  verificationReviewedAt      DateTime?                @map("verification_reviewed_at") @db.Timestamptz
   createdAt                   DateTime                 @default(now()) @map("created_at") @db.Timestamptz
   updatedAt                   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz
 
-  user              User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  specialties       LawyerProfileSpecialty[]
-  offerings         LawyerConsultationOffering[]
-  reviews           Review[]
-  availabilitySlots AvailabilitySlot[]
-  consultations     Consultation[]
+  user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties           LawyerProfileSpecialty[]
+  offerings             LawyerConsultationOffering[]
+  reviews               Review[]
+  availabilitySlots     AvailabilitySlot[]
+  consultations         Consultation[]
+  verificationDocuments LawyerVerificationDocument[]
 
   @@index([verificationStatus])
   @@map("lawyer_profiles")
@@ -495,6 +505,25 @@ model LawyerConsultationOffering {
 
   @@unique([lawyerProfileId, consultationType])
   @@map("lawyer_consultation_offerings")
+}
+
+/// A file a lawyer sent to prove their license (ID, bar card). Stored on
+/// private disk under `storageKey` (see FileStorageService); only the
+/// owner and admins can reach it through the API. Kept after review as
+/// the audit trail of what was approved.
+model LawyerVerificationDocument {
+  id              String   @id @default(uuid()) @db.Uuid
+  lawyerProfileId String   @map("lawyer_profile_id") @db.Uuid
+  storageKey      String   @unique @map("storage_key")
+  originalName    String   @map("original_name")
+  mimeType        String   @map("mime_type")
+  sizeBytes       Int      @map("size_bytes")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([lawyerProfileId, createdAt])
+  @@map("lawyer_verification_documents")
 }
 
 /// The frontend's "Reviews" section was two hardcoded static entries in
@@ -702,4 +731,40 @@ model ContractSignature {
   @@unique([contractId, userId])
   @@index([userId])
   @@map("contract_signatures")
+}
+
+// -----------------------------------------------------------------------------
+// 8. Notifications
+// -----------------------------------------------------------------------------
+
+/// What happened. The app renders the title and body in the reader's
+/// language from the type and `params`.
+enum NotificationType {
+  consultationRequested
+  consultationAccepted
+  consultationRejected
+  consultationCancelled
+  consultationCompleted
+  consultationRescheduled
+  lawyerVerificationApproved
+  lawyerVerificationRejected
+}
+
+/// One event for one account. Written only by the server, in the same
+/// transaction as the change it reports.
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
+  /// Id of the entity it is about (for now always a consultation).
+  relatedId String?          @map("related_id") @db.Uuid
+  /// Values the text needs, e.g. {"actorName": "...", "scheduledAt": "..."}.
+  params    Json             @default("{}")
+  readAt    DateTime?        @map("read_at") @db.Timestamptz
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

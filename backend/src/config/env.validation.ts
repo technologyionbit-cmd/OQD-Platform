@@ -42,4 +42,7 @@ export const envValidationSchema = Joi.object({
   TERMS_VERSION: Joi.string()
     .max(32)
     .pattern(/^[\w.-]+$/),
+
+  // Storage — a relative path resolves against the working directory.
+  UPLOADS_DIR: Joi.string().default('storage/uploads'),
 });

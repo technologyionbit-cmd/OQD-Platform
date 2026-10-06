@@ -118,4 +118,19 @@ void main() {
 
     expect(failure, isA<RateLimitedFailure>().having((f) => f.retryAfter, 'retryAfter', isNull));
   });
+
+  test('guard returns the value, or rethrows any error as a Failure', () async {
+    expect(await mapper.guard(() async => 42), 42);
+    await expectLater(
+      mapper.guard<int>(() async => throw DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError)),
+      throwsA(isA<NetworkFailure>()),
+    );
+  });
+
+  test('capture wraps the value or the Failure in a Result', () async {
+    expect((await mapper.capture(() async => 42)).valueOrNull, 42);
+    final failed = await mapper.capture<int>(() async => throw StateError('boom'));
+    expect(failed.isFailure, isTrue);
+    failed.fold((failure) => expect(failure, isA<UnknownFailure>()), (_) => fail('expected a failure'));
+  });
 }

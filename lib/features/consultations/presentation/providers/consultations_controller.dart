@@ -1,18 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aqd_ionbit/core/errors/result.dart';
-import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
-import 'package:aqd_ionbit/core/localization/locale_controller.dart';
-import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/consultations/data/repositories/consultations_repository_impl.dart';
 import 'package:aqd_ionbit/features/consultations/domain/entities/consultation.dart';
 import 'package:aqd_ionbit/features/consultations/domain/repositories/consultations_repository.dart';
-import 'package:aqd_ionbit/features/notifications/domain/entities/notification_type.dart';
-import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
 
 /// The full consultations list (bookings + requests, every status) —
 /// client/lawyer/company screens all filter this by status client-side,
@@ -33,108 +27,21 @@ class ConsultationsController extends AsyncNotifier<List<Consultation>> {
     state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 
-  /// Notification title/body must reflect the app's *current* locale even
-  /// though this is a plain [AsyncNotifier] with no `BuildContext` — loading
-  /// the delegate directly off the persisted locale is the same trick used
-  /// wherever else this codebase needs l10n outside the widget tree. Falls
-  /// back to the app's default locale if `localeControllerProvider` isn't
-  /// wired up in the current container (e.g. a narrowly-scoped test that
-  /// only overrides the consultations/session providers it's exercising) —
-  /// a notification's language is never worth failing the underlying action
-  /// over.
-  Future<AppLocalizations> _l10n() async {
-    Locale locale;
-    try {
-      locale = ref.read(localeControllerProvider);
-    } catch (_) {
-      locale = const Locale('ar');
-    }
-    return AppLocalizations.delegate.load(locale);
-  }
+  Future<Result<Consultation>> acceptRequest(String id) => _thenRefresh(_repository.acceptRequest(id));
 
-  Future<Result<Consultation>> acceptRequest(String id) async {
-    final result = await _repository.acceptRequest(id);
-    if (result.isSuccess) {
-      await refresh();
-      final consultation = result.valueOrNull!;
-      final l10n = await _l10n();
-      await ref
-          .read(notificationsControllerProvider.notifier)
-          .create(
-            type: NotificationType.consultationAccepted,
-            title: l10n.notificationConsultationAcceptedTitle,
-            body: l10n.notificationConsultationAcceptedBody(consultation.lawyerName),
-            relatedId: consultation.id,
-            recipientUserId: kDemoClientUserId,
-          );
-    }
-    return result;
-  }
+  Future<Result<Consultation>> rejectRequest(String id, {String? reason}) => _thenRefresh(_repository.rejectRequest(id, reason: reason));
 
-  Future<Result<Consultation>> rejectRequest(String id, {String? reason}) async {
-    final result = await _repository.rejectRequest(id, reason: reason);
-    if (result.isSuccess) {
-      await refresh();
-      final consultation = result.valueOrNull!;
-      final l10n = await _l10n();
-      await ref
-          .read(notificationsControllerProvider.notifier)
-          .create(
-            type: NotificationType.consultationRejected,
-            title: l10n.notificationConsultationRejectedTitle,
-            body: l10n.notificationConsultationRejectedBody(consultation.lawyerName),
-            relatedId: consultation.id,
-            recipientUserId: kDemoClientUserId,
-          );
-    }
-    return result;
-  }
+  Future<Result<Consultation>> cancel(String id, {String? reason}) => _thenRefresh(_repository.cancel(id, reason: reason));
 
-  Future<Result<Consultation>> cancel(String id, {String? reason}) async {
-    final result = await _repository.cancel(id, reason: reason);
-    if (result.isSuccess) {
-      await refresh();
-      final consultation = result.valueOrNull!;
-      final l10n = await _l10n();
-      await ref
-          .read(notificationsControllerProvider.notifier)
-          .create(
-            type: NotificationType.consultationCancelled,
-            title: l10n.notificationConsultationCancelledTitle,
-            body: l10n.notificationConsultationCancelledBody,
-            relatedId: consultation.id,
-            // Simplified to the fixed demo client identity — `Consultation`
-            // has no `clientId` to derive "the other party" from regardless
-            // of who (client or lawyer) initiated the cancellation; a real
-            // backend would notify whichever side didn't act.
-            recipientUserId: kDemoClientUserId,
-          );
-    }
-    return result;
-  }
+  Future<Result<Consultation>> reschedule({required String id, required DateTime newDateTime}) =>
+      _thenRefresh(_repository.reschedule(id: id, newDateTime: newDateTime));
 
-  Future<Result<Consultation>> reschedule({required String id, required DateTime newDateTime}) async {
-    final result = await _repository.reschedule(id: id, newDateTime: newDateTime);
+  Future<Result<Consultation>> complete(String id) => _thenRefresh(_repository.complete(id));
+
+  /// The server notifies the other participant of each change itself.
+  Future<Result<Consultation>> _thenRefresh(Future<Result<Consultation>> action) async {
+    final result = await action;
     if (result.isSuccess) await refresh();
-    return result;
-  }
-
-  Future<Result<Consultation>> complete(String id) async {
-    final result = await _repository.complete(id);
-    if (result.isSuccess) {
-      await refresh();
-      final consultation = result.valueOrNull!;
-      final l10n = await _l10n();
-      await ref
-          .read(notificationsControllerProvider.notifier)
-          .create(
-            type: NotificationType.consultationCompleted,
-            title: l10n.notificationConsultationCompletedTitle,
-            body: l10n.notificationConsultationCompletedBody,
-            relatedId: consultation.id,
-            recipientUserId: kDemoClientUserId,
-          );
-    }
     return result;
   }
 

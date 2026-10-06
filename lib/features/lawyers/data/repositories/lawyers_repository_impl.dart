@@ -6,6 +6,7 @@ import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_remote_data_source.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_specialty.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_document_upload.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/repositories/lawyers_repository.dart';
 
 class LawyersRepositoryImpl implements LawyersRepository {
@@ -18,21 +19,20 @@ class LawyersRepositoryImpl implements LawyersRepository {
 
   @override
   Future<Result<List<LawyerProfile>>> getLawyers({String? query, LawyerSpecialty? specialty, double? minRating, int? page}) =>
-      _guard(() => _remote.getLawyers(query: query, specialty: specialty, minRating: minRating, page: page));
+      _errorMapper.capture(() => _remote.getLawyers(query: query, specialty: specialty, minRating: minRating, page: page));
 
   @override
-  Future<Result<LawyerProfile>> getLawyerById(String id) => _guard(() => _remote.getLawyerById(id));
+  Future<Result<LawyerProfile>> getLawyerById(String id) => _errorMapper.capture(() => _remote.getLawyerById(id));
 
   @override
-  Future<Result<LawyerProfile>> updateProfile(LawyerProfile profile) => _guard(() => _remote.updateProfile(profile));
+  Future<Result<LawyerProfile>> getMyProfile() => _errorMapper.capture(_remote.getMyProfile);
 
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
-  }
+  @override
+  Future<Result<LawyerProfile>> updateProfile(LawyerProfile profile) => _errorMapper.capture(() => _remote.updateProfile(profile));
+
+  @override
+  Future<Result<LawyerProfile>> submitVerification(List<VerificationDocumentUpload> documents) =>
+      _errorMapper.capture(() => _remote.submitVerification(documents));
 }
 
 final lawyersRepositoryProvider = Provider<LawyersRepository>((ref) {

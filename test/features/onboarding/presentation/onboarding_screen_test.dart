@@ -8,10 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:aqd_ionbit/app.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
-import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
-
-class _MockTokenManager extends Mock implements TokenManager {}
+import '../../../support/test_doubles.dart';
 
 void main() {
   late AppPreferences preferences;
@@ -19,7 +17,7 @@ void main() {
   Future<void> pumpFirstLaunch(WidgetTester tester, {List<Locale>? deviceLocales}) async {
     SharedPreferences.setMockInitialValues({});
     preferences = AppPreferences(await SharedPreferences.getInstance());
-    final tokenManager = _MockTokenManager();
+    final tokenManager = MockTokenManager();
     when(tokenManager.loadFromStorage).thenAnswer((_) async => null);
     when(() => tokenManager.current).thenReturn(null);
 

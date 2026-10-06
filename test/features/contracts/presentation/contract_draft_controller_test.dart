@@ -15,18 +15,13 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dar
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 import 'package:aqd_ionbit/features/documents/data/repositories/documents_repository_impl.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document_source_type.dart';
-import 'package:aqd_ionbit/features/documents/domain/repositories/documents_repository.dart';
 import '../../../support/signed_in_override.dart';
 import '../../../support/role_test_harness.dart' show FixedLocaleController;
-
-class MockContractsRepository extends Mock implements ContractsRepository {}
-
-class MockDocumentsRepository extends Mock implements DocumentsRepository {}
+import '../../../support/test_doubles.dart';
 
 const _template = ContractTemplate(
   id: 't1',

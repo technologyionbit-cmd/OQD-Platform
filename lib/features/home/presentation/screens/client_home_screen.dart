@@ -20,6 +20,7 @@ import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_card
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/providers/lawyers_controller.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/lawyer_card.dart';
+import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
 
 /// One tile in the "your legal services" grid — [gradientColors] stands in
 /// for the reference's photography (no bundled image assets in this repo),
@@ -95,6 +96,7 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
   Future<void> _refresh() => Future.wait([
     ref.read(contractsControllerProvider.notifier).refresh(),
     ref.read(lawyersControllerProvider.notifier).refresh(),
+    ref.read(notificationsControllerProvider.notifier).refresh(),
   ]);
 
   void _openService(_ServiceTile tile) {
@@ -111,6 +113,7 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     final user = ref.watch(authControllerProvider).value;
     final contractsState = ref.watch(contractsControllerProvider);
     final lawyersState = ref.watch(lawyersControllerProvider);
+    final unreadCount = ref.watch(unreadNotificationsCountProvider);
     final services = _services(l10n);
     final isSearching = _query.trim().isNotEmpty;
     final filteredServices = isSearching
@@ -124,10 +127,7 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
           children: [
             _ClientHomeHeader(
               greetingName: user?.fullName,
-              // Notifications are still mock data, so real accounts would see a
-              // made-up count. The badge comes back (watching
-              // unreadNotificationsCountProvider) with the notifications backend.
-              unreadCount: 0,
+              unreadCount: unreadCount,
               searchController: _searchController,
               onSearchChanged: (value) => setState(() => _query = value),
             ),

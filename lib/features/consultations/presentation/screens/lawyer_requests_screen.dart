@@ -16,7 +16,6 @@ import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/features/consultations/domain/entities/consultation.dart';
 import 'package:aqd_ionbit/features/consultations/domain/entities/consultation_status.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/providers/consultations_controller.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/consultation_type_x.dart';
 
 /// Pending consultation requests awaiting the demo lawyer's Accept/Reject
@@ -36,7 +35,7 @@ class LawyerRequestsScreen extends ConsumerWidget {
         AsyncData(value: final consultations) => Builder(
           builder: (context) {
             final pending = consultations
-                .where((c) => c.lawyerId == kDemoLawyerId && c.status == ConsultationStatus.pendingApproval)
+                .where((c) => c.status == ConsultationStatus.pendingApproval)
                 .toList();
             if (pending.isEmpty) {
               return EmptyState(title: l10n.lawyerRequestsEmptyTitle, message: l10n.lawyerRequestsEmptyMessage);

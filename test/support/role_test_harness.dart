@@ -13,7 +13,6 @@ import 'package:aqd_ionbit/core/storage/app_preferences.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
-import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/consultation_room/data/datasources/consultation_room_data_source_provider.dart';
 import 'package:aqd_ionbit/features/consultation_room/data/datasources/consultation_room_mock_data_source.dart';
@@ -25,14 +24,10 @@ import 'package:aqd_ionbit/features/gov_documents/data/datasources/gov_documents
 import 'package:aqd_ionbit/features/gov_documents/data/datasources/gov_documents_mock_data_source.dart';
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
-
-/// Shared by every Phase 5 router/shell test — pumping an authenticated
-/// `AqdApp` needs the same mock repository/token-manager/provider-override
-/// boilerplate regardless of which role or screen size the test actually
-/// cares about, so it lives here once instead of three times.
-class MockAuthRepository extends Mock implements AuthRepository {}
-
-class MockTokenManager extends Mock implements TokenManager {}
+import 'package:aqd_ionbit/features/notifications/data/datasources/notifications_data_source_provider.dart';
+import 'package:aqd_ionbit/features/notifications/data/datasources/notifications_mock_data_source.dart';
+import 'test_doubles.dart';
+export 'test_doubles.dart' show MockAuthRepository, MockTokenManager;
 
 /// Overrides [LocaleController.build] so a test can pin the locale
 /// directly instead of driving the language-toggle UI to get there.
@@ -96,6 +91,7 @@ Future<RoleTestHarness> pumpAuthenticatedApp(
       contractsRemoteDataSourceProvider.overrideWithValue(ContractsMockDataSource()),
       govDocumentsRemoteDataSourceProvider.overrideWithValue(GovDocumentsMockDataSource()),
       lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource()),
+      notificationsRemoteDataSourceProvider.overrideWithValue(NotificationsMockDataSource()),
       tokenManagerProvider.overrideWithValue(tokenManager),
       localeControllerProvider.overrideWith(() => FixedLocaleController(locale)),
     ],

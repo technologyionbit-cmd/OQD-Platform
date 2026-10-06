@@ -10,10 +10,9 @@ import 'package:aqd_ionbit/features/auth/domain/entities/auth_session.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
+import '../../../support/test_doubles.dart';
 
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
-
-class MockTokenManager extends Mock implements TokenManager {}
 
 void main() {
   const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', role: UserRole.client, emailVerified: true);

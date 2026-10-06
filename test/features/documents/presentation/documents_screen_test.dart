@@ -11,19 +11,14 @@ import 'package:aqd_ionbit/features/ai/domain/entities/contract_analysis.dart';
 import 'package:aqd_ionbit/features/ai/domain/repositories/ai_repository.dart';
 import 'package:aqd_ionbit/features/contracts/data/repositories/contracts_repository_impl.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/documents/data/repositories/documents_repository_impl.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document_source_type.dart';
-import 'package:aqd_ionbit/features/documents/domain/repositories/documents_repository.dart';
 import 'package:aqd_ionbit/features/documents/presentation/screens/documents_screen.dart';
 import '../../../support/signed_in_override.dart';
-
-class MockDocumentsRepository extends Mock implements DocumentsRepository {}
+import '../../../support/test_doubles.dart';
 
 class MockAiRepository extends Mock implements AiRepository {}
-
-class MockContractsRepository extends Mock implements ContractsRepository {}
 
 Document _document(String id, String title, {String? contractId}) {
   return Document(

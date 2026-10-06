@@ -5,7 +5,6 @@ import 'package:aqd_ionbit/core/network/api_error_mapper.dart';
 import 'package:aqd_ionbit/features/notifications/data/datasources/notifications_data_source_provider.dart';
 import 'package:aqd_ionbit/features/notifications/data/datasources/notifications_remote_data_source.dart';
 import 'package:aqd_ionbit/features/notifications/domain/entities/app_notification.dart';
-import 'package:aqd_ionbit/features/notifications/domain/entities/notification_type.dart';
 import 'package:aqd_ionbit/features/notifications/domain/repositories/notifications_repository.dart';
 
 class NotificationsRepositoryImpl implements NotificationsRepository {
@@ -17,35 +16,16 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   final ApiErrorMapper _errorMapper;
 
   @override
-  Future<Result<List<AppNotification>>> getNotifications() => _guard(_remote.getNotifications);
+  Future<Result<List<AppNotification>>> getNotifications() => _errorMapper.capture(_remote.getNotifications);
 
   @override
-  Future<Result<void>> markAsRead(String id) => _guard(() => _remote.markAsRead(id));
+  Future<Result<void>> markAsRead(String id) => _errorMapper.capture(() => _remote.markAsRead(id));
 
   @override
-  Future<Result<void>> markAllAsRead() => _guard(_remote.markAllAsRead);
+  Future<Result<void>> markAllAsRead() => _errorMapper.capture(_remote.markAllAsRead);
 
   @override
-  Future<Result<void>> deleteNotification(String id) => _guard(() => _remote.deleteNotification(id));
-
-  @override
-  Future<Result<AppNotification>> create({
-    required NotificationType type,
-    required String title,
-    required String body,
-    String? relatedId,
-    String? recipientUserId,
-  }) {
-    return _guard(() => _remote.create(type: type, title: title, body: body, relatedId: relatedId, recipientUserId: recipientUserId));
-  }
-
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
-  }
+  Future<Result<void>> deleteNotification(String id) => _errorMapper.capture(() => _remote.deleteNotification(id));
 }
 
 final notificationsRepositoryProvider = Provider<NotificationsRepository>((ref) {

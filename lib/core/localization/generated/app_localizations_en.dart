@@ -1010,11 +1010,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consultationMessageHint => 'Type a message...';
 
   @override
-  String get notificationConsultationBookedTitle => 'Consultation request sent';
+  String get notificationConsultationRequestedTitle =>
+      'New consultation request';
 
   @override
-  String notificationConsultationBookedBody(String lawyerName) {
-    return 'Waiting for $lawyerName to approve your consultation request';
+  String notificationConsultationRequestedBody(String name) {
+    return '$name sent you a consultation request';
   }
 
   @override
@@ -1022,8 +1023,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Consultation request accepted';
 
   @override
-  String notificationConsultationAcceptedBody(String lawyerName) {
-    return '$lawyerName approved your consultation request';
+  String notificationConsultationAcceptedBody(String name) {
+    return '$name approved your consultation request';
   }
 
   @override
@@ -1031,44 +1032,33 @@ class AppLocalizationsEn extends AppLocalizations {
       'Consultation request declined';
 
   @override
-  String notificationConsultationRejectedBody(String lawyerName) {
-    return '$lawyerName declined your consultation request';
+  String notificationConsultationRejectedBody(String name) {
+    return '$name declined your consultation request';
   }
 
   @override
   String get notificationConsultationCancelledTitle => 'Consultation cancelled';
 
   @override
-  String get notificationConsultationCancelledBody =>
-      'Your consultation appointment was cancelled';
+  String notificationConsultationCancelledBody(String name) {
+    return '$name cancelled the consultation';
+  }
 
   @override
   String get notificationConsultationCompletedTitle => 'Consultation ended';
 
   @override
-  String get notificationConsultationCompletedBody =>
-      'Your consultation session has ended';
-
-  @override
-  String get notificationNewMessageTitle => 'New message';
-
-  @override
-  String get notificationNewAttachmentBody => 'Sent you a new attachment';
-
-  @override
-  String get notificationDocumentUploadedTitle => 'Document uploaded';
-
-  @override
-  String notificationDocumentUploadedBody(String title) {
-    return '\"$title\" was added to your digital vault';
+  String notificationConsultationCompletedBody(String name) {
+    return 'Your consultation with $name has ended';
   }
 
   @override
-  String get notificationAiAnalysisTitle => 'Contract analysis complete';
+  String get notificationConsultationRescheduledTitle =>
+      'Consultation rescheduled';
 
   @override
-  String notificationAiAnalysisBody(String documentTitle) {
-    return 'Finished analyzing \"$documentTitle\"';
+  String notificationConsultationRescheduledBody(String name) {
+    return '$name moved the consultation to a new time';
   }
 
   @override
@@ -1609,6 +1599,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardStartSession => 'Start Session';
 
   @override
+  String get dashboardVerificationUnverifiedTitle =>
+      'Your account is not verified yet';
+
+  @override
+  String get dashboardVerificationUnverifiedMessage =>
+      'Clients can\'t see your profile or book you until your account is verified';
+
+  @override
+  String get dashboardVerificationPendingTitle => 'Verification under review';
+
+  @override
+  String get dashboardVerificationPendingMessage =>
+      'We\'ll review your documents soon; your profile goes live once approved';
+
+  @override
+  String get dashboardVerificationRejectedTitle => 'Verification rejected';
+
+  @override
+  String get dashboardVerificationRejectedMessage =>
+      'Review your profile and upload your verification documents again';
+
+  @override
+  String get dashboardVerificationAction => 'Complete verification';
+
+  @override
   String get earningsBalance => 'Total Earned';
 
   @override
@@ -1688,6 +1703,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get lawyerVerificationSubmittedMessage =>
       'Document submitted for review';
+
+  @override
+  String get lawyerVerificationDocumentsHint =>
+      'Upload your ID and bar card: JPG, PNG or PDF, up to 3 files, 10 MB each';
+
+  @override
+  String lawyerVerificationRejectedReason(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String get lawyerVerificationFileTooLarge =>
+      'One of the files is larger than 10 MB';
+
+  @override
+  String get lawyerVerificationTooManyFiles => 'You can upload at most 3 files';
+
+  @override
+  String get lawyerVerificationInvalidFile =>
+      'Only JPG, PNG or PDF files are accepted';
+
+  @override
+  String get lawyerVerificationAlreadyPending =>
+      'Your documents are already under review';
+
+  @override
+  String get notificationVerificationApprovedTitle =>
+      'Your account is verified';
+
+  @override
+  String get notificationVerificationApprovedBody =>
+      'Clients can now find your profile and book consultations with you';
+
+  @override
+  String get notificationVerificationRejectedTitle => 'Verification rejected';
+
+  @override
+  String notificationVerificationRejectedBody(String reason) {
+    return 'Reason: $reason';
+  }
 
   @override
   String get lawyerPriceLabel => 'Price';

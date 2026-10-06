@@ -19,10 +19,8 @@ import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
-import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/verify_email_screen.dart';
-
-class _MockAuthRepository extends Mock implements AuthRepository {}
+import '../../../support/test_doubles.dart';
 
 typedef _SessionResult = Result<({AuthUser user, AuthTokens tokens})>;
 
@@ -36,7 +34,7 @@ const _config = AppConfig(
 );
 
 void main() {
-  late _MockAuthRepository repository;
+  late MockAuthRepository repository;
   late List<Uri> openedLinks;
 
   setUpAll(() {
@@ -46,7 +44,7 @@ void main() {
   });
 
   setUp(() {
-    repository = _MockAuthRepository();
+    repository = MockAuthRepository();
     openedLinks = [];
     when(repository.restoreSession).thenAnswer((_) async => const Result.success(null));
   });

@@ -17,36 +17,28 @@ class AiRepositoryImpl implements AiRepository {
   final ApiErrorMapper _errorMapper;
 
   @override
-  Future<Result<List<AiConversation>>> getConversations() => _guard(_remote.getConversations);
+  Future<Result<List<AiConversation>>> getConversations() => _errorMapper.capture(_remote.getConversations);
 
   @override
-  Future<Result<AiConversation>> getConversationById(String id) => _guard(() => _remote.getConversationById(id));
+  Future<Result<AiConversation>> getConversationById(String id) => _errorMapper.capture(() => _remote.getConversationById(id));
 
   @override
   Future<Result<AiConversation>> sendMessage({required String text, String? conversationId}) {
-    return _guard(() => _remote.sendMessage(text: text, conversationId: conversationId));
+    return _errorMapper.capture(() => _remote.sendMessage(text: text, conversationId: conversationId));
   }
 
   @override
-  Future<Result<void>> clearConversation(String id) => _guard(() => _remote.clearConversation(id));
+  Future<Result<void>> clearConversation(String id) => _errorMapper.capture(() => _remote.clearConversation(id));
 
   @override
-  Future<Result<List<ContractAnalysis>>> getAnalyses() => _guard(_remote.getAnalyses);
+  Future<Result<List<ContractAnalysis>>> getAnalyses() => _errorMapper.capture(_remote.getAnalyses);
 
   @override
-  Future<Result<ContractAnalysis>> getAnalysisById(String id) => _guard(() => _remote.getAnalysisById(id));
+  Future<Result<ContractAnalysis>> getAnalysisById(String id) => _errorMapper.capture(() => _remote.getAnalysisById(id));
 
   @override
   Future<Result<ContractAnalysis>> analyzeDocument({required String documentTitle, String? sourceDocumentId}) {
-    return _guard(() => _remote.analyzeDocument(documentTitle: documentTitle, sourceDocumentId: sourceDocumentId));
-  }
-
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
+    return _errorMapper.capture(() => _remote.analyzeDocument(documentTitle: documentTitle, sourceDocumentId: sourceDocumentId));
   }
 }
 

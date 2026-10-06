@@ -20,25 +20,25 @@ class ConsultationRoomRepositoryImpl implements ConsultationRoomRepository {
 
   @override
   Future<Result<ConsultationRoomSession>> getSession(String consultationId, {required ConsultationType type}) {
-    return _guard(() => _remote.getSession(consultationId, type: type));
+    return _errorMapper.capture(() => _remote.getSession(consultationId, type: type));
   }
 
   @override
-  Future<Result<ConsultationRoomSession>> join(String consultationId) => _guard(() => _remote.join(consultationId));
+  Future<Result<ConsultationRoomSession>> join(String consultationId) => _errorMapper.capture(() => _remote.join(consultationId));
 
   @override
-  Future<Result<ConsultationRoomSession>> connect(String consultationId) => _guard(() => _remote.connect(consultationId));
+  Future<Result<ConsultationRoomSession>> connect(String consultationId) => _errorMapper.capture(() => _remote.connect(consultationId));
 
   @override
-  Future<Result<ConsultationRoomSession>> retryConnection(String consultationId) => _guard(() => _remote.retryConnection(consultationId));
+  Future<Result<ConsultationRoomSession>> retryConnection(String consultationId) => _errorMapper.capture(() => _remote.retryConnection(consultationId));
 
   @override
   Future<Result<ConsultationRoomSession>> reportConnectionLost(String consultationId) {
-    return _guard(() => _remote.reportConnectionLost(consultationId));
+    return _errorMapper.capture(() => _remote.reportConnectionLost(consultationId));
   }
 
   @override
-  Future<Result<ConsultationRoomSession>> endSession(String consultationId) => _guard(() => _remote.endSession(consultationId));
+  Future<Result<ConsultationRoomSession>> endSession(String consultationId) => _errorMapper.capture(() => _remote.endSession(consultationId));
 
   @override
   Future<Result<ConsultationRoomSession>> updateMetrics({
@@ -47,17 +47,9 @@ class ConsultationRoomRepositoryImpl implements ConsultationRoomRepository {
     bool? isCameraOn,
     bool? isSpeakerOn,
   }) {
-    return _guard(
+    return _errorMapper.capture(
       () => _remote.updateMetrics(consultationId: consultationId, isMuted: isMuted, isCameraOn: isCameraOn, isSpeakerOn: isSpeakerOn),
     );
-  }
-
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
   }
 }
 

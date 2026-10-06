@@ -1,12 +1,12 @@
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import type { Contract, ContractStatus, Prisma } from '@prisma/client';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { ApiErrorCode } from '../common/errors/api-error-codes';
+import type { Contract, ContractStatus, Prisma } from '@prisma/client';
+import {
+  conflict,
+  forbidden,
+  notFound,
+  validationFailed,
+} from '../common/errors/api-exceptions';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser, RequestContext } from '../auth/auth.types';
 import {
@@ -216,10 +216,7 @@ export class ContractsService {
 
   private assertMayWrite(user: AuthenticatedUser): void {
     if (user.role === 'lawyer') {
-      throw new ForbiddenException({
-        message: 'Lawyers cannot create or change contracts.',
-        code: ApiErrorCode.FORBIDDEN,
-      });
+      throw forbidden('Lawyers cannot create or change contracts.');
     }
   }
 
@@ -229,10 +226,7 @@ export class ContractsService {
       where: { id, ownerUserId: user.id },
     });
     if (!contract) {
-      throw new NotFoundException({
-        message: 'Contract not found.',
-        code: ApiErrorCode.NOT_FOUND,
-      });
+      throw notFound('Contract not found.');
     }
     return contract;
   }
@@ -251,11 +245,10 @@ export class ContractsService {
       requireAll,
     });
     if (Object.keys(errors).length > 0) {
-      throw new UnprocessableEntityException({
-        message: 'Some contract fields are missing or invalid.',
-        code: ApiErrorCode.VALIDATION_ERROR,
+      throw validationFailed(
         errors,
-      });
+        'Some contract fields are missing or invalid.',
+      );
     }
     return values;
   }
@@ -279,10 +272,10 @@ export class ContractsService {
 }
 
 function statusConflict(): ConflictException {
-  return new ConflictException({
-    message: 'The contract is not in a state that allows this.',
-    code: ApiErrorCode.CONTRACT_STATUS_CONFLICT,
-  });
+  return conflict(
+    'The contract is not in a state that allows this.',
+    ApiErrorCode.CONTRACT_STATUS_CONFLICT,
+  );
 }
 
 function toView(contract: Contract): ContractView {

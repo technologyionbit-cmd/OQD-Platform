@@ -18,7 +18,7 @@ import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/features/consultations/data/repositories/consultations_repository_impl.dart';
 import 'package:aqd_ionbit/features/consultations/domain/entities/availability_slot.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/providers/availability_provider.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
+import 'package:aqd_ionbit/features/lawyers/presentation/providers/my_lawyer_profile_provider.dart';
 
 /// The demo lawyer's own availability calendar — day view, add/remove
 /// slots. Slots already consumed by a booking ([AvailabilitySlot.isBooked])
@@ -51,7 +51,7 @@ class _LawyerScheduleScreenState extends ConsumerState<LawyerScheduleScreen> {
     if (!mounted) return;
     result.fold(
       (failure) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.scheduleActionFailedMessage))),
-      (_) => ref.invalidate(availabilityProvider(kDemoLawyerId)),
+      (_) => ref.invalidate(availabilityProvider),
     );
   }
 
@@ -80,12 +80,14 @@ class _LawyerScheduleScreenState extends ConsumerState<LawyerScheduleScreen> {
     );
     if (hour == null || !mounted) return;
     final start = DateTime(day.year, day.month, day.day, hour);
+    final lawyerId = ref.read(myLawyerProfileProvider).value?.id;
+    if (lawyerId == null) return;
     final repository = ref.read(consultationsRepositoryProvider);
-    final result = await repository.addAvailabilitySlot(lawyerId: kDemoLawyerId, start: start, end: start.add(const Duration(hours: 1)));
+    final result = await repository.addAvailabilitySlot(lawyerId: lawyerId, start: start, end: start.add(const Duration(hours: 1)));
     if (!mounted) return;
     result.fold(
       (failure) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.scheduleActionFailedMessage))),
-      (_) => ref.invalidate(availabilityProvider(kDemoLawyerId)),
+      (_) => ref.invalidate(availabilityProvider),
     );
   }
 
@@ -105,7 +107,7 @@ class _LawyerScheduleScreenState extends ConsumerState<LawyerScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final availabilityState = ref.watch(availabilityProvider(kDemoLawyerId));
+    final availabilityState = ref.watch(myAvailabilityProvider);
     final locale = Localizations.localeOf(context).toLanguageTag();
 
     return Scaffold(
@@ -225,7 +227,7 @@ class _LawyerScheduleScreenState extends ConsumerState<LawyerScheduleScreen> {
             );
           },
         ),
-        AsyncError() => ErrorView(message: l10n.errorGeneric, onRetry: () => ref.invalidate(availabilityProvider(kDemoLawyerId))),
+        AsyncError() => ErrorView(message: l10n.errorGeneric, onRetry: () => ref.invalidate(availabilityProvider)),
         _ => const LoadingView(),
       },
     );

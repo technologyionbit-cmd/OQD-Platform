@@ -1,9 +1,9 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { createHash, randomBytes } from 'node:crypto';
 import type { RefreshToken, UserRole } from '@prisma/client';
-import { ApiErrorCode } from '../../common/errors/api-error-codes';
+import { unauthorized } from '../../common/errors/api-exceptions';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { JwtConfig } from '../../config/configuration';
 import type {
@@ -62,7 +62,7 @@ export class TokenService {
     });
 
     if (!existing) {
-      throw this.unauthorized();
+      throw unauthorized('Session expired. Please sign in again.');
     }
 
     if (existing.revokedAt) {
@@ -71,15 +71,15 @@ export class TokenService {
         `Refresh token reuse detected for user ${existing.userId} — revoking all sessions`,
       );
       await this.revokeAllForUser(existing.userId);
-      throw this.unauthorized();
+      throw unauthorized('Session expired. Please sign in again.');
     }
 
     if (existing.expiresAt.getTime() <= Date.now()) {
-      throw this.unauthorized();
+      throw unauthorized('Session expired. Please sign in again.');
     }
 
     if (existing.user.status !== 'active') {
-      throw this.unauthorized();
+      throw unauthorized('Session expired. Please sign in again.');
     }
 
     const rawNext = this.generateRawRefreshToken();
@@ -167,7 +167,7 @@ export class TokenService {
       // Secret + expiry come from JwtModule.registerAsync (auth.module.ts).
       return this.jwt.verify<AccessTokenPayload>(token);
     } catch {
-      throw this.unauthorized();
+      throw unauthorized('Session expired. Please sign in again.');
     }
   }
 
@@ -208,12 +208,5 @@ export class TokenService {
     return new Date(
       Date.now() + this.jwtConfig.refreshTtlDays * 24 * 60 * 60 * 1000,
     );
-  }
-
-  private unauthorized(): UnauthorizedException {
-    return new UnauthorizedException({
-      message: 'Session expired. Please sign in again.',
-      code: ApiErrorCode.UNAUTHORIZED,
-    });
   }
 }

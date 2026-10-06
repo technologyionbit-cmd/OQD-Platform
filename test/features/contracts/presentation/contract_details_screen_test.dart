@@ -13,11 +13,9 @@ import 'package:aqd_ionbit/features/contracts/data/repositories/contracts_reposi
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_category.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_details_screen.dart';
 import '../../../support/signed_in_override.dart';
-
-class MockContractsRepository extends Mock implements ContractsRepository {}
+import '../../../support/test_doubles.dart';
 
 Contract _contract(ContractStatus status) => Contract(
   id: 'c1',

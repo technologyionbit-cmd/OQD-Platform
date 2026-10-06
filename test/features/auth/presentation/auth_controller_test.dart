@@ -11,11 +11,9 @@ import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
-import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/email_verification_prompt.dart';
-
-class MockAuthRepository extends Mock implements AuthRepository {}
+import '../../../support/test_doubles.dart';
 
 void main() {
   const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', role: UserRole.client, emailVerified: true);

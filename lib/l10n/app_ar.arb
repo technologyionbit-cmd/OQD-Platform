@@ -415,45 +415,46 @@
   "consultationEnd": "إنهاء الاستشارة",
   "consultationMessageHint": "اكتب رسالة...",
 
-  "notificationConsultationBookedTitle": "تم إرسال طلب الاستشارة",
-  "notificationConsultationBookedBody": "بانتظار موافقة المحامي {lawyerName} على طلب استشارتك",
-  "@notificationConsultationBookedBody": {
+  "notificationConsultationRequestedTitle": "طلب استشارة جديد",
+  "notificationConsultationRequestedBody": "أرسل لك {name} طلب استشارة",
+  "@notificationConsultationRequestedBody": {
     "placeholders": {
-      "lawyerName": {"type": "String"}
+      "name": {"type": "String"}
     }
   },
   "notificationConsultationAcceptedTitle": "تم قبول طلب الاستشارة",
-  "notificationConsultationAcceptedBody": "وافق المحامي {lawyerName} على طلب استشارتك",
+  "notificationConsultationAcceptedBody": "وافق {name} على طلب استشارتك",
   "@notificationConsultationAcceptedBody": {
     "placeholders": {
-      "lawyerName": {"type": "String"}
+      "name": {"type": "String"}
     }
   },
   "notificationConsultationRejectedTitle": "تم رفض طلب الاستشارة",
-  "notificationConsultationRejectedBody": "اعتذر المحامي {lawyerName} عن طلب استشارتك",
+  "notificationConsultationRejectedBody": "اعتذر {name} عن طلب استشارتك",
   "@notificationConsultationRejectedBody": {
     "placeholders": {
-      "lawyerName": {"type": "String"}
+      "name": {"type": "String"}
     }
   },
   "notificationConsultationCancelledTitle": "تم إلغاء الاستشارة",
-  "notificationConsultationCancelledBody": "تم إلغاء موعد استشارتك",
-  "notificationConsultationCompletedTitle": "انتهت الاستشارة",
-  "notificationConsultationCompletedBody": "انتهت جلسة استشارتك بنجاح",
-  "notificationNewMessageTitle": "رسالة جديدة",
-  "notificationNewAttachmentBody": "أرسل لك مرفقًا جديدًا",
-  "notificationDocumentUploadedTitle": "تم رفع مستند",
-  "notificationDocumentUploadedBody": "\"{title}\" أُضيف إلى خزنتك الرقمية",
-  "@notificationDocumentUploadedBody": {
+  "notificationConsultationCancelledBody": "ألغى {name} موعد الاستشارة",
+  "@notificationConsultationCancelledBody": {
     "placeholders": {
-      "title": {"type": "String"}
+      "name": {"type": "String"}
     }
   },
-  "notificationAiAnalysisTitle": "اكتمل تحليل العقد",
-  "notificationAiAnalysisBody": "تم الانتهاء من تحليل \"{documentTitle}\"",
-  "@notificationAiAnalysisBody": {
+  "notificationConsultationCompletedTitle": "انتهت الاستشارة",
+  "notificationConsultationCompletedBody": "انتهت استشارتك مع {name}",
+  "@notificationConsultationCompletedBody": {
     "placeholders": {
-      "documentTitle": {"type": "String"}
+      "name": {"type": "String"}
+    }
+  },
+  "notificationConsultationRescheduledTitle": "تم تغيير موعد الاستشارة",
+  "notificationConsultationRescheduledBody": "غيّر {name} موعد الاستشارة",
+  "@notificationConsultationRescheduledBody": {
+    "placeholders": {
+      "name": {"type": "String"}
     }
   },
 
@@ -647,6 +648,13 @@
   },
   "dashboardActiveSessionReady": "جاهزة للبدء الآن",
   "dashboardStartSession": "بدء الجلسة",
+  "dashboardVerificationUnverifiedTitle": "حسابك غير موثّق بعد",
+  "dashboardVerificationUnverifiedMessage": "لن يظهر ملفك للعملاء ولن يتمكنوا من حجز استشارة معك قبل توثيق حسابك",
+  "dashboardVerificationPendingTitle": "طلب التوثيق قيد المراجعة",
+  "dashboardVerificationPendingMessage": "سنراجع مستنداتك قريبًا، وسيظهر ملفك للعملاء بعد الموافقة",
+  "dashboardVerificationRejectedTitle": "تم رفض طلب التوثيق",
+  "dashboardVerificationRejectedMessage": "راجع ملفك وأعد رفع مستندات التوثيق",
+  "dashboardVerificationAction": "إكمال التوثيق",
 
   "earningsBalance": "إجمالي الأرباح",
   "earningsPending": "{amount} بانتظار الاستشارات القادمة",
@@ -677,6 +685,26 @@
   "lawyerUploadVerificationDocument": "رفع مستند توثيق",
   "lawyerVerificationDocumentPreviewTitle": "معاينة المستند",
   "lawyerVerificationSubmittedMessage": "تم إرسال المستند للمراجعة",
+  "lawyerVerificationDocumentsHint": "ارفع صورة هويتك وبطاقة النقابة: JPG أو PNG أو PDF، حتى 3 ملفات، و10 ميغابايت لكل ملف",
+  "lawyerVerificationRejectedReason": "سبب الرفض: {reason}",
+  "@lawyerVerificationRejectedReason": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
+  "lawyerVerificationFileTooLarge": "حجم أحد الملفات أكبر من 10 ميغابايت",
+  "lawyerVerificationTooManyFiles": "يمكنك رفع 3 ملفات كحد أقصى",
+  "lawyerVerificationInvalidFile": "نقبل فقط ملفات JPG أو PNG أو PDF",
+  "lawyerVerificationAlreadyPending": "مستنداتك قيد المراجعة بالفعل",
+  "notificationVerificationApprovedTitle": "تم توثيق حسابك",
+  "notificationVerificationApprovedBody": "أصبح ملفك ظاهرًا للعملاء ويمكنهم حجز استشارات معك",
+  "notificationVerificationRejectedTitle": "تم رفض طلب التوثيق",
+  "notificationVerificationRejectedBody": "السبب: {reason}",
+  "@notificationVerificationRejectedBody": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
   "lawyerPriceLabel": "السعر",
   "lawyerBioRequiredError": "يرجى كتابة نبذة تعريفية قبل الحفظ",
   "lawyerExperienceInvalidError": "أدخل عدد سنوات صحيحًا",

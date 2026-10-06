@@ -1,10 +1,5 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { ApiErrorCode } from '../common/errors/api-error-codes';
 import { ConfigService } from '@nestjs/config';
 import type {
   Prisma,
@@ -12,7 +7,7 @@ import type {
   UserRole,
   VerificationPurpose,
 } from '@prisma/client';
-import { ApiErrorCode } from '../common/errors/api-error-codes';
+import { forbidden, notFound, unauthorized } from '../common/errors/api-exceptions';
 import { RateLimitedException } from '../common/errors/rate-limited.exception';
 import type { AuthConfig } from '../config/configuration';
 import { PrismaService } from '../prisma/prisma.service';
@@ -179,17 +174,11 @@ export class AuthService {
     );
 
     if (!user || !ok) {
-      throw new UnauthorizedException({
-        message: 'Invalid email or password.',
-        code: ApiErrorCode.UNAUTHORIZED,
-      });
+      throw unauthorized('Invalid email or password.');
     }
 
     if (user.status !== 'active') {
-      throw new ForbiddenException({
-        message: 'This account is not active.',
-        code: ApiErrorCode.ACCOUNT_INACTIVE,
-      });
+      throw forbidden('This account is not active.', ApiErrorCode.ACCOUNT_INACTIVE);
     }
 
     const tokens = await this.tokens.issueSession(user.id, user.role, ctx);
@@ -230,10 +219,7 @@ export class AuthService {
       where: { id: userId },
     });
     if (!current) {
-      throw new NotFoundException({
-        message: 'Account not found.',
-        code: ApiErrorCode.NOT_FOUND,
-      });
+      throw notFound('Account not found.');
     }
 
     const emailChanged = current.email.toLowerCase() !== email;
@@ -398,10 +384,7 @@ export class AuthService {
   ): Promise<void> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      throw new UnauthorizedException({
-        message: 'Session expired. Please sign in again.',
-        code: ApiErrorCode.UNAUTHORIZED,
-      });
+      throw unauthorized('Session expired. Please sign in again.');
     }
 
     const ok = await this.passwords.verify(
@@ -435,10 +418,7 @@ export class AuthService {
   async revokeSession(userId: string, sessionId: string): Promise<void> {
     const revoked = await this.tokens.revokeSession(userId, sessionId);
     if (!revoked) {
-      throw new NotFoundException({
-        message: 'Session not found.',
-        code: ApiErrorCode.NOT_FOUND,
-      });
+      throw notFound('Session not found.');
     }
   }
 
@@ -464,10 +444,7 @@ export class AuthService {
   private async activeUser(userId: string): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user || user.status !== 'active') {
-      throw new UnauthorizedException({
-        message: 'Session expired. Please sign in again.',
-        code: ApiErrorCode.UNAUTHORIZED,
-      });
+      throw unauthorized('Session expired. Please sign in again.');
     }
     return user;
   }

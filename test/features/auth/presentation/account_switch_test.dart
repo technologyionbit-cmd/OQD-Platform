@@ -7,18 +7,13 @@ import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
-import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/contracts/data/repositories/contracts_repository_impl.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_category.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contracts_controller.dart';
-
-class _MockAuthRepository extends Mock implements AuthRepository {}
-
-class _MockContractsRepository extends Mock implements ContractsRepository {}
+import '../../../support/test_doubles.dart';
 
 const _alice = AuthUser(id: 'u_alice', fullName: 'Alice', email: 'alice@aqd.test', role: UserRole.client, emailVerified: true);
 const _bob = AuthUser(id: 'u_bob', fullName: 'Bob', email: 'bob@aqd.test', role: UserRole.client, emailVerified: true);
@@ -39,8 +34,8 @@ Contract _contractOf(String owner) => Contract(
 
 void main() {
   test('signing out and in as someone else never shows the previous account\'s data', () async {
-    final auth = _MockAuthRepository();
-    final contracts = _MockContractsRepository();
+    final auth = MockAuthRepository();
+    final contracts = MockContractsRepository();
     when(auth.restoreSession).thenAnswer((_) async => const Result.success(null));
     when(auth.logout).thenAnswer((_) async {});
     for (final user in [_alice, _bob]) {

@@ -14,17 +14,15 @@ import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
-import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
-
-class _MockAuthRepository extends Mock implements AuthRepository {}
+import '../../../support/test_doubles.dart';
 
 typedef _LoginResult = Result<({AuthUser user, AuthTokens tokens})>;
 
 void main() {
-  late _MockAuthRepository repository;
+  late MockAuthRepository repository;
 
   setUp(() {
-    repository = _MockAuthRepository();
+    repository = MockAuthRepository();
     when(repository.restoreSession).thenAnswer((_) async => const Result.success(null));
   });
 

@@ -1,18 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aqd_ionbit/core/errors/result.dart';
-import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
-import 'package:aqd_ionbit/core/localization/locale_controller.dart';
-import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/documents/data/repositories/documents_repository_impl.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document.dart';
 import 'package:aqd_ionbit/features/documents/domain/repositories/documents_repository.dart';
-import 'package:aqd_ionbit/features/notifications/domain/entities/notification_type.dart';
-import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
 
 class DocumentsController extends AsyncNotifier<List<Document>> {
   DocumentsRepository get _repository => ref.read(documentsRepositoryProvider);
@@ -39,26 +33,7 @@ class DocumentsController extends AsyncNotifier<List<Document>> {
 
   Future<Result<Document>> upload(String title) async {
     final result = await _repository.uploadDocument(title: title);
-    if (result.isSuccess) {
-      await refresh();
-      Locale locale;
-      try {
-        locale = ref.read(localeControllerProvider);
-      } catch (_) {
-        locale = const Locale('ar');
-      }
-      final l10n = await AppLocalizations.delegate.load(locale);
-      await ref
-          .read(notificationsControllerProvider.notifier)
-          .create(
-            type: NotificationType.documentUploaded,
-            title: l10n.notificationDocumentUploadedTitle,
-            body: l10n.notificationDocumentUploadedBody(title),
-            // Self-notification — whoever is signed in did the uploading,
-            // regardless of role (this feature is shared across all three).
-            recipientUserId: ref.read(authControllerProvider).value?.id,
-          );
-    }
+    if (result.isSuccess) await refresh();
     return result;
   }
 

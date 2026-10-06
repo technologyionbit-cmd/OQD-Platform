@@ -1,19 +1,16 @@
-/// Fixed, app-known taxonomy of notification events — mirrors how
-/// [ContractCategory]/[ContractStatus] are modeled as enums rather than
-/// arbitrary backend strings, since the app itself decides when each of
-/// these fires (contract generated, booking accepted, ...).
+/// The events the server notifies about — mirrors the backend's
+/// `NotificationType` enum. The app builds each notification's text from
+/// its type and params, so it always shows in the current language.
 enum NotificationType {
-  contractCreated,
-  contractUpdated,
-  contractReady,
-  contractRequiresAction,
-  consultationBooked,
+  /// A client asked a lawyer for a consultation (sent to the lawyer).
+  consultationRequested,
   consultationAccepted,
   consultationRejected,
   consultationCancelled,
   consultationCompleted,
-  consultationReminder,
-  newMessage,
-  documentUploaded,
-  aiAnalysisCompleted,
+  consultationRescheduled,
+  /// An admin approved the lawyer's verification (sent to the lawyer).
+  lawyerVerificationApproved,
+  /// An admin rejected it; `params['reason']` says why.
+  lawyerVerificationRejected,
 }

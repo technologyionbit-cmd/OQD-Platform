@@ -5,6 +5,7 @@ import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_remote_data
 import 'package:aqd_ionbit/features/lawyers/domain/entities/consultation_type.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_specialty.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_document_upload.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
 
 /// Dio-backed implementation talking to `<apiBaseUrl>/lawyers/*`
@@ -25,7 +26,7 @@ class LawyersRemoteDataSourceImpl implements LawyersRemoteDataSource {
 
   @override
   Future<List<LawyerProfile>> getLawyers({String? query, LawyerSpecialty? specialty, double? minRating, int? page}) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.get<Map<String, dynamic>>(
         '/lawyers',
         queryParameters: {
@@ -42,15 +43,23 @@ class LawyersRemoteDataSourceImpl implements LawyersRemoteDataSource {
 
   @override
   Future<LawyerProfile> getLawyerById(String id) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.get<Map<String, dynamic>>('/lawyers/$id');
       return _parseLawyer(res.data!['data'] as Map<String, dynamic>);
     });
   }
 
   @override
+  Future<LawyerProfile> getMyProfile() {
+    return _errorMapper.guard(() async {
+      final res = await _dio.get<Map<String, dynamic>>('/lawyers/me');
+      return _parseLawyer(res.data!['data'] as Map<String, dynamic>);
+    });
+  }
+
+  @override
   Future<LawyerProfile> updateProfile(LawyerProfile profile) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.patch<Map<String, dynamic>>(
         '/lawyers/me',
         data: {
@@ -64,10 +73,19 @@ class LawyersRemoteDataSourceImpl implements LawyersRemoteDataSource {
     });
   }
 
+  @override
+  Future<LawyerProfile> submitVerification(List<VerificationDocumentUpload> documents) {
+    return _errorMapper.guard(() async {
+      final form = FormData.fromMap({
+        'documents': [for (final doc in documents) MultipartFile.fromBytes(doc.bytes, filename: doc.fileName)],
+      });
+      final res = await _dio.post<Map<String, dynamic>>('/lawyers/me/verification', data: form);
+      return _parseLawyer(res.data!['data'] as Map<String, dynamic>);
+    });
+  }
+
   LawyerProfile _parseLawyer(Map<String, dynamic> row) {
-    final pricing = (row['pricing'] as Map<String, dynamic>).map(
-      (key, value) => MapEntry(ConsultationType.values.byName(key), (value as num).toDouble()),
-    );
+    final pricing = (row['pricing'] as Map<String, dynamic>).map((key, value) => MapEntry(ConsultationType.values.byName(key), (value as num).toDouble()));
     return LawyerProfile(
       id: row['id'] as String,
       fullName: row['fullName'] as String,
@@ -76,22 +94,10 @@ class LawyersRemoteDataSourceImpl implements LawyersRemoteDataSource {
       yearsOfExperience: row['yearsOfExperience'] as int,
       rating: (row['rating'] as num).toDouble(),
       reviewsCount: row['reviewsCount'] as int,
-      consultationTypes: (row['consultationTypes'] as List)
-          .cast<String>()
-          .map(ConsultationType.values.byName)
-          .toList(growable: false),
+      consultationTypes: (row['consultationTypes'] as List).cast<String>().map(ConsultationType.values.byName).toList(growable: false),
       pricing: pricing,
       verificationStatus: VerificationStatus.values.byName(row['verificationStatus'] as String),
+      verificationRejectionReason: row['verificationRejectionReason'] as String?,
     );
-  }
-
-  /// Runs [action], translating any [DioException] (or unexpected error)
-  /// into a typed [Failure] before it escapes this layer.
-  Future<T> _call<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } catch (error) {
-      throw _errorMapper.map(error);
-    }
   }
 }

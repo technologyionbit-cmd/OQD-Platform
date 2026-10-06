@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:aqd_ionbit/features/notifications/data/datasources/notifications_mock_data_source.dart';
-import 'package:aqd_ionbit/features/notifications/domain/entities/notification_type.dart';
 
 void main() {
   late NotificationsMockDataSource dataSource;
@@ -11,7 +10,7 @@ void main() {
   test('getNotifications returns the seeded notifications sorted by most-recent first', () async {
     final notifications = await dataSource.getNotifications();
 
-    expect(notifications.length, 5);
+    expect(notifications.length, 3);
     for (var i = 1; i < notifications.length; i++) {
       expect(notifications[i - 1].createdAt.isAfter(notifications[i].createdAt) || notifications[i - 1].createdAt.isAtSameMomentAs(notifications[i].createdAt), isTrue);
     }
@@ -41,16 +40,4 @@ void main() {
     expect(after.any((n) => n.id == 'n_seed_1'), isFalse);
   });
 
-  test('create inserts a new unread notification at the top', () async {
-    final created = await dataSource.create(
-      type: NotificationType.contractReady,
-      title: 'عنوان',
-      body: 'نص',
-      relatedId: 'c_1',
-    );
-
-    expect(created.isRead, isFalse);
-    final notifications = await dataSource.getNotifications();
-    expect(notifications.first.id, created.id);
-  });
 }

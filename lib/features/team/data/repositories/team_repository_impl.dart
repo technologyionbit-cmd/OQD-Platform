@@ -17,28 +17,20 @@ class TeamRepositoryImpl implements TeamRepository {
   final ApiErrorMapper _errorMapper;
 
   @override
-  Future<Result<List<TeamMember>>> getMembers() => _guard(_remote.getMembers);
+  Future<Result<List<TeamMember>>> getMembers() => _errorMapper.capture(_remote.getMembers);
 
   @override
   Future<Result<TeamMember>> addMember({required String fullName, required String email, required TeamMemberRole role}) {
-    return _guard(() => _remote.addMember(fullName: fullName, email: email, role: role));
+    return _errorMapper.capture(() => _remote.addMember(fullName: fullName, email: email, role: role));
   }
 
   @override
   Future<Result<TeamMember>> updateMemberRole({required String id, required TeamMemberRole role}) {
-    return _guard(() => _remote.updateMemberRole(id: id, role: role));
+    return _errorMapper.capture(() => _remote.updateMemberRole(id: id, role: role));
   }
 
   @override
-  Future<Result<void>> removeMember(String id) => _guard(() => _remote.removeMember(id));
-
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
-  }
+  Future<Result<void>> removeMember(String id) => _errorMapper.capture(() => _remote.removeMember(id));
 }
 
 final teamRepositoryProvider = Provider<TeamRepository>((ref) {

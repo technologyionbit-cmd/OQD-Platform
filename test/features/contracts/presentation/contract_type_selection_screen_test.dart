@@ -14,12 +14,10 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_category.
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_type_selection_screen.dart';
 import '../../../support/signed_in_override.dart';
-
-class MockContractsRepository extends Mock implements ContractsRepository {}
+import '../../../support/test_doubles.dart';
 
 class _FixedLocaleController extends LocaleController {
   @override

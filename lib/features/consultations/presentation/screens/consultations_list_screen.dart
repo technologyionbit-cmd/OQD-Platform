@@ -17,24 +17,19 @@ import 'package:aqd_ionbit/features/consultations/presentation/widgets/consultat
 /// Shared by client, lawyer, and company — [showLawyerName] flips which
 /// party's name each card shows, [includePendingTab] hides the "Pending"
 /// tab on the lawyer side (which has its own dedicated Requests screen for
-/// that), [routeBase] picks whose details route tapping a card pushes, and
-/// [lawyerId] (set only from the lawyer-side route registration) scopes the
-/// list to that lawyer's own bookings — the mock store holds more than one
-/// lawyer's consultations, so without this a lawyer would see every other
-/// lawyer's bookings too.
+/// that), and [routeBase] picks whose details route tapping a card pushes.
+/// The server returns only the signed-in account's own consultations.
 class ConsultationsListScreen extends ConsumerStatefulWidget {
   const ConsultationsListScreen({
     super.key,
     this.routeBase = RoutePaths.clientBase,
     this.showLawyerName = true,
     this.includePendingTab = true,
-    this.lawyerId,
   });
 
   final String routeBase;
   final bool showLawyerName;
   final bool includePendingTab;
-  final String? lawyerId;
 
   @override
   ConsumerState<ConsultationsListScreen> createState() => _ConsultationsListScreenState();
@@ -82,9 +77,7 @@ class _ConsultationsListScreenState extends ConsumerState<ConsultationsListScree
             children: [
               for (final status in _tabStatuses)
                 _StatusTab(
-                  consultations: consultations
-                      .where((c) => c.status == status && (widget.lawyerId == null || c.lawyerId == widget.lawyerId))
-                      .toList(),
+                  consultations: consultations.where((c) => c.status == status).toList(),
                   routeBase: widget.routeBase,
                   showLawyerName: widget.showLawyerName,
                 ),

@@ -24,7 +24,7 @@ class ContractsRemoteDataSourceImpl implements ContractsRemoteDataSource {
 
   @override
   Future<List<ContractTemplate>> getTemplates(Locale locale) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.get<Map<String, dynamic>>('/contract-templates', queryParameters: {'locale': _languageOf(locale)});
       return _rows(res.data).map(_parseTemplate).toList(growable: false);
     });
@@ -32,7 +32,7 @@ class ContractsRemoteDataSourceImpl implements ContractsRemoteDataSource {
 
   @override
   Future<List<Contract>> getContracts() {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.get<Map<String, dynamic>>('/contracts');
       return _rows(res.data).map(_parseContract).toList(growable: false);
     });
@@ -40,7 +40,7 @@ class ContractsRemoteDataSourceImpl implements ContractsRemoteDataSource {
 
   @override
   Future<Contract> getContractById(String id) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.get<Map<String, dynamic>>('/contracts/$id');
       return _parseContract(_data(res.data));
     });
@@ -53,7 +53,7 @@ class ContractsRemoteDataSourceImpl implements ContractsRemoteDataSource {
     required Locale locale,
     String? contractId,
   }) {
-    return _call(() => _saveDraft(template: template, fieldValues: fieldValues, locale: locale, contractId: contractId));
+    return _errorMapper.guard(() => _saveDraft(template: template, fieldValues: fieldValues, locale: locale, contractId: contractId));
   }
 
   /// Saves the latest values first, so the text is built from exactly
@@ -65,7 +65,7 @@ class ContractsRemoteDataSourceImpl implements ContractsRemoteDataSource {
     required Locale locale,
     String? contractId,
   }) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final draft = await _saveDraft(template: template, fieldValues: fieldValues, locale: locale, contractId: contractId);
       final res = await _dio.post<Map<String, dynamic>>('/contracts/${draft.id}/generate', data: {'locale': _languageOf(locale)});
       return _parseContract(_data(res.data));
@@ -74,7 +74,7 @@ class ContractsRemoteDataSourceImpl implements ContractsRemoteDataSource {
 
   @override
   Future<Contract> signContract(String id) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.post<Map<String, dynamic>>('/contracts/$id/sign');
       return _parseContract(_data(res.data));
     });
@@ -82,7 +82,7 @@ class ContractsRemoteDataSourceImpl implements ContractsRemoteDataSource {
 
   @override
   Future<void> deleteContract(String id) {
-    return _call(() => _dio.delete<void>('/contracts/$id'));
+    return _errorMapper.guard(() => _dio.delete<void>('/contracts/$id'));
   }
 
   Future<Contract> _saveDraft({
@@ -140,15 +140,5 @@ class ContractsRemoteDataSourceImpl implements ContractsRemoteDataSource {
       templateId: json['templateId'] as String,
       generatedContent: json['generatedContent'] as String? ?? '',
     );
-  }
-
-  /// Runs [action], translating any [DioException] (or unexpected error)
-  /// into a typed `Failure` before it escapes this layer.
-  Future<T> _call<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } catch (error) {
-      throw _errorMapper.map(error);
-    }
   }
 }

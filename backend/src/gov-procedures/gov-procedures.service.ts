@@ -1,5 +1,5 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { ApiErrorCode } from '../common/errors/api-error-codes';
+import { Injectable } from '@nestjs/common';
+import { badRequest, notFound } from '../common/errors/api-exceptions';
 import { PrismaService } from '../prisma/prisma.service';
 import type { UpdateGovProcedureProgressDto } from './dto/update-progress.dto';
 
@@ -29,7 +29,7 @@ export class GovProceduresService {
       },
     });
     if (!procedure) {
-      throw this.notFound();
+      throw notFound('Government procedure not found.');
     }
     return procedure;
   }
@@ -63,10 +63,7 @@ export class GovProceduresService {
 
     if (dto.toggleDocumentId) {
       if (!requiredDocumentIds.has(dto.toggleDocumentId)) {
-        throw new BadRequestException({
-          message: 'Document does not belong to this procedure.',
-          code: ApiErrorCode.BAD_REQUEST,
-        });
+        throw badRequest('Document does not belong to this procedure.');
       }
       if (!checked.delete(dto.toggleDocumentId)) {
         checked.add(dto.toggleDocumentId);
@@ -95,7 +92,7 @@ export class GovProceduresService {
       select: { id: true },
     });
     if (!exists) {
-      throw this.notFound();
+      throw notFound('Government procedure not found.');
     }
   }
 
@@ -105,15 +102,8 @@ export class GovProceduresService {
       include: { requiredDocuments: { select: { id: true } } },
     });
     if (!procedure) {
-      throw this.notFound();
+      throw notFound('Government procedure not found.');
     }
     return new Set(procedure.requiredDocuments.map((doc) => doc.id));
-  }
-
-  private notFound(): NotFoundException {
-    return new NotFoundException({
-      message: 'Government procedure not found.',
-      code: ApiErrorCode.NOT_FOUND,
-    });
   }
 }

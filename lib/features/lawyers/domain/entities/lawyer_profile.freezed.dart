@@ -14,7 +14,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LawyerProfile {
 
- String get id; String get fullName; List<LawyerSpecialty> get specialties; String get bio; int get yearsOfExperience; double get rating; int get reviewsCount; List<ConsultationType> get consultationTypes; Map<ConsultationType, double> get pricing; VerificationStatus get verificationStatus;
+ String get id; String get fullName; List<LawyerSpecialty> get specialties; String get bio; int get yearsOfExperience; double get rating; int get reviewsCount; List<ConsultationType> get consultationTypes; Map<ConsultationType, double> get pricing; VerificationStatus get verificationStatus;/// Why an admin rejected verification — only on the lawyer's own
+/// profile (`GET /lawyers/me`), never on public ones.
+ String? get verificationRejectionReason;
 /// Create a copy of LawyerProfile
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +27,16 @@ $LawyerProfileCopyWith<LawyerProfile> get copyWith => _$LawyerProfileCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LawyerProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&const DeepCollectionEquality().equals(other.specialties, specialties)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.yearsOfExperience, yearsOfExperience) || other.yearsOfExperience == yearsOfExperience)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.reviewsCount, reviewsCount) || other.reviewsCount == reviewsCount)&&const DeepCollectionEquality().equals(other.consultationTypes, consultationTypes)&&const DeepCollectionEquality().equals(other.pricing, pricing)&&(identical(other.verificationStatus, verificationStatus) || other.verificationStatus == verificationStatus));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LawyerProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&const DeepCollectionEquality().equals(other.specialties, specialties)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.yearsOfExperience, yearsOfExperience) || other.yearsOfExperience == yearsOfExperience)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.reviewsCount, reviewsCount) || other.reviewsCount == reviewsCount)&&const DeepCollectionEquality().equals(other.consultationTypes, consultationTypes)&&const DeepCollectionEquality().equals(other.pricing, pricing)&&(identical(other.verificationStatus, verificationStatus) || other.verificationStatus == verificationStatus)&&(identical(other.verificationRejectionReason, verificationRejectionReason) || other.verificationRejectionReason == verificationRejectionReason));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,fullName,const DeepCollectionEquality().hash(specialties),bio,yearsOfExperience,rating,reviewsCount,const DeepCollectionEquality().hash(consultationTypes),const DeepCollectionEquality().hash(pricing),verificationStatus);
+int get hashCode => Object.hash(runtimeType,id,fullName,const DeepCollectionEquality().hash(specialties),bio,yearsOfExperience,rating,reviewsCount,const DeepCollectionEquality().hash(consultationTypes),const DeepCollectionEquality().hash(pricing),verificationStatus,verificationRejectionReason);
 
 @override
 String toString() {
-  return 'LawyerProfile(id: $id, fullName: $fullName, specialties: $specialties, bio: $bio, yearsOfExperience: $yearsOfExperience, rating: $rating, reviewsCount: $reviewsCount, consultationTypes: $consultationTypes, pricing: $pricing, verificationStatus: $verificationStatus)';
+  return 'LawyerProfile(id: $id, fullName: $fullName, specialties: $specialties, bio: $bio, yearsOfExperience: $yearsOfExperience, rating: $rating, reviewsCount: $reviewsCount, consultationTypes: $consultationTypes, pricing: $pricing, verificationStatus: $verificationStatus, verificationRejectionReason: $verificationRejectionReason)';
 }
 
 
@@ -45,7 +47,7 @@ abstract mixin class $LawyerProfileCopyWith<$Res>  {
   factory $LawyerProfileCopyWith(LawyerProfile value, $Res Function(LawyerProfile) _then) = _$LawyerProfileCopyWithImpl;
 @useResult
 $Res call({
- String id, String fullName, List<LawyerSpecialty> specialties, String bio, int yearsOfExperience, double rating, int reviewsCount, List<ConsultationType> consultationTypes, Map<ConsultationType, double> pricing, VerificationStatus verificationStatus
+ String id, String fullName, List<LawyerSpecialty> specialties, String bio, int yearsOfExperience, double rating, int reviewsCount, List<ConsultationType> consultationTypes, Map<ConsultationType, double> pricing, VerificationStatus verificationStatus, String? verificationRejectionReason
 });
 
 
@@ -62,7 +64,7 @@ class _$LawyerProfileCopyWithImpl<$Res>
 
 /// Create a copy of LawyerProfile
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fullName = null,Object? specialties = null,Object? bio = null,Object? yearsOfExperience = null,Object? rating = null,Object? reviewsCount = null,Object? consultationTypes = null,Object? pricing = null,Object? verificationStatus = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fullName = null,Object? specialties = null,Object? bio = null,Object? yearsOfExperience = null,Object? rating = null,Object? reviewsCount = null,Object? consultationTypes = null,Object? pricing = null,Object? verificationStatus = null,Object? verificationRejectionReason = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
@@ -74,7 +76,8 @@ as double,reviewsCount: null == reviewsCount ? _self.reviewsCount : reviewsCount
 as int,consultationTypes: null == consultationTypes ? _self.consultationTypes : consultationTypes // ignore: cast_nullable_to_non_nullable
 as List<ConsultationType>,pricing: null == pricing ? _self.pricing : pricing // ignore: cast_nullable_to_non_nullable
 as Map<ConsultationType, double>,verificationStatus: null == verificationStatus ? _self.verificationStatus : verificationStatus // ignore: cast_nullable_to_non_nullable
-as VerificationStatus,
+as VerificationStatus,verificationRejectionReason: freezed == verificationRejectionReason ? _self.verificationRejectionReason : verificationRejectionReason // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -159,10 +162,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fullName,  List<LawyerSpecialty> specialties,  String bio,  int yearsOfExperience,  double rating,  int reviewsCount,  List<ConsultationType> consultationTypes,  Map<ConsultationType, double> pricing,  VerificationStatus verificationStatus)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fullName,  List<LawyerSpecialty> specialties,  String bio,  int yearsOfExperience,  double rating,  int reviewsCount,  List<ConsultationType> consultationTypes,  Map<ConsultationType, double> pricing,  VerificationStatus verificationStatus,  String? verificationRejectionReason)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LawyerProfile() when $default != null:
-return $default(_that.id,_that.fullName,_that.specialties,_that.bio,_that.yearsOfExperience,_that.rating,_that.reviewsCount,_that.consultationTypes,_that.pricing,_that.verificationStatus);case _:
+return $default(_that.id,_that.fullName,_that.specialties,_that.bio,_that.yearsOfExperience,_that.rating,_that.reviewsCount,_that.consultationTypes,_that.pricing,_that.verificationStatus,_that.verificationRejectionReason);case _:
   return orElse();
 
 }
@@ -180,10 +183,10 @@ return $default(_that.id,_that.fullName,_that.specialties,_that.bio,_that.yearsO
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fullName,  List<LawyerSpecialty> specialties,  String bio,  int yearsOfExperience,  double rating,  int reviewsCount,  List<ConsultationType> consultationTypes,  Map<ConsultationType, double> pricing,  VerificationStatus verificationStatus)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fullName,  List<LawyerSpecialty> specialties,  String bio,  int yearsOfExperience,  double rating,  int reviewsCount,  List<ConsultationType> consultationTypes,  Map<ConsultationType, double> pricing,  VerificationStatus verificationStatus,  String? verificationRejectionReason)  $default,) {final _that = this;
 switch (_that) {
 case _LawyerProfile():
-return $default(_that.id,_that.fullName,_that.specialties,_that.bio,_that.yearsOfExperience,_that.rating,_that.reviewsCount,_that.consultationTypes,_that.pricing,_that.verificationStatus);case _:
+return $default(_that.id,_that.fullName,_that.specialties,_that.bio,_that.yearsOfExperience,_that.rating,_that.reviewsCount,_that.consultationTypes,_that.pricing,_that.verificationStatus,_that.verificationRejectionReason);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -200,10 +203,10 @@ return $default(_that.id,_that.fullName,_that.specialties,_that.bio,_that.yearsO
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fullName,  List<LawyerSpecialty> specialties,  String bio,  int yearsOfExperience,  double rating,  int reviewsCount,  List<ConsultationType> consultationTypes,  Map<ConsultationType, double> pricing,  VerificationStatus verificationStatus)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fullName,  List<LawyerSpecialty> specialties,  String bio,  int yearsOfExperience,  double rating,  int reviewsCount,  List<ConsultationType> consultationTypes,  Map<ConsultationType, double> pricing,  VerificationStatus verificationStatus,  String? verificationRejectionReason)?  $default,) {final _that = this;
 switch (_that) {
 case _LawyerProfile() when $default != null:
-return $default(_that.id,_that.fullName,_that.specialties,_that.bio,_that.yearsOfExperience,_that.rating,_that.reviewsCount,_that.consultationTypes,_that.pricing,_that.verificationStatus);case _:
+return $default(_that.id,_that.fullName,_that.specialties,_that.bio,_that.yearsOfExperience,_that.rating,_that.reviewsCount,_that.consultationTypes,_that.pricing,_that.verificationStatus,_that.verificationRejectionReason);case _:
   return null;
 
 }
@@ -215,7 +218,7 @@ return $default(_that.id,_that.fullName,_that.specialties,_that.bio,_that.yearsO
 
 
 class _LawyerProfile implements LawyerProfile {
-  const _LawyerProfile({required this.id, required this.fullName, required final  List<LawyerSpecialty> specialties, required this.bio, required this.yearsOfExperience, required this.rating, required this.reviewsCount, required final  List<ConsultationType> consultationTypes, required final  Map<ConsultationType, double> pricing, this.verificationStatus = VerificationStatus.verified}): _specialties = specialties,_consultationTypes = consultationTypes,_pricing = pricing;
+  const _LawyerProfile({required this.id, required this.fullName, required final  List<LawyerSpecialty> specialties, required this.bio, required this.yearsOfExperience, required this.rating, required this.reviewsCount, required final  List<ConsultationType> consultationTypes, required final  Map<ConsultationType, double> pricing, this.verificationStatus = VerificationStatus.verified, this.verificationRejectionReason}): _specialties = specialties,_consultationTypes = consultationTypes,_pricing = pricing;
   
 
 @override final  String id;
@@ -246,6 +249,9 @@ class _LawyerProfile implements LawyerProfile {
 }
 
 @override@JsonKey() final  VerificationStatus verificationStatus;
+/// Why an admin rejected verification — only on the lawyer's own
+/// profile (`GET /lawyers/me`), never on public ones.
+@override final  String? verificationRejectionReason;
 
 /// Create a copy of LawyerProfile
 /// with the given fields replaced by the non-null parameter values.
@@ -257,16 +263,16 @@ _$LawyerProfileCopyWith<_LawyerProfile> get copyWith => __$LawyerProfileCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LawyerProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&const DeepCollectionEquality().equals(other._specialties, _specialties)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.yearsOfExperience, yearsOfExperience) || other.yearsOfExperience == yearsOfExperience)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.reviewsCount, reviewsCount) || other.reviewsCount == reviewsCount)&&const DeepCollectionEquality().equals(other._consultationTypes, _consultationTypes)&&const DeepCollectionEquality().equals(other._pricing, _pricing)&&(identical(other.verificationStatus, verificationStatus) || other.verificationStatus == verificationStatus));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LawyerProfile&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&const DeepCollectionEquality().equals(other._specialties, _specialties)&&(identical(other.bio, bio) || other.bio == bio)&&(identical(other.yearsOfExperience, yearsOfExperience) || other.yearsOfExperience == yearsOfExperience)&&(identical(other.rating, rating) || other.rating == rating)&&(identical(other.reviewsCount, reviewsCount) || other.reviewsCount == reviewsCount)&&const DeepCollectionEquality().equals(other._consultationTypes, _consultationTypes)&&const DeepCollectionEquality().equals(other._pricing, _pricing)&&(identical(other.verificationStatus, verificationStatus) || other.verificationStatus == verificationStatus)&&(identical(other.verificationRejectionReason, verificationRejectionReason) || other.verificationRejectionReason == verificationRejectionReason));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,fullName,const DeepCollectionEquality().hash(_specialties),bio,yearsOfExperience,rating,reviewsCount,const DeepCollectionEquality().hash(_consultationTypes),const DeepCollectionEquality().hash(_pricing),verificationStatus);
+int get hashCode => Object.hash(runtimeType,id,fullName,const DeepCollectionEquality().hash(_specialties),bio,yearsOfExperience,rating,reviewsCount,const DeepCollectionEquality().hash(_consultationTypes),const DeepCollectionEquality().hash(_pricing),verificationStatus,verificationRejectionReason);
 
 @override
 String toString() {
-  return 'LawyerProfile(id: $id, fullName: $fullName, specialties: $specialties, bio: $bio, yearsOfExperience: $yearsOfExperience, rating: $rating, reviewsCount: $reviewsCount, consultationTypes: $consultationTypes, pricing: $pricing, verificationStatus: $verificationStatus)';
+  return 'LawyerProfile(id: $id, fullName: $fullName, specialties: $specialties, bio: $bio, yearsOfExperience: $yearsOfExperience, rating: $rating, reviewsCount: $reviewsCount, consultationTypes: $consultationTypes, pricing: $pricing, verificationStatus: $verificationStatus, verificationRejectionReason: $verificationRejectionReason)';
 }
 
 
@@ -277,7 +283,7 @@ abstract mixin class _$LawyerProfileCopyWith<$Res> implements $LawyerProfileCopy
   factory _$LawyerProfileCopyWith(_LawyerProfile value, $Res Function(_LawyerProfile) _then) = __$LawyerProfileCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String fullName, List<LawyerSpecialty> specialties, String bio, int yearsOfExperience, double rating, int reviewsCount, List<ConsultationType> consultationTypes, Map<ConsultationType, double> pricing, VerificationStatus verificationStatus
+ String id, String fullName, List<LawyerSpecialty> specialties, String bio, int yearsOfExperience, double rating, int reviewsCount, List<ConsultationType> consultationTypes, Map<ConsultationType, double> pricing, VerificationStatus verificationStatus, String? verificationRejectionReason
 });
 
 
@@ -294,7 +300,7 @@ class __$LawyerProfileCopyWithImpl<$Res>
 
 /// Create a copy of LawyerProfile
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fullName = null,Object? specialties = null,Object? bio = null,Object? yearsOfExperience = null,Object? rating = null,Object? reviewsCount = null,Object? consultationTypes = null,Object? pricing = null,Object? verificationStatus = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fullName = null,Object? specialties = null,Object? bio = null,Object? yearsOfExperience = null,Object? rating = null,Object? reviewsCount = null,Object? consultationTypes = null,Object? pricing = null,Object? verificationStatus = null,Object? verificationRejectionReason = freezed,}) {
   return _then(_LawyerProfile(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
@@ -306,7 +312,8 @@ as double,reviewsCount: null == reviewsCount ? _self.reviewsCount : reviewsCount
 as int,consultationTypes: null == consultationTypes ? _self._consultationTypes : consultationTypes // ignore: cast_nullable_to_non_nullable
 as List<ConsultationType>,pricing: null == pricing ? _self._pricing : pricing // ignore: cast_nullable_to_non_nullable
 as Map<ConsultationType, double>,verificationStatus: null == verificationStatus ? _self.verificationStatus : verificationStatus // ignore: cast_nullable_to_non_nullable
-as VerificationStatus,
+as VerificationStatus,verificationRejectionReason: freezed == verificationRejectionReason ? _self.verificationRejectionReason : verificationRejectionReason // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

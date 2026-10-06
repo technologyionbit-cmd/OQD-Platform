@@ -1,11 +1,6 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import type { Request } from 'express';
-import { ApiErrorCode } from '../../common/errors/api-error-codes';
+import { unauthorized } from '../../common/errors/api-exceptions';
 import { TokenService } from '../services/token.service';
 import type { AuthenticatedUser } from '../auth.types';
 
@@ -26,13 +21,13 @@ export class JwtAuthGuard implements CanActivate {
     const header = request.headers.authorization;
 
     if (!header?.startsWith('Bearer ')) {
-      throw this.unauthorized('Authentication required.');
+      throw unauthorized('Authentication required.');
     }
 
     const payload = this.tokenService.verifyAccessToken(header.slice(7));
 
     if (!(await this.tokenService.isSessionActive(payload.sid))) {
-      throw this.unauthorized('Session expired. Please sign in again.');
+      throw unauthorized('Session expired. Please sign in again.');
     }
 
     const user: AuthenticatedUser = {
@@ -42,12 +37,5 @@ export class JwtAuthGuard implements CanActivate {
     };
     (request as Request & { user: AuthenticatedUser }).user = user;
     return true;
-  }
-
-  private unauthorized(message: string): UnauthorizedException {
-    return new UnauthorizedException({
-      message,
-      code: ApiErrorCode.UNAUTHORIZED,
-    });
   }
 }

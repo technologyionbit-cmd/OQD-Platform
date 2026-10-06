@@ -13,6 +13,7 @@ import 'package:aqd_ionbit/core/widgets/error_view.dart';
 import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/lawyers/presentation/providers/my_lawyer_profile_provider.dart';
 import 'package:aqd_ionbit/features/notifications/domain/entities/app_notification.dart';
 import 'package:aqd_ionbit/features/notifications/domain/entities/notification_type.dart';
 import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
@@ -20,62 +21,33 @@ import 'package:aqd_ionbit/features/notifications/presentation/widgets/notificat
 
 /// Shared by all three roles — each role's route file mounts this same
 /// screen at its own `/<role>/notifications` path (guard-covered by that
-/// role's base), since the underlying notification list isn't role-scoped
-/// in this single-session mock backend.
+/// role's base). The server returns only the signed-in account's list.
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
-  /// Maps a notification to where tapping it should go, based on the
-  /// current role's route subtree. Returns null for types that don't have
-  /// a destination yet — the tap still marks it read, it just doesn't
-  /// navigate anywhere.
+  /// Where tapping a notification goes in the current role's route
+  /// subtree. Null when there is nothing to open — the tap still marks it
+  /// read.
   String? _routeFor(AppNotification notification, UserRole role) {
-    final id = notification.relatedId;
-    switch (notification.type) {
-      case NotificationType.contractCreated:
-      case NotificationType.contractUpdated:
-      case NotificationType.contractReady:
-      case NotificationType.contractRequiresAction:
-        if (id == null) return null;
-        return switch (role) {
-          UserRole.client => RoutePaths.clientContractDetails(id),
-          UserRole.company => RoutePaths.companyContractDetails(id),
-          // A lawyer only ever sees a client's contract read-only, but that
-          // route does exist (lawyerContractDetailsPattern) — she should
-          // land on it like everyone else, not hit a dead end.
-          UserRole.lawyer => RoutePaths.lawyerContractDetails(id),
-        };
-      case NotificationType.consultationBooked:
-      case NotificationType.consultationAccepted:
-      case NotificationType.consultationRejected:
-      case NotificationType.consultationCancelled:
-      case NotificationType.consultationCompleted:
-      case NotificationType.consultationReminder:
-        if (id == null) return null;
-        return switch (role) {
-          UserRole.client => RoutePaths.clientConsultationDetails(id),
-          UserRole.lawyer => RoutePaths.lawyerConsultationDetails(id),
-          UserRole.company => RoutePaths.companyConsultationDetails(id),
-        };
-      case NotificationType.newMessage:
-        // A "new chat message" notification should open the chat itself,
-        // not a detour through the consultation details screen.
-        if (id == null) return null;
-        return switch (role) {
-          UserRole.client => RoutePaths.chatRoomFor(RoutePaths.clientBase, id),
-          UserRole.lawyer => RoutePaths.chatRoomFor(RoutePaths.lawyerBase, id),
-          UserRole.company => RoutePaths.chatRoomFor(RoutePaths.companyBase, id),
-        };
-      case NotificationType.documentUploaded:
-        return switch (role) {
-          UserRole.client => RoutePaths.clientDocuments,
-          UserRole.company => RoutePaths.companyDocuments,
-          UserRole.lawyer => RoutePaths.lawyerDocuments,
-        };
-      case NotificationType.aiAnalysisCompleted:
-        if (id == null) return null;
-        return role == UserRole.client ? RoutePaths.clientAiAnalysisResult(id) : null;
+    final type = notification.type;
+    if (type == NotificationType.lawyerVerificationApproved || type == NotificationType.lawyerVerificationRejected) {
+      return role == UserRole.lawyer ? RoutePaths.lawyerProfileEdit : null;
     }
+    final id = notification.relatedId;
+    if (id == null) return null;
+    return switch (type) {
+      NotificationType.consultationRequested ||
+      NotificationType.consultationAccepted ||
+      NotificationType.consultationRejected ||
+      NotificationType.consultationCancelled ||
+      NotificationType.consultationCompleted ||
+      NotificationType.consultationRescheduled => switch (role) {
+        UserRole.client => RoutePaths.clientConsultationDetails(id),
+        UserRole.lawyer => RoutePaths.lawyerConsultationDetails(id),
+        UserRole.company => RoutePaths.companyConsultationDetails(id),
+      },
+      NotificationType.lawyerVerificationApproved || NotificationType.lawyerVerificationRejected => null,
+    };
   }
 
   Future<void> _handleTap(BuildContext context, WidgetRef ref, AppNotification notification) async {
@@ -84,6 +56,12 @@ class NotificationsScreen extends ConsumerWidget {
     final role = ref.read(authControllerProvider).value?.role;
     if (role == null) return;
     final route = _routeFor(notification, role);
+    // A verification result changes the lawyer's own profile: reload it so
+    // the screen it opens shows the new status.
+    if (notification.type == NotificationType.lawyerVerificationApproved ||
+        notification.type == NotificationType.lawyerVerificationRejected) {
+      ref.invalidate(myLawyerProfileProvider);
+    }
     if (route != null) {
       unawaited(context.push(route));
       return;

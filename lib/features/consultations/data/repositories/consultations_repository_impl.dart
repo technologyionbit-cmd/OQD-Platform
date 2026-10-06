@@ -20,21 +20,21 @@ class ConsultationsRepositoryImpl implements ConsultationsRepository {
   final ApiErrorMapper _errorMapper;
 
   @override
-  Future<Result<List<Consultation>>> getConsultations() => _guard(_remote.getConsultations);
+  Future<Result<List<Consultation>>> getConsultations() => _errorMapper.capture(_remote.getConsultations);
 
   @override
-  Future<Result<Consultation>> getConsultationById(String id) => _guard(() => _remote.getConsultationById(id));
+  Future<Result<Consultation>> getConsultationById(String id) => _errorMapper.capture(() => _remote.getConsultationById(id));
 
   @override
-  Future<Result<List<AvailabilitySlot>>> getAvailability(String lawyerId) => _guard(() => _remote.getAvailability(lawyerId));
+  Future<Result<List<AvailabilitySlot>>> getAvailability(String lawyerId) => _errorMapper.capture(() => _remote.getAvailability(lawyerId));
 
   @override
   Future<Result<AvailabilitySlot>> addAvailabilitySlot({required String lawyerId, required DateTime start, required DateTime end}) {
-    return _guard(() => _remote.addAvailabilitySlot(lawyerId: lawyerId, start: start, end: end));
+    return _errorMapper.capture(() => _remote.addAvailabilitySlot(lawyerId: lawyerId, start: start, end: end));
   }
 
   @override
-  Future<Result<void>> removeAvailabilitySlot(String slotId) => _guard(() => _remote.removeAvailabilitySlot(slotId));
+  Future<Result<void>> removeAvailabilitySlot(String slotId) => _errorMapper.capture(() => _remote.removeAvailabilitySlot(slotId));
 
   @override
   Future<Result<Consultation>> bookConsultation({
@@ -45,7 +45,7 @@ class ConsultationsRepositoryImpl implements ConsultationsRepository {
     required double price,
     String notes = '',
   }) {
-    return _guard(
+    return _errorMapper.capture(
       () => _remote.bookConsultation(
         lawyerId: lawyerId,
         lawyerName: lawyerName,
@@ -58,35 +58,27 @@ class ConsultationsRepositoryImpl implements ConsultationsRepository {
   }
 
   @override
-  Future<Result<Consultation>> acceptRequest(String id) => _guard(() => _remote.acceptRequest(id));
+  Future<Result<Consultation>> acceptRequest(String id) => _errorMapper.capture(() => _remote.acceptRequest(id));
 
   @override
-  Future<Result<Consultation>> rejectRequest(String id, {String? reason}) => _guard(() => _remote.rejectRequest(id, reason: reason));
+  Future<Result<Consultation>> rejectRequest(String id, {String? reason}) => _errorMapper.capture(() => _remote.rejectRequest(id, reason: reason));
 
   @override
-  Future<Result<Consultation>> cancel(String id, {String? reason}) => _guard(() => _remote.cancel(id, reason: reason));
+  Future<Result<Consultation>> cancel(String id, {String? reason}) => _errorMapper.capture(() => _remote.cancel(id, reason: reason));
 
   @override
   Future<Result<Consultation>> reschedule({required String id, required DateTime newDateTime}) {
-    return _guard(() => _remote.reschedule(id: id, newDateTime: newDateTime));
+    return _errorMapper.capture(() => _remote.reschedule(id: id, newDateTime: newDateTime));
   }
 
   @override
-  Future<Result<Consultation>> complete(String id) => _guard(() => _remote.complete(id));
+  Future<Result<Consultation>> complete(String id) => _errorMapper.capture(() => _remote.complete(id));
 
   @override
-  Future<Result<Consultation>> markMissed(String id) => _guard(() => _remote.markMissed(id));
+  Future<Result<Consultation>> markMissed(String id) => _errorMapper.capture(() => _remote.markMissed(id));
 
   @override
-  Future<Result<Consultation>> markFailed(String id) => _guard(() => _remote.markFailed(id));
-
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
-  }
+  Future<Result<Consultation>> markFailed(String id) => _errorMapper.capture(() => _remote.markFailed(id));
 }
 
 final consultationsRepositoryProvider = Provider<ConsultationsRepository>((ref) {

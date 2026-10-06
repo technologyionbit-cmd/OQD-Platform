@@ -1,14 +1,14 @@
 import {
-  applyDecorators,
   CanActivate,
   ExecutionContext,
-  ForbiddenException,
   Injectable,
   UseGuards,
+  applyDecorators,
 } from '@nestjs/common';
+import { ApiErrorCode } from '../../common/errors/api-error-codes';
 import { ApiForbiddenResponse } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { ApiErrorCode } from '../../common/errors/api-error-codes';
+import { forbidden } from '../../common/errors/api-exceptions';
 import { ApiErrorResponseDto } from '../../common/openapi/api-error.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { AuthenticatedUser } from '../auth.types';
@@ -39,10 +39,10 @@ export class EmailVerifiedGuard implements CanActivate {
       : null;
 
     if (!user?.emailVerifiedAt) {
-      throw new ForbiddenException({
-        message: 'Verify your email address to continue.',
-        code: ApiErrorCode.EMAIL_NOT_VERIFIED,
-      });
+      throw forbidden(
+        'Verify your email address to continue.',
+        ApiErrorCode.EMAIL_NOT_VERIFIED,
+      );
     }
     return true;
   }

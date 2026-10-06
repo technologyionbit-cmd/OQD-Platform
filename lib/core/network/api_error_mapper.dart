@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'package:aqd_ionbit/core/errors/failure.dart';
+import 'package:aqd_ionbit/core/errors/result.dart';
 
 /// Central place that turns transport-level errors into typed [Failure]s.
 ///
@@ -9,6 +10,26 @@ import 'package:aqd_ionbit/core/errors/failure.dart';
 /// [Failure]. Nothing above the data layer should import `dio`.
 class ApiErrorMapper {
   const ApiErrorMapper();
+
+  /// For data sources: runs [action] and lets any error escape only as a
+  /// typed [Failure].
+  Future<T> guard<T>(Future<T> Function() action) async {
+    try {
+      return await action();
+    } catch (error) {
+      throw map(error);
+    }
+  }
+
+  /// For repositories: runs [action] and returns its value, or the error
+  /// as a typed [Failure], as a [Result].
+  Future<Result<T>> capture<T>(Future<T> Function() action) async {
+    try {
+      return Result.success(await action());
+    } catch (error) {
+      return Result.failure(map(error));
+    }
+  }
 
   Failure map(Object error) {
     if (error is Failure) return error;

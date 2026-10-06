@@ -32,7 +32,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Result<({AuthUser user, AuthTokens tokens})>> login({required String email, required String password}) {
-    return _run(() async {
+    return _errorMapper.capture(() async {
       final result = await _remote.login(email: email, password: password);
       await _tokenManager.save(result.tokens);
       return result;
@@ -41,7 +41,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Result<({AuthUser user, AuthTokens tokens})>> register(RegisterRequest request) {
-    return _run(() async {
+    return _errorMapper.capture(() async {
       final result = await _remote.register(request);
       await _tokenManager.save(result.tokens);
       return result;
@@ -97,12 +97,12 @@ class AuthRepositoryImpl implements AuthRepository {
     if (_tokenManager.current?.accessToken == null) {
       return Future.value(const Result.failure(UnauthorizedFailure()));
     }
-    return _run(_remote.currentUser);
+    return _errorMapper.capture(_remote.currentUser);
   }
 
   @override
   Future<Result<AuthUser>> updateProfile({required String fullName, required String email}) {
-    return _run(() => _remote.updateProfile(fullName: fullName, email: email));
+    return _errorMapper.capture(() => _remote.updateProfile(fullName: fullName, email: email));
   }
 
   @override
@@ -120,48 +120,40 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Result<AuthUser>> verifyEmail({required String code}) {
-    return _run(() => _remote.verifyEmail(code: code));
+    return _errorMapper.capture(() => _remote.verifyEmail(code: code));
   }
 
   @override
-  Future<Result<void>> resendEmailVerification() => _run(_remote.resendEmailVerification);
+  Future<Result<void>> resendEmailVerification() => _errorMapper.capture(_remote.resendEmailVerification);
 
   @override
   Future<Result<void>> requestPasswordReset({required String email}) {
-    return _run(() => _remote.requestPasswordReset(email: email));
+    return _errorMapper.capture(() => _remote.requestPasswordReset(email: email));
   }
 
   @override
   Future<Result<void>> verifyPasswordResetCode({required String email, required String code}) {
-    return _run(() => _remote.verifyPasswordResetCode(email: email, code: code));
+    return _errorMapper.capture(() => _remote.verifyPasswordResetCode(email: email, code: code));
   }
 
   @override
   Future<Result<void>> resetPassword({required String email, required String code, required String newPassword}) {
-    return _run(() => _remote.resetPassword(email: email, code: code, newPassword: newPassword));
+    return _errorMapper.capture(() => _remote.resetPassword(email: email, code: code, newPassword: newPassword));
   }
 
   @override
   Future<Result<void>> changePassword({required String currentPassword, required String newPassword}) {
-    return _run(() => _remote.changePassword(currentPassword: currentPassword, newPassword: newPassword));
+    return _errorMapper.capture(() => _remote.changePassword(currentPassword: currentPassword, newPassword: newPassword));
   }
 
   @override
-  Future<Result<List<AuthSession>>> listSessions() => _run(_remote.listSessions);
+  Future<Result<List<AuthSession>>> listSessions() => _errorMapper.capture(_remote.listSessions);
 
   @override
-  Future<Result<void>> revokeSession(String sessionId) => _run(() => _remote.revokeSession(sessionId));
+  Future<Result<void>> revokeSession(String sessionId) => _errorMapper.capture(() => _remote.revokeSession(sessionId));
 
   @override
-  Future<Result<void>> revokeOtherSessions() => _run(_remote.revokeOtherSessions);
-
-  Future<Result<T>> _run<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (error) {
-      return Result.failure(_errorMapper.map(error));
-    }
-  }
+  Future<Result<void>> revokeOtherSessions() => _errorMapper.capture(_remote.revokeOtherSessions);
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

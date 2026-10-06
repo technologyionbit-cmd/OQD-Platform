@@ -52,12 +52,20 @@ export interface AuthConfig {
   termsVersion: string;
 }
 
+/** Private files (lawyer verification documents). */
+export interface StorageConfig {
+  /** Directory for uploaded files. Must not be served by the web server;
+   *  files are only reachable through the API's access checks. */
+  uploadsDir: string;
+}
+
 export interface Configuration {
   app: AppConfig;
   database: DatabaseConfig;
   cors: CorsConfig;
   jwt: JwtConfig;
   auth: AuthConfig;
+  storage: StorageConfig;
 }
 
 /**
@@ -112,6 +120,9 @@ export default (): Configuration => ({
       10,
     ),
     termsVersion: process.env.TERMS_VERSION ?? DEFAULT_TERMS_VERSION,
+  },
+  storage: {
+    uploadsDir: process.env.UPLOADS_DIR ?? 'storage/uploads',
   },
 });
 
