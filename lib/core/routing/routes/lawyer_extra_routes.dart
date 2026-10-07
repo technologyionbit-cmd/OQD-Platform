@@ -12,7 +12,6 @@ import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_deta
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contracts_list_screen.dart';
 import 'package:aqd_ionbit/features/documents/presentation/screens/documents_screen.dart';
 import 'package:aqd_ionbit/features/lawyer_dashboard/presentation/screens/lawyer_client_details_screen.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/screens/lawyer_profile_edit_screen.dart';
 import 'package:aqd_ionbit/features/messages/presentation/screens/chat_room_screen.dart';
 import 'package:aqd_ionbit/features/notifications/presentation/screens/notifications_screen.dart';
@@ -34,7 +33,6 @@ List<RouteBase> lawyerExtraRoutes() {
         routeBase: RoutePaths.lawyerBase,
         showLawyerName: false,
         includePendingTab: false,
-        lawyerId: kDemoLawyerId,
       ),
     ),
     GoRoute(

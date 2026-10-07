@@ -104,6 +104,18 @@ abstract class AppLocalizations {
   /// **'عقد'**
   String get appName;
 
+  /// One-line tagline under the app name on the splash screen
+  ///
+  /// In ar, this message translates to:
+  /// **'منصتك القانونية الذكية'**
+  String get splashTagline;
+
+  /// Screen-reader label for the splash screen's loading indicator
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ التحميل'**
+  String get splashLoading;
+
   /// No description provided for @commonRetry.
   ///
   /// In ar, this message translates to:
@@ -133,6 +145,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تخطي'**
   String get commonSkip;
+
+  /// Screen-reader label for the language switch button
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير اللغة'**
+  String get commonChangeLanguage;
 
   /// No description provided for @commonNext.
   ///
@@ -356,6 +374,54 @@ abstract class AppLocalizations {
   /// **'سياسة الخصوصية'**
   String get authPrivacyPolicy;
 
+  /// No description provided for @authTermsCheckboxPrefix.
+  ///
+  /// In ar, this message translates to:
+  /// **'أوافق على '**
+  String get authTermsCheckboxPrefix;
+
+  /// No description provided for @authPasswordRulesHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'8 أحرف على الأقل، وتحتوي على حرف ورقم'**
+  String get authPasswordRulesHint;
+
+  /// No description provided for @authVerifyEmailTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد البريد الإلكتروني'**
+  String get authVerifyEmailTitle;
+
+  /// No description provided for @authVerifyEmailSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أرسلنا رمزًا مكونًا من 6 أرقام إلى {email}'**
+  String authVerifyEmailSubtitle(String email);
+
+  /// No description provided for @authVerifyEmailLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'لاحقًا'**
+  String get authVerifyEmailLater;
+
+  /// No description provided for @authVerifyEmailResent.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إرسال رمز جديد'**
+  String get authVerifyEmailResent;
+
+  /// No description provided for @emailVerificationBannerMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'بريدك الإلكتروني غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وإضافة التقييمات'**
+  String get emailVerificationBannerMessage;
+
+  /// No description provided for @emailVerificationBannerAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد الآن'**
+  String get emailVerificationBannerAction;
+
   /// No description provided for @authForgotPasswordTitle.
   ///
   /// In ar, this message translates to:
@@ -365,31 +431,13 @@ abstract class AppLocalizations {
   /// No description provided for @authForgotPasswordSubtitle.
   ///
   /// In ar, this message translates to:
-  /// **'اختر طريقة الاستعادة للمتابعة'**
+  /// **'أدخل البريد الإلكتروني لحسابك وسنرسل لك رمز تحقق'**
   String get authForgotPasswordSubtitle;
-
-  /// No description provided for @authMethodSms.
-  ///
-  /// In ar, this message translates to:
-  /// **'رسالة SMS'**
-  String get authMethodSms;
-
-  /// No description provided for @authMethodEmail.
-  ///
-  /// In ar, this message translates to:
-  /// **'البريد الإلكتروني'**
-  String get authMethodEmail;
-
-  /// No description provided for @authSmsInfo.
-  ///
-  /// In ar, this message translates to:
-  /// **'سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور'**
-  String get authSmsInfo;
 
   /// No description provided for @authEmailInfo.
   ///
   /// In ar, this message translates to:
-  /// **'سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور'**
+  /// **'إذا كان البريد مسجلًا لدينا فسيصلك رمز من 6 أرقام خلال دقائق. إن لم تجده فتحقق من مجلد الرسائل غير المرغوب فيها'**
   String get authEmailInfo;
 
   /// No description provided for @authSendCode.
@@ -403,30 +451,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تذكرت كلمة المرور؟'**
   String get authRememberPassword;
-
-  /// No description provided for @authSentTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم الإرسال!'**
-  String get authSentTitle;
-
-  /// No description provided for @authSentSubtitleSms.
-  ///
-  /// In ar, this message translates to:
-  /// **'تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور'**
-  String get authSentSubtitleSms;
-
-  /// No description provided for @authSentSubtitleEmail.
-  ///
-  /// In ar, this message translates to:
-  /// **'تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور'**
-  String get authSentSubtitleEmail;
-
-  /// No description provided for @authEnterCode.
-  ///
-  /// In ar, this message translates to:
-  /// **'إدخال رمز التحقق'**
-  String get authEnterCode;
 
   /// No description provided for @authResend.
   ///
@@ -463,6 +487,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'رمز التحقق غير صحيح'**
   String get authOtpInvalidCode;
+
+  /// No description provided for @authResetCodeExpired.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت صلاحية رمز التحقق. ارجع واطلب رمزًا جديدًا'**
+  String get authResetCodeExpired;
 
   /// No description provided for @authResetPasswordTitle.
   ///
@@ -560,6 +590,12 @@ abstract class AppLocalizations {
   /// **'ابدأ'**
   String get onboardingGetStarted;
 
+  /// Screen-reader label for the onboarding page dots
+  ///
+  /// In ar, this message translates to:
+  /// **'الشريحة {current} من {total}'**
+  String onboardingSlideIndicator(int current, int total);
+
   /// No description provided for @errorGeneric.
   ///
   /// In ar, this message translates to:
@@ -590,6 +626,72 @@ abstract class AppLocalizations {
   /// **'انتهت مهلة الاتصال'**
   String get errorTimeout;
 
+  /// No description provided for @errorTooManyAttempts.
+  ///
+  /// In ar, this message translates to:
+  /// **'محاولات كثيرة، يرجى المحاولة لاحقًا'**
+  String get errorTooManyAttempts;
+
+  /// Rate-limited (HTTP 429) with a known wait time
+  ///
+  /// In ar, this message translates to:
+  /// **'{minutes, plural, =1{محاولات كثيرة، حاول مجددًا بعد دقيقة} =2{محاولات كثيرة، حاول مجددًا بعد دقيقتين} few{محاولات كثيرة، حاول مجددًا بعد {minutes} دقائق} other{محاولات كثيرة، حاول مجددًا بعد {minutes} دقيقة}}'**
+  String errorTooManyAttemptsRetryIn(int minutes);
+
+  /// No description provided for @errorAccountInactive.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الحساب غير مفعّل، يرجى التواصل مع الدعم'**
+  String get errorAccountInactive;
+
+  /// No description provided for @errorEmailNotVerified.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكّد بريدك الإلكتروني أولًا لإتمام هذا الإجراء'**
+  String get errorEmailNotVerified;
+
+  /// No description provided for @errorEmailAlreadyRegistered.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا البريد الإلكتروني مسجَّل مسبقًا'**
+  String get errorEmailAlreadyRegistered;
+
+  /// No description provided for @errorCommercialRegistrationTaken.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم السجل التجاري مستخدم في حساب آخر'**
+  String get errorCommercialRegistrationTaken;
+
+  /// No description provided for @errorBarLicenseTaken.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم إجازة المحاماة مستخدم في حساب آخر'**
+  String get errorBarLicenseTaken;
+
+  /// No description provided for @errorTermsVersionOutdated.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تحديث شروط الخدمة، حدّث التطبيق ثم حاول مجددًا'**
+  String get errorTermsVersionOutdated;
+
+  /// No description provided for @errorVerificationCodeLocked.
+  ///
+  /// In ar, this message translates to:
+  /// **'محاولات خاطئة كثيرة، اطلب رمزًا جديدًا'**
+  String get errorVerificationCodeLocked;
+
+  /// No description provided for @errorContractStatusConflict.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن تنفيذ هذا الإجراء على العقد بحالته الحالية. حدّث الصفحة وحاول مجددًا'**
+  String get errorContractStatusConflict;
+
+  /// No description provided for @errorLinkOpenFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر فتح الرابط'**
+  String get errorLinkOpenFailed;
+
   /// No description provided for @validationRequired.
   ///
   /// In ar, this message translates to:
@@ -613,6 +715,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'رقم الهاتف غير صحيح'**
   String get validationInvalidPhone;
+
+  /// No description provided for @validationInvalidValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'القيمة المدخلة غير صحيحة'**
+  String get validationInvalidValue;
+
+  /// No description provided for @validationPasswordNeedsLetterAndDigit.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور يجب أن تحتوي على حرف ورقم على الأقل'**
+  String get validationPasswordNeedsLetterAndDigit;
+
+  /// No description provided for @validationPasswordTooLong.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور طويلة جدًا'**
+  String get validationPasswordTooLong;
+
+  /// No description provided for @validationTooLong.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب ألا يزيد النص عن {max} حرفًا'**
+  String validationTooLong(int max);
+
+  /// No description provided for @validationTermsRequired.
+  ///
+  /// In ar, this message translates to:
+  /// **'يجب الموافقة على شروط الخدمة وسياسة الخصوصية'**
+  String get validationTermsRequired;
 
   /// No description provided for @navHome.
   ///
@@ -1802,17 +1934,17 @@ abstract class AppLocalizations {
   /// **'اكتب رسالة...'**
   String get consultationMessageHint;
 
-  /// No description provided for @notificationConsultationBookedTitle.
+  /// No description provided for @notificationConsultationRequestedTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تم إرسال طلب الاستشارة'**
-  String get notificationConsultationBookedTitle;
+  /// **'طلب استشارة جديد'**
+  String get notificationConsultationRequestedTitle;
 
-  /// No description provided for @notificationConsultationBookedBody.
+  /// No description provided for @notificationConsultationRequestedBody.
   ///
   /// In ar, this message translates to:
-  /// **'بانتظار موافقة المحامي {lawyerName} على طلب استشارتك'**
-  String notificationConsultationBookedBody(String lawyerName);
+  /// **'أرسل لك {name} طلب استشارة'**
+  String notificationConsultationRequestedBody(String name);
 
   /// No description provided for @notificationConsultationAcceptedTitle.
   ///
@@ -1823,8 +1955,8 @@ abstract class AppLocalizations {
   /// No description provided for @notificationConsultationAcceptedBody.
   ///
   /// In ar, this message translates to:
-  /// **'وافق المحامي {lawyerName} على طلب استشارتك'**
-  String notificationConsultationAcceptedBody(String lawyerName);
+  /// **'وافق {name} على طلب استشارتك'**
+  String notificationConsultationAcceptedBody(String name);
 
   /// No description provided for @notificationConsultationRejectedTitle.
   ///
@@ -1835,8 +1967,8 @@ abstract class AppLocalizations {
   /// No description provided for @notificationConsultationRejectedBody.
   ///
   /// In ar, this message translates to:
-  /// **'اعتذر المحامي {lawyerName} عن طلب استشارتك'**
-  String notificationConsultationRejectedBody(String lawyerName);
+  /// **'اعتذر {name} عن طلب استشارتك'**
+  String notificationConsultationRejectedBody(String name);
 
   /// No description provided for @notificationConsultationCancelledTitle.
   ///
@@ -1847,8 +1979,8 @@ abstract class AppLocalizations {
   /// No description provided for @notificationConsultationCancelledBody.
   ///
   /// In ar, this message translates to:
-  /// **'تم إلغاء موعد استشارتك'**
-  String get notificationConsultationCancelledBody;
+  /// **'ألغى {name} موعد الاستشارة'**
+  String notificationConsultationCancelledBody(String name);
 
   /// No description provided for @notificationConsultationCompletedTitle.
   ///
@@ -1859,44 +1991,20 @@ abstract class AppLocalizations {
   /// No description provided for @notificationConsultationCompletedBody.
   ///
   /// In ar, this message translates to:
-  /// **'انتهت جلسة استشارتك بنجاح'**
-  String get notificationConsultationCompletedBody;
+  /// **'انتهت استشارتك مع {name}'**
+  String notificationConsultationCompletedBody(String name);
 
-  /// No description provided for @notificationNewMessageTitle.
+  /// No description provided for @notificationConsultationRescheduledTitle.
   ///
   /// In ar, this message translates to:
-  /// **'رسالة جديدة'**
-  String get notificationNewMessageTitle;
+  /// **'تم تغيير موعد الاستشارة'**
+  String get notificationConsultationRescheduledTitle;
 
-  /// No description provided for @notificationNewAttachmentBody.
+  /// No description provided for @notificationConsultationRescheduledBody.
   ///
   /// In ar, this message translates to:
-  /// **'أرسل لك مرفقًا جديدًا'**
-  String get notificationNewAttachmentBody;
-
-  /// No description provided for @notificationDocumentUploadedTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم رفع مستند'**
-  String get notificationDocumentUploadedTitle;
-
-  /// No description provided for @notificationDocumentUploadedBody.
-  ///
-  /// In ar, this message translates to:
-  /// **'\"{title}\" أُضيف إلى خزنتك الرقمية'**
-  String notificationDocumentUploadedBody(String title);
-
-  /// No description provided for @notificationAiAnalysisTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'اكتمل تحليل العقد'**
-  String get notificationAiAnalysisTitle;
-
-  /// No description provided for @notificationAiAnalysisBody.
-  ///
-  /// In ar, this message translates to:
-  /// **'تم الانتهاء من تحليل \"{documentTitle}\"'**
-  String notificationAiAnalysisBody(String documentTitle);
+  /// **'غيّر {name} موعد الاستشارة'**
+  String notificationConsultationRescheduledBody(String name);
 
   /// No description provided for @consultationRoomTitle.
   ///
@@ -2828,6 +2936,48 @@ abstract class AppLocalizations {
   /// **'بدء الجلسة'**
   String get dashboardStartSession;
 
+  /// No description provided for @dashboardVerificationUnverifiedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حسابك غير موثّق بعد'**
+  String get dashboardVerificationUnverifiedTitle;
+
+  /// No description provided for @dashboardVerificationUnverifiedMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'لن يظهر ملفك للعملاء ولن يتمكنوا من حجز استشارة معك قبل توثيق حسابك'**
+  String get dashboardVerificationUnverifiedMessage;
+
+  /// No description provided for @dashboardVerificationPendingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'طلب التوثيق قيد المراجعة'**
+  String get dashboardVerificationPendingTitle;
+
+  /// No description provided for @dashboardVerificationPendingMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'سنراجع مستنداتك قريبًا، وسيظهر ملفك للعملاء بعد الموافقة'**
+  String get dashboardVerificationPendingMessage;
+
+  /// No description provided for @dashboardVerificationRejectedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم رفض طلب التوثيق'**
+  String get dashboardVerificationRejectedTitle;
+
+  /// No description provided for @dashboardVerificationRejectedMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'راجع ملفك وأعد رفع مستندات التوثيق'**
+  String get dashboardVerificationRejectedMessage;
+
+  /// No description provided for @dashboardVerificationAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'إكمال التوثيق'**
+  String get dashboardVerificationAction;
+
   /// No description provided for @earningsBalance.
   ///
   /// In ar, this message translates to:
@@ -2971,6 +3121,66 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم إرسال المستند للمراجعة'**
   String get lawyerVerificationSubmittedMessage;
+
+  /// No description provided for @lawyerVerificationDocumentsHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ارفع صورة هويتك وبطاقة النقابة: JPG أو PNG أو PDF، حتى 3 ملفات، و10 ميغابايت لكل ملف'**
+  String get lawyerVerificationDocumentsHint;
+
+  /// No description provided for @lawyerVerificationRejectedReason.
+  ///
+  /// In ar, this message translates to:
+  /// **'سبب الرفض: {reason}'**
+  String lawyerVerificationRejectedReason(String reason);
+
+  /// No description provided for @lawyerVerificationFileTooLarge.
+  ///
+  /// In ar, this message translates to:
+  /// **'حجم أحد الملفات أكبر من 10 ميغابايت'**
+  String get lawyerVerificationFileTooLarge;
+
+  /// No description provided for @lawyerVerificationTooManyFiles.
+  ///
+  /// In ar, this message translates to:
+  /// **'يمكنك رفع 3 ملفات كحد أقصى'**
+  String get lawyerVerificationTooManyFiles;
+
+  /// No description provided for @lawyerVerificationInvalidFile.
+  ///
+  /// In ar, this message translates to:
+  /// **'نقبل فقط ملفات JPG أو PNG أو PDF'**
+  String get lawyerVerificationInvalidFile;
+
+  /// No description provided for @lawyerVerificationAlreadyPending.
+  ///
+  /// In ar, this message translates to:
+  /// **'مستنداتك قيد المراجعة بالفعل'**
+  String get lawyerVerificationAlreadyPending;
+
+  /// No description provided for @notificationVerificationApprovedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم توثيق حسابك'**
+  String get notificationVerificationApprovedTitle;
+
+  /// No description provided for @notificationVerificationApprovedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أصبح ملفك ظاهرًا للعملاء ويمكنهم حجز استشارات معك'**
+  String get notificationVerificationApprovedBody;
+
+  /// No description provided for @notificationVerificationRejectedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم رفض طلب التوثيق'**
+  String get notificationVerificationRejectedTitle;
+
+  /// No description provided for @notificationVerificationRejectedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'السبب: {reason}'**
+  String notificationVerificationRejectedBody(String reason);
 
   /// No description provided for @lawyerPriceLabel.
   ///

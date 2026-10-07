@@ -28,7 +28,7 @@ class LawyerCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              IconBadge(icon: Icons.person_outline, size: 48),
+              const IconBadge(icon: Icons.person_outline),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(

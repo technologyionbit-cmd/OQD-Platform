@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/consultation_room/data/repositories/consultation_room_repository_impl.dart';
 import 'package:aqd_ionbit/features/consultation_room/domain/entities/consultation_room_session.dart';
 import 'package:aqd_ionbit/features/consultation_room/domain/repositories/consultation_room_repository.dart';
@@ -24,11 +25,12 @@ class SessionController extends AsyncNotifier<ConsultationRoomSession> {
   SessionController(this.arg);
 
   final SessionControllerArgs arg;
-  late final ConsultationRoomRepository _repository;
+  ConsultationRoomRepository get _repository => ref.read(consultationRoomRepositoryProvider);
 
   @override
   FutureOr<ConsultationRoomSession> build() async {
-    _repository = ref.watch(consultationRoomRepositoryProvider);
+    ref.watch(consultationRoomRepositoryProvider);
+    ref.watch(currentUserIdProvider);
     final result = await _repository.getSession(arg.consultationId, type: arg.type);
     return result.fold((failure) => throw failure, (session) => session);
   }

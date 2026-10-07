@@ -9,7 +9,9 @@ import 'package:aqd_ionbit/core/theme/app_theme.dart';
 import 'package:aqd_ionbit/features/consultations/data/datasources/consultations_data_source_provider.dart';
 import 'package:aqd_ionbit/features/consultations/data/datasources/consultations_mock_data_source.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/screens/lawyer_schedule_screen.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart' show kDemoLawyerId;
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
+import '../../../support/signed_in_override.dart';
 
 /// Covers the booked-slot -> consultation deep link fix: `AvailabilitySlot`
 /// now carries a `consultationId` (populated for live bookings and
@@ -18,7 +20,11 @@ import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart'
 /// rather than always falling back to the generic consultations list.
 Future<ProviderContainer> _pump(WidgetTester tester, {ConsultationsMockDataSource? dataSource}) async {
   final container = ProviderContainer(
-    overrides: [consultationsRemoteDataSourceProvider.overrideWithValue(dataSource ?? ConsultationsMockDataSource())],
+    overrides: [
+      signedInOverride,
+      consultationsRemoteDataSourceProvider.overrideWithValue(dataSource ?? ConsultationsMockDataSource()),
+      lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource()),
+    ],
   );
   addTearDown(container.dispose);
 
@@ -39,6 +45,8 @@ Future<ProviderContainer> _pump(WidgetTester tester, {ConsultationsMockDataSourc
       container: container,
       child: MaterialApp.router(
         theme: AppTheme.light,
+        // Assertions below are written against the English strings.
+        locale: const Locale('en'),
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         routerConfig: router,

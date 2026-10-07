@@ -37,7 +37,7 @@ class ChatLobbyView extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              IconBadge(icon: Icons.person_outline, size: 56),
+              const IconBadge(icon: Icons.person_outline, size: 56),
               const SizedBox(height: AppSpacing.md),
               Text(otherPartyName, style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.center),
               const SizedBox(height: AppSpacing.xxs),

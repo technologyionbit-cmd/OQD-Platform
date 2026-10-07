@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,39 +21,33 @@ import 'package:aqd_ionbit/features/notifications/domain/repositories/notificati
 import 'package:aqd_ionbit/features/notifications/presentation/screens/notifications_screen.dart';
 
 import '../../../support/role_test_harness.dart' show testClient, testLawyer;
+import '../../../support/signed_in_override.dart';
+import '../../../support/test_doubles.dart';
 
 class MockNotificationsRepository extends Mock implements NotificationsRepository {}
 
-/// Overrides [AuthController.build] so a test can pin the signed-in role
-/// directly instead of driving the login flow to get there.
-class FixedAuthController extends AuthController {
-  FixedAuthController(this._user);
-  final AuthUser _user;
-
-  @override
-  FutureOr<AuthUser?> build() async => _user;
-}
-
-final _contractReadyNotification = AppNotification(
-  id: 'n_seed_2',
-  type: NotificationType.contractReady,
-  title: 'عقدك جاهز',
-  body: 'تم إنشاء العقد بنجاح',
-  createdAt: DateTime(2026, 1, 1),
-  relatedId: 'c_seed_1',
+final _requestNotification = AppNotification(
+  id: 'n_request',
+  type: NotificationType.consultationRequested,
+  createdAt: DateTime(2026),
+  relatedId: 'cons_1',
+  params: const {'actorName': 'أحمد الخالدي'},
 );
 
-/// AI contract analysis is only ever a client-facing surface — this is the
-/// one notification type genuinely has no destination for the lawyer role,
-/// used below to keep exercising the "no destination" fallback now that
-/// contract/document notifications route correctly for a lawyer too.
-final _aiAnalysisNotification = AppNotification(
-  id: 'n_seed_ai',
-  type: NotificationType.aiAnalysisCompleted,
-  title: 'اكتمل تحليل العقد',
-  body: 'تم الانتهاء من تحليل العقد',
-  createdAt: DateTime(2026, 1, 1),
-  relatedId: 'c_seed_1',
+final _acceptedNotification = AppNotification(
+  id: 'n_accepted',
+  type: NotificationType.consultationAccepted,
+  createdAt: DateTime(2026),
+  relatedId: 'cons_1',
+  params: const {'actorName': 'سارة المطيري'},
+);
+
+/// No related entity, so there is nowhere to go.
+final _orphanNotification = AppNotification(
+  id: 'n_orphan',
+  type: NotificationType.consultationCancelled,
+  createdAt: DateTime(2026),
+  params: const {'actorName': 'سارة المطيري'},
 );
 
 Future<ProviderContainer> _pump(
@@ -66,7 +59,7 @@ Future<ProviderContainer> _pump(
   final prefs = await SharedPreferences.getInstance();
 
   final container = ProviderContainer(
-    overrides: [
+    overrides: [signedInOverride, 
       authControllerProvider.overrideWith(() => FixedAuthController(user)),
       notificationsRepositoryProvider.overrideWithValue(repository),
       // NotificationsScreen now also renders the push-notifications toggle
@@ -85,12 +78,12 @@ Future<ProviderContainer> _pump(
     routes: [
       GoRoute(path: RoutePaths.lawyerNotifications, builder: (context, state) => const NotificationsScreen()),
       GoRoute(
-        path: RoutePaths.lawyerContractDetailsPattern,
-        builder: (context, state) => const Scaffold(body: Text('contract-details')),
+        path: RoutePaths.lawyerConsultationDetailsPattern,
+        builder: (context, state) => Scaffold(body: Text('lawyer-consultation-${state.pathParameters['id']}')),
       ),
       GoRoute(
-        path: RoutePaths.clientContractDetailsPattern,
-        builder: (context, state) => const Scaffold(body: Text('contract-details')),
+        path: RoutePaths.clientConsultationDetailsPattern,
+        builder: (context, state) => Scaffold(body: Text('client-consultation-${state.pathParameters['id']}')),
       ),
     ],
   );
@@ -112,52 +105,54 @@ Future<ProviderContainer> _pump(
 }
 
 void main() {
-  // A lawyer only ever gets AI contract-analysis notifications generated
-  // for the client — that type has no lawyer-side screen at all, so this is
-  // the genuine "no destination" case. Tapping it must still give feedback
-  // instead of silently doing nothing.
-  testWidgets('tapping a notification with no destination for the current role shows a fallback message', (tester) async {
+  testWidgets('builds the text in the current language from the type and params', (tester) async {
     final repository = MockNotificationsRepository();
-    when(() => repository.getNotifications()).thenAnswer((_) async => Result.success([_aiAnalysisNotification]));
-    when(() => repository.markAsRead('n_seed_ai')).thenAnswer((_) async => const Result.success(null));
+    when(repository.getNotifications).thenAnswer((_) async => Result.success([_requestNotification]));
 
     await _pump(tester, user: testLawyer, repository: repository);
 
-    await tester.tap(find.text('اكتمل تحليل العقد'));
-    await tester.pumpAndSettle();
-
-    expect(find.text('contract-details'), findsNothing);
-    expect(find.text('هذا الإشعار غير متاح من حسابك الحالي'), findsOneWidget);
-    verify(() => repository.markAsRead('n_seed_ai')).called(1);
+    expect(find.text('طلب استشارة جديد'), findsOneWidget);
+    expect(find.text('أرسل لك أحمد الخالدي طلب استشارة'), findsOneWidget);
   });
 
-  testWidgets('tapping a notification with a valid destination navigates there', (tester) async {
+  testWidgets('a lawyer tapping a request opens her own consultation details', (tester) async {
     final repository = MockNotificationsRepository();
-    when(() => repository.getNotifications()).thenAnswer((_) async => Result.success([_contractReadyNotification]));
-    when(() => repository.markAsRead('n_seed_2')).thenAnswer((_) async => const Result.success(null));
+    when(repository.getNotifications).thenAnswer((_) async => Result.success([_requestNotification]));
+    when(() => repository.markAsRead('n_request')).thenAnswer((_) async => const Result.success(null));
+
+    await _pump(tester, user: testLawyer, repository: repository);
+
+    await tester.tap(find.text('طلب استشارة جديد'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('lawyer-consultation-cons_1'), findsOneWidget);
+    verify(() => repository.markAsRead('n_request')).called(1);
+  });
+
+  testWidgets('a client tapping an acceptance opens the client consultation details', (tester) async {
+    final repository = MockNotificationsRepository();
+    when(repository.getNotifications).thenAnswer((_) async => Result.success([_acceptedNotification]));
+    when(() => repository.markAsRead('n_accepted')).thenAnswer((_) async => const Result.success(null));
 
     await _pump(tester, user: testClient, repository: repository);
 
-    await tester.tap(find.text('عقدك جاهز'));
+    await tester.tap(find.text('تم قبول طلب الاستشارة'));
     await tester.pumpAndSettle();
 
-    expect(find.text('contract-details'), findsOneWidget);
+    expect(find.text('client-consultation-cons_1'), findsOneWidget);
   });
 
-  // Regression coverage for the fix: a lawyer can read a client's contract
-  // (lawyerContractDetailsPattern exists and is registered), so a contract
-  // notification must actually take her there instead of the old
-  // unconditional null for the lawyer role.
-  testWidgets('a lawyer tapping a contract notification navigates to her own contract-details route', (tester) async {
+  testWidgets('tapping a notification with nowhere to go still marks it read and says so', (tester) async {
     final repository = MockNotificationsRepository();
-    when(() => repository.getNotifications()).thenAnswer((_) async => Result.success([_contractReadyNotification]));
-    when(() => repository.markAsRead('n_seed_2')).thenAnswer((_) async => const Result.success(null));
+    when(repository.getNotifications).thenAnswer((_) async => Result.success([_orphanNotification]));
+    when(() => repository.markAsRead('n_orphan')).thenAnswer((_) async => const Result.success(null));
 
-    await _pump(tester, user: testLawyer, repository: repository);
+    await _pump(tester, user: testClient, repository: repository);
 
-    await tester.tap(find.text('عقدك جاهز'));
+    await tester.tap(find.text('تم إلغاء الاستشارة'));
     await tester.pumpAndSettle();
 
-    expect(find.text('contract-details'), findsOneWidget);
+    expect(find.text('هذا الإشعار غير متاح من حسابك الحالي'), findsOneWidget);
+    verify(() => repository.markAsRead('n_orphan')).called(1);
   });
 }

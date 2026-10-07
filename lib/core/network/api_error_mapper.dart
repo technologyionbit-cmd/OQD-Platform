@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'package:aqd_ionbit/core/errors/failure.dart';
+import 'package:aqd_ionbit/core/errors/result.dart';
 
 /// Central place that turns transport-level errors into typed [Failure]s.
 ///
@@ -9,6 +10,26 @@ import 'package:aqd_ionbit/core/errors/failure.dart';
 /// [Failure]. Nothing above the data layer should import `dio`.
 class ApiErrorMapper {
   const ApiErrorMapper();
+
+  /// For data sources: runs [action] and lets any error escape only as a
+  /// typed [Failure].
+  Future<T> guard<T>(Future<T> Function() action) async {
+    try {
+      return await action();
+    } catch (error) {
+      throw map(error);
+    }
+  }
+
+  /// For repositories: runs [action] and returns its value, or the error
+  /// as a typed [Failure], as a [Result].
+  Future<Result<T>> capture<T>(Future<T> Function() action) async {
+    try {
+      return Result.success(await action());
+    } catch (error) {
+      return Result.failure(map(error));
+    }
+  }
 
   Failure map(Object error) {
     if (error is Failure) return error;
@@ -39,27 +60,33 @@ class ApiErrorMapper {
   }
 
   Failure _mapStatusCode(DioException error) {
-    final statusCode = error.response?.statusCode;
-    final backendMessage = _extractBackendMessage(error.response?.data);
+    final response = error.response;
+    final statusCode = response?.statusCode;
+    final message = _extractBackendMessage(response?.data);
+    final code = _extractCode(response?.data);
 
-    switch (statusCode) {
-      case 401:
-        return UnauthorizedFailure(message: backendMessage);
-      case 403:
-        return ForbiddenFailure(message: backendMessage);
-      case 404:
-        return NotFoundFailure(message: backendMessage);
-      case 422:
-        return ValidationFailure(
-          message: backendMessage,
-          fieldErrors: _extractFieldErrors(error.response?.data),
-        );
-      default:
-        if (statusCode != null && statusCode >= 500) {
-          return ServerFailure(message: backendMessage, statusCode: statusCode);
-        }
-        return ServerFailure(message: backendMessage, statusCode: statusCode);
-    }
+    return switch (statusCode) {
+      401 => UnauthorizedFailure(message: message, code: code),
+      403 => ForbiddenFailure(message: message, code: code),
+      404 => NotFoundFailure(message: message, code: code),
+      422 => ValidationFailure(message: message, code: code, fieldErrors: _extractFieldErrors(response?.data)),
+      429 => RateLimitedFailure(message: message, code: code, retryAfter: _parseRetryAfter(response?.headers)),
+      _ => ServerFailure(message: message, code: code, statusCode: statusCode),
+    };
+  }
+
+  String? _extractCode(dynamic data) {
+    if (data is! Map) return null;
+    final error = data['error'];
+    final code = error is Map ? error['code'] : data['code'];
+    return code is String ? code : null;
+  }
+
+  /// `Retry-After` in its delta-seconds form (what the API sends); the
+  /// HTTP-date form is ignored rather than guessed at.
+  Duration? _parseRetryAfter(Headers? headers) {
+    final seconds = int.tryParse(headers?.value('retry-after')?.trim() ?? '');
+    return seconds != null && seconds > 0 ? Duration(seconds: seconds) : null;
   }
 
   /// Backend error envelope shape is not finalized yet — this defensively

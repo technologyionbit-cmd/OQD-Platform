@@ -13,6 +13,8 @@ void main() {
           phone: '0790000000',
           email: 'a@test.com',
           password: 'Password123',
+          acceptTerms: true,
+          termsVersion: 'v1',
         ),
       );
       expect(body, {
@@ -21,6 +23,8 @@ void main() {
         'phone': '0790000000',
         'email': 'a@test.com',
         'password': 'Password123',
+        'acceptTerms': true,
+        'termsVersion': 'v1',
       });
     });
 
@@ -32,6 +36,8 @@ void main() {
           email: 'c@test.com',
           phone: '0791111111',
           password: 'Password123',
+          acceptTerms: true,
+          termsVersion: 'v1',
         ),
       );
       expect(body['accountType'], 'company');
@@ -49,6 +55,8 @@ void main() {
           email: 'l@test.com',
           phone: '0792222222',
           password: 'Password123',
+          acceptTerms: true,
+          termsVersion: 'v1',
         ),
       );
       expect(body['accountType'], 'lawyer');
@@ -61,20 +69,31 @@ void main() {
     test('session() reads user + tokens out of the data envelope', () {
       final result = AuthWire.session({
         'data': {
-          'user': {'id': 'u1', 'fullName': 'Ahmad', 'email': 'a@test.com', 'role': 'lawyer'},
+          'user': {'id': 'u1', 'fullName': 'Ahmad', 'email': 'a@test.com', 'role': 'lawyer', 'emailVerified': false},
           'tokens': {'accessToken': 'access', 'refreshToken': 'refresh'},
         },
       });
       expect(result.user.role, UserRole.lawyer);
       expect(result.user.id, 'u1');
+      expect(result.user.emailVerified, isFalse);
       expect(result.tokens.accessToken, 'access');
       expect(result.tokens.refreshToken, 'refresh');
     });
 
     test('user() throws on an unknown role rather than defaulting', () {
       expect(
-        () => AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'admin'}),
+        () => AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'admin', 'emailVerified': false}),
         throwsArgumentError,
+      );
+    });
+
+    test('user() reads emailVerified and fails loudly when it is missing', () {
+      final verified = AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'client', 'emailVerified': true});
+      expect(verified.emailVerified, isTrue);
+
+      expect(
+        () => AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'client'}),
+        throwsA(isA<TypeError>()),
       );
     });
 

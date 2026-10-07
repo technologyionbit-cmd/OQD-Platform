@@ -35,7 +35,7 @@ class ConsultationRoomRemoteDataSourceImpl implements ConsultationRoomRemoteData
 
   @override
   Future<ConsultationRoomSession> getSession(String consultationId, {required ConsultationType type}) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       _types[consultationId] = type;
       final res = await _dio.post<Map<String, dynamic>>('/consultations/$consultationId/room/token');
       final data = res.data!['data'] as Map<String, dynamic>;
@@ -46,7 +46,7 @@ class ConsultationRoomRemoteDataSourceImpl implements ConsultationRoomRemoteData
 
   @override
   Future<ConsultationRoomSession> join(String consultationId) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final roomToken = _pendingRoomTokens.remove(consultationId);
       final res = await _dio.post<Map<String, dynamic>>(
         '/consultations/$consultationId/room/join',
@@ -58,7 +58,7 @@ class ConsultationRoomRemoteDataSourceImpl implements ConsultationRoomRemoteData
 
   @override
   Future<ConsultationRoomSession> connect(String consultationId) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.post<Map<String, dynamic>>('/consultations/$consultationId/room/connect');
       return _parseSession(consultationId, res.data!['data'] as Map<String, dynamic>);
     });
@@ -66,7 +66,7 @@ class ConsultationRoomRemoteDataSourceImpl implements ConsultationRoomRemoteData
 
   @override
   Future<ConsultationRoomSession> retryConnection(String consultationId) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.post<Map<String, dynamic>>('/consultations/$consultationId/room/retry');
       return _parseSession(consultationId, res.data!['data'] as Map<String, dynamic>);
     });
@@ -74,7 +74,7 @@ class ConsultationRoomRemoteDataSourceImpl implements ConsultationRoomRemoteData
 
   @override
   Future<ConsultationRoomSession> reportConnectionLost(String consultationId) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.post<Map<String, dynamic>>('/consultations/$consultationId/room/connection-lost');
       return _parseSession(consultationId, res.data!['data'] as Map<String, dynamic>);
     });
@@ -82,7 +82,7 @@ class ConsultationRoomRemoteDataSourceImpl implements ConsultationRoomRemoteData
 
   @override
   Future<ConsultationRoomSession> endSession(String consultationId) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.post<Map<String, dynamic>>('/consultations/$consultationId/room/end');
       return _parseSession(consultationId, res.data!['data'] as Map<String, dynamic>);
     });
@@ -95,7 +95,7 @@ class ConsultationRoomRemoteDataSourceImpl implements ConsultationRoomRemoteData
     bool? isCameraOn,
     bool? isSpeakerOn,
   }) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.patch<Map<String, dynamic>>(
         '/consultations/$consultationId/room/metrics',
         data: {
@@ -124,15 +124,5 @@ class ConsultationRoomRemoteDataSourceImpl implements ConsultationRoomRemoteData
         isSpeakerOn: row['isSpeakerOn'] as bool,
       ),
     );
-  }
-
-  /// Runs [action], translating any [DioException] (or unexpected error)
-  /// into a typed [Failure] before it escapes this layer.
-  Future<T> _call<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } catch (error) {
-      throw _errorMapper.map(error);
-    }
   }
 }

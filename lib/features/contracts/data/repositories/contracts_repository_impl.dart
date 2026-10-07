@@ -20,42 +20,40 @@ class ContractsRepositoryImpl implements ContractsRepository {
 
   @override
   Future<Result<List<ContractTemplate>>> getTemplates({required Locale locale}) {
-    return _guard(() => _remote.getTemplates(locale));
+    return _errorMapper.capture(() => _remote.getTemplates(locale));
   }
 
   @override
-  Future<Result<List<Contract>>> getContracts() => _guard(_remote.getContracts);
+  Future<Result<List<Contract>>> getContracts() => _errorMapper.capture(_remote.getContracts);
 
   @override
-  Future<Result<Contract>> getContractById(String id) => _guard(() => _remote.getContractById(id));
+  Future<Result<Contract>> getContractById(String id) => _errorMapper.capture(() => _remote.getContractById(id));
 
   @override
-  Future<Result<Contract>> saveDraft({required ContractTemplate template, required Map<String, String> fieldValues, String? contractId}) {
-    return _guard(() => _remote.saveDraft(template: template, fieldValues: fieldValues, contractId: contractId));
+  Future<Result<Contract>> saveDraft({
+    required ContractTemplate template,
+    required Map<String, String> fieldValues,
+    required Locale locale,
+    String? contractId,
+  }) {
+    return _errorMapper.capture(() => _remote.saveDraft(template: template, fieldValues: fieldValues, locale: locale, contractId: contractId));
   }
 
   @override
   Future<Result<Contract>> generateContract({
     required ContractTemplate template,
     required Map<String, String> fieldValues,
+    required Locale locale,
     String? contractId,
   }) {
-    return _guard(() => _remote.generateContract(template: template, fieldValues: fieldValues, contractId: contractId));
+    return _errorMapper.capture(() => _remote.generateContract(template: template, fieldValues: fieldValues, locale: locale, contractId: contractId));
   }
 
   @override
-  Future<Result<Contract>> signContract(String id) => _guard(() => _remote.signContract(id));
+  Future<Result<Contract>> signContract(String id) => _errorMapper.capture(() => _remote.signContract(id));
 
   @override
-  Future<Result<void>> deleteContract(String id) => _guard(() => _remote.deleteContract(id));
-
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
-  }
+  Future<Result<void>> deleteContract(String id) => _errorMapper.capture(() => _remote.deleteContract(id));
 }
 
 final contractsRepositoryProvider = Provider<ContractsRepository>((ref) {

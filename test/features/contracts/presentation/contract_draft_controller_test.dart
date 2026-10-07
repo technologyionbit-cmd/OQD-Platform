@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
@@ -14,16 +15,13 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dar
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 import 'package:aqd_ionbit/features/documents/data/repositories/documents_repository_impl.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document.dart';
 import 'package:aqd_ionbit/features/documents/domain/entities/document_source_type.dart';
-import 'package:aqd_ionbit/features/documents/domain/repositories/documents_repository.dart';
-
-class MockContractsRepository extends Mock implements ContractsRepository {}
-
-class MockDocumentsRepository extends Mock implements DocumentsRepository {}
+import '../../../support/signed_in_override.dart';
+import '../../../support/role_test_harness.dart' show FixedLocaleController;
+import '../../../support/test_doubles.dart';
 
 const _template = ContractTemplate(
   id: 't1',
@@ -44,6 +42,7 @@ void main() {
   late AppLocalizations l10n;
 
   setUpAll(() async {
+    registerFallbackValue(const Locale('ar'));
     l10n = await AppLocalizations.delegate.load(const Locale('en'));
   });
 
@@ -51,7 +50,7 @@ void main() {
     repository = MockContractsRepository();
     documentsRepository = MockDocumentsRepository();
     container = ProviderContainer(
-      overrides: [
+      overrides: [signedInOverride, localeControllerProvider.overrideWith(() => FixedLocaleController(const Locale('ar'))), 
         contractsRepositoryProvider.overrideWithValue(repository),
         documentsRepositoryProvider.overrideWithValue(documentsRepository),
       ],
@@ -100,7 +99,7 @@ void main() {
       ..selectTemplate(_template)
       ..setFieldValue('partyA', 'Acme')
       ..setFieldValue('amount', '1200')
-      ..setFieldValue('startDate', DateTime(2026, 1, 1).toIso8601String());
+      ..setFieldValue('startDate', DateTime(2026).toIso8601String());
 
     expect(controller().validate(l10n), isTrue);
     expect(container.read(contractDraftControllerProvider).errors, isEmpty);
@@ -112,8 +111,8 @@ void main() {
       title: _template.title,
       category: _template.category,
       status: ContractStatus.draft,
-      createdAt: DateTime(2026, 1, 1),
-      updatedAt: DateTime(2026, 1, 1),
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
       parties: const ['Acme'],
       fieldValues: const {'partyA': 'Acme'},
       templateId: _template.id,
@@ -129,7 +128,7 @@ void main() {
         ..selectTemplate(_template)
         ..setFieldValue('partyA', 'Acme');
       when(
-        () => repository.saveDraft(template: _template, fieldValues: {'partyA': 'Acme'}, contractId: null),
+        () => repository.saveDraft(template: _template, fieldValues: {'partyA': 'Acme'}, locale: any(named: 'locale')),
       ).thenAnswer((_) async => Result.success(tokens));
 
       final result = await controller().saveDraft();
@@ -143,7 +142,7 @@ void main() {
         ..selectTemplate(_template)
         ..setFieldValue('partyA', 'Acme');
       when(
-        () => repository.saveDraft(template: _template, fieldValues: {'partyA': 'Acme'}, contractId: null),
+        () => repository.saveDraft(template: _template, fieldValues: {'partyA': 'Acme'}, locale: any(named: 'locale')),
       ).thenAnswer((_) async => const Result.failure(ServerFailure()));
 
       final result = await controller().saveDraft();
@@ -157,7 +156,7 @@ void main() {
         ..selectTemplate(_template)
         ..setFieldValue('partyA', 'Acme');
       when(
-        () => repository.generateContract(template: _template, fieldValues: {'partyA': 'Acme'}, contractId: null),
+        () => repository.generateContract(template: _template, fieldValues: {'partyA': 'Acme'}, locale: any(named: 'locale')),
       ).thenAnswer((_) async => Result.success(tokens));
       when(
         () => documentsRepository.addGeneratedContractDocument(contractId: tokens.id, title: tokens.title),
@@ -167,7 +166,7 @@ void main() {
             id: 'd1',
             title: tokens.title,
             sourceType: DocumentSourceType.generatedContract,
-            createdAt: DateTime(2026, 1, 1),
+            createdAt: DateTime(2026),
             sizeLabel: '200 KB',
             contractId: tokens.id,
           ),

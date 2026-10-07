@@ -12,6 +12,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appName => 'عقد';
 
   @override
+  String get splashTagline => 'منصتك القانونية الذكية';
+
+  @override
+  String get splashLoading => 'جارٍ التحميل';
+
+  @override
   String get commonRetry => 'إعادة المحاولة';
 
   @override
@@ -25,6 +31,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get commonSkip => 'تخطي';
+
+  @override
+  String get commonChangeLanguage => 'تغيير اللغة';
 
   @override
   String get commonNext => 'التالي';
@@ -140,43 +149,48 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authPrivacyPolicy => 'سياسة الخصوصية';
 
   @override
+  String get authTermsCheckboxPrefix => 'أوافق على ';
+
+  @override
+  String get authPasswordRulesHint => '8 أحرف على الأقل، وتحتوي على حرف ورقم';
+
+  @override
+  String get authVerifyEmailTitle => 'تأكيد البريد الإلكتروني';
+
+  @override
+  String authVerifyEmailSubtitle(String email) {
+    return 'أرسلنا رمزًا مكونًا من 6 أرقام إلى $email';
+  }
+
+  @override
+  String get authVerifyEmailLater => 'لاحقًا';
+
+  @override
+  String get authVerifyEmailResent => 'تم إرسال رمز جديد';
+
+  @override
+  String get emailVerificationBannerMessage =>
+      'بريدك الإلكتروني غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وإضافة التقييمات';
+
+  @override
+  String get emailVerificationBannerAction => 'تأكيد الآن';
+
+  @override
   String get authForgotPasswordTitle => 'نسيت كلمة المرور؟';
 
   @override
-  String get authForgotPasswordSubtitle => 'اختر طريقة الاستعادة للمتابعة';
+  String get authForgotPasswordSubtitle =>
+      'أدخل البريد الإلكتروني لحسابك وسنرسل لك رمز تحقق';
 
   @override
-  String get authMethodSms => 'رسالة SMS';
-
-  @override
-  String get authMethodEmail => 'البريد الإلكتروني';
-
-  @override
-  String get authSmsInfo =>
-      'سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور';
-
-  @override
-  String get authEmailInfo => 'سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور';
+  String get authEmailInfo =>
+      'إذا كان البريد مسجلًا لدينا فسيصلك رمز من 6 أرقام خلال دقائق. إن لم تجده فتحقق من مجلد الرسائل غير المرغوب فيها';
 
   @override
   String get authSendCode => 'إرسال رمز التحقق';
 
   @override
   String get authRememberPassword => 'تذكرت كلمة المرور؟';
-
-  @override
-  String get authSentTitle => 'تم الإرسال!';
-
-  @override
-  String get authSentSubtitleSms =>
-      'تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور';
-
-  @override
-  String get authSentSubtitleEmail =>
-      'تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور';
-
-  @override
-  String get authEnterCode => 'إدخال رمز التحقق';
 
   @override
   String get authResend => 'إعادة الإرسال';
@@ -199,6 +213,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get authOtpInvalidCode => 'رمز التحقق غير صحيح';
+
+  @override
+  String get authResetCodeExpired =>
+      'انتهت صلاحية رمز التحقق. ارجع واطلب رمزًا جديدًا';
 
   @override
   String get authResetPasswordTitle => 'كلمة مرور جديدة';
@@ -253,6 +271,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingGetStarted => 'ابدأ';
 
   @override
+  String onboardingSlideIndicator(int current, int total) {
+    return 'الشريحة $current من $total';
+  }
+
+  @override
   String get errorGeneric => 'حدث خطأ غير متوقع';
 
   @override
@@ -269,6 +292,56 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorTimeout => 'انتهت مهلة الاتصال';
 
   @override
+  String get errorTooManyAttempts => 'محاولات كثيرة، يرجى المحاولة لاحقًا';
+
+  @override
+  String errorTooManyAttemptsRetryIn(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'محاولات كثيرة، حاول مجددًا بعد $minutes دقيقة',
+      few: 'محاولات كثيرة، حاول مجددًا بعد $minutes دقائق',
+      two: 'محاولات كثيرة، حاول مجددًا بعد دقيقتين',
+      one: 'محاولات كثيرة، حاول مجددًا بعد دقيقة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errorAccountInactive =>
+      'هذا الحساب غير مفعّل، يرجى التواصل مع الدعم';
+
+  @override
+  String get errorEmailNotVerified =>
+      'أكّد بريدك الإلكتروني أولًا لإتمام هذا الإجراء';
+
+  @override
+  String get errorEmailAlreadyRegistered =>
+      'هذا البريد الإلكتروني مسجَّل مسبقًا';
+
+  @override
+  String get errorCommercialRegistrationTaken =>
+      'رقم السجل التجاري مستخدم في حساب آخر';
+
+  @override
+  String get errorBarLicenseTaken => 'رقم إجازة المحاماة مستخدم في حساب آخر';
+
+  @override
+  String get errorTermsVersionOutdated =>
+      'تم تحديث شروط الخدمة، حدّث التطبيق ثم حاول مجددًا';
+
+  @override
+  String get errorVerificationCodeLocked =>
+      'محاولات خاطئة كثيرة، اطلب رمزًا جديدًا';
+
+  @override
+  String get errorContractStatusConflict =>
+      'لا يمكن تنفيذ هذا الإجراء على العقد بحالته الحالية. حدّث الصفحة وحاول مجددًا';
+
+  @override
+  String get errorLinkOpenFailed => 'تعذّر فتح الرابط';
+
+  @override
   String get validationRequired => 'هذا الحقل مطلوب';
 
   @override
@@ -279,6 +352,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get validationInvalidPhone => 'رقم الهاتف غير صحيح';
+
+  @override
+  String get validationInvalidValue => 'القيمة المدخلة غير صحيحة';
+
+  @override
+  String get validationPasswordNeedsLetterAndDigit =>
+      'كلمة المرور يجب أن تحتوي على حرف ورقم على الأقل';
+
+  @override
+  String get validationPasswordTooLong => 'كلمة المرور طويلة جدًا';
+
+  @override
+  String validationTooLong(int max) {
+    return 'يجب ألا يزيد النص عن $max حرفًا';
+  }
+
+  @override
+  String get validationTermsRequired =>
+      'يجب الموافقة على شروط الخدمة وسياسة الخصوصية';
 
   @override
   String get navHome => 'الرئيسية';
@@ -907,62 +999,52 @@ class AppLocalizationsAr extends AppLocalizations {
   String get consultationMessageHint => 'اكتب رسالة...';
 
   @override
-  String get notificationConsultationBookedTitle => 'تم إرسال طلب الاستشارة';
+  String get notificationConsultationRequestedTitle => 'طلب استشارة جديد';
 
   @override
-  String notificationConsultationBookedBody(String lawyerName) {
-    return 'بانتظار موافقة المحامي $lawyerName على طلب استشارتك';
+  String notificationConsultationRequestedBody(String name) {
+    return 'أرسل لك $name طلب استشارة';
   }
 
   @override
   String get notificationConsultationAcceptedTitle => 'تم قبول طلب الاستشارة';
 
   @override
-  String notificationConsultationAcceptedBody(String lawyerName) {
-    return 'وافق المحامي $lawyerName على طلب استشارتك';
+  String notificationConsultationAcceptedBody(String name) {
+    return 'وافق $name على طلب استشارتك';
   }
 
   @override
   String get notificationConsultationRejectedTitle => 'تم رفض طلب الاستشارة';
 
   @override
-  String notificationConsultationRejectedBody(String lawyerName) {
-    return 'اعتذر المحامي $lawyerName عن طلب استشارتك';
+  String notificationConsultationRejectedBody(String name) {
+    return 'اعتذر $name عن طلب استشارتك';
   }
 
   @override
   String get notificationConsultationCancelledTitle => 'تم إلغاء الاستشارة';
 
   @override
-  String get notificationConsultationCancelledBody => 'تم إلغاء موعد استشارتك';
+  String notificationConsultationCancelledBody(String name) {
+    return 'ألغى $name موعد الاستشارة';
+  }
 
   @override
   String get notificationConsultationCompletedTitle => 'انتهت الاستشارة';
 
   @override
-  String get notificationConsultationCompletedBody =>
-      'انتهت جلسة استشارتك بنجاح';
-
-  @override
-  String get notificationNewMessageTitle => 'رسالة جديدة';
-
-  @override
-  String get notificationNewAttachmentBody => 'أرسل لك مرفقًا جديدًا';
-
-  @override
-  String get notificationDocumentUploadedTitle => 'تم رفع مستند';
-
-  @override
-  String notificationDocumentUploadedBody(String title) {
-    return '\"$title\" أُضيف إلى خزنتك الرقمية';
+  String notificationConsultationCompletedBody(String name) {
+    return 'انتهت استشارتك مع $name';
   }
 
   @override
-  String get notificationAiAnalysisTitle => 'اكتمل تحليل العقد';
+  String get notificationConsultationRescheduledTitle =>
+      'تم تغيير موعد الاستشارة';
 
   @override
-  String notificationAiAnalysisBody(String documentTitle) {
-    return 'تم الانتهاء من تحليل \"$documentTitle\"';
+  String notificationConsultationRescheduledBody(String name) {
+    return 'غيّر $name موعد الاستشارة';
   }
 
   @override
@@ -1497,6 +1579,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboardStartSession => 'بدء الجلسة';
 
   @override
+  String get dashboardVerificationUnverifiedTitle => 'حسابك غير موثّق بعد';
+
+  @override
+  String get dashboardVerificationUnverifiedMessage =>
+      'لن يظهر ملفك للعملاء ولن يتمكنوا من حجز استشارة معك قبل توثيق حسابك';
+
+  @override
+  String get dashboardVerificationPendingTitle => 'طلب التوثيق قيد المراجعة';
+
+  @override
+  String get dashboardVerificationPendingMessage =>
+      'سنراجع مستنداتك قريبًا، وسيظهر ملفك للعملاء بعد الموافقة';
+
+  @override
+  String get dashboardVerificationRejectedTitle => 'تم رفض طلب التوثيق';
+
+  @override
+  String get dashboardVerificationRejectedMessage =>
+      'راجع ملفك وأعد رفع مستندات التوثيق';
+
+  @override
+  String get dashboardVerificationAction => 'إكمال التوثيق';
+
+  @override
   String get earningsBalance => 'إجمالي الأرباح';
 
   @override
@@ -1573,6 +1679,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get lawyerVerificationSubmittedMessage => 'تم إرسال المستند للمراجعة';
+
+  @override
+  String get lawyerVerificationDocumentsHint =>
+      'ارفع صورة هويتك وبطاقة النقابة: JPG أو PNG أو PDF، حتى 3 ملفات، و10 ميغابايت لكل ملف';
+
+  @override
+  String lawyerVerificationRejectedReason(String reason) {
+    return 'سبب الرفض: $reason';
+  }
+
+  @override
+  String get lawyerVerificationFileTooLarge =>
+      'حجم أحد الملفات أكبر من 10 ميغابايت';
+
+  @override
+  String get lawyerVerificationTooManyFiles => 'يمكنك رفع 3 ملفات كحد أقصى';
+
+  @override
+  String get lawyerVerificationInvalidFile =>
+      'نقبل فقط ملفات JPG أو PNG أو PDF';
+
+  @override
+  String get lawyerVerificationAlreadyPending => 'مستنداتك قيد المراجعة بالفعل';
+
+  @override
+  String get notificationVerificationApprovedTitle => 'تم توثيق حسابك';
+
+  @override
+  String get notificationVerificationApprovedBody =>
+      'أصبح ملفك ظاهرًا للعملاء ويمكنهم حجز استشارات معك';
+
+  @override
+  String get notificationVerificationRejectedTitle => 'تم رفض طلب التوثيق';
+
+  @override
+  String notificationVerificationRejectedBody(String reason) {
+    return 'السبب: $reason';
+  }
 
   @override
   String get lawyerPriceLabel => 'السعر';

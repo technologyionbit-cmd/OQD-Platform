@@ -9,7 +9,7 @@ import 'video_call_test_support.dart';
 /// data-source plumbing, just the video screen's own widget tree.
 void main() {
   testWidgets('active -> simulated connection loss -> reconnecting -> retry succeeds -> active again', (tester) async {
-    final consultation = videoConsultation(id: 'cons_seed_8');
+    final consultation = videoConsultation();
     await pumpVideoCall(
       tester,
       user: testClient,

@@ -606,7 +606,7 @@ class _TypingIndicator extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
-        decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.mdRadius),
+        decoration: const BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.mdRadius),
         child: const SizedBox(
           width: 24,
           height: 12,

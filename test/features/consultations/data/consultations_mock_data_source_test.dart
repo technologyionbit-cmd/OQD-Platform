@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:aqd_ionbit/features/consultations/data/datasources/consultations_mock_data_source.dart';
 import 'package:aqd_ionbit/features/consultations/domain/entities/consultation_status.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/consultation_type.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart' show kDemoLawyerId;
 
 void main() {
   late ConsultationsMockDataSource dataSource;

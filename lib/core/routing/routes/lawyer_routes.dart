@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/widgets/app_shell.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/email_verification_banner.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/screens/lawyer_schedule_screen.dart';
 import 'package:aqd_ionbit/features/lawyer_dashboard/presentation/screens/lawyer_clients_screen.dart';
 import 'package:aqd_ionbit/features/lawyer_dashboard/presentation/screens/lawyer_dashboard_screen.dart';
@@ -19,6 +20,7 @@ StatefulShellRoute lawyerShellRoute() {
       final l10n = AppLocalizations.of(context)!;
       return AppShell(
         navigationShell: navigationShell,
+        banner: const EmailVerificationBanner(),
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.space_dashboard_outlined),

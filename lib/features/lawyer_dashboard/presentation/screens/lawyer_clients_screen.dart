@@ -12,7 +12,6 @@ import 'package:aqd_ionbit/core/widgets/error_view.dart';
 import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
 import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/providers/consultations_controller.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 
 /// The demo lawyer's client roster — derived from her own consultation
 /// history (every unique client she's had a booking with) rather than a
@@ -58,7 +57,7 @@ class _LawyerClientsScreenState extends ConsumerState<LawyerClientsScreen> {
               child: switch (consultationsState) {
                 AsyncData(value: final consultations) => Builder(
                   builder: (context) {
-                    final mine = consultations.where((c) => c.lawyerId == kDemoLawyerId);
+                    final mine = consultations;
                     final byClient = <String, int>{};
                     final lastSeen = <String, DateTime>{};
                     for (final c in mine) {

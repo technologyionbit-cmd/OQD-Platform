@@ -13,6 +13,9 @@ import { GovProceduresModule } from './gov-procedures/gov-procedures.module';
 import { LawyersModule } from './lawyers/lawyers.module';
 import { ConsultationsModule } from './consultations/consultations.module';
 import { ConsultationRoomModule } from './consultation-room/consultation-room.module';
+import { ContractsModule } from './contracts/contracts.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -37,6 +40,9 @@ import { ConsultationRoomModule } from './consultation-room/consultation-room.mo
     LawyersModule,
     ConsultationsModule,
     ConsultationRoomModule,
+    ContractsModule,
+    NotificationsModule,
+    AdminModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: HttpExceptionFilter },

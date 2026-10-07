@@ -4,12 +4,24 @@
   "@appName": {
     "description": "Application name shown in title bars and splash screen"
   },
+  "splashTagline": "منصتك القانونية الذكية",
+  "@splashTagline": {
+    "description": "One-line tagline under the app name on the splash screen"
+  },
+  "splashLoading": "جارٍ التحميل",
+  "@splashLoading": {
+    "description": "Screen-reader label for the splash screen's loading indicator"
+  },
 
   "commonRetry": "إعادة المحاولة",
   "commonLogout": "تسجيل الخروج",
   "commonCancel": "إلغاء",
   "commonConfirm": "تأكيد",
   "commonSkip": "تخطي",
+  "commonChangeLanguage": "تغيير اللغة",
+  "@commonChangeLanguage": {
+    "description": "Screen-reader label for the language switch button"
+  },
   "commonNext": "التالي",
   "commonViewAll": "عرض الكل",
   "commonSave": "حفظ",
@@ -54,19 +66,25 @@
   "authTermsOfService": "شروط الخدمة",
   "authTermsAgreementJoiner": " و",
   "authPrivacyPolicy": "سياسة الخصوصية",
+  "authTermsCheckboxPrefix": "أوافق على ",
+  "authPasswordRulesHint": "8 أحرف على الأقل، وتحتوي على حرف ورقم",
+  "authVerifyEmailTitle": "تأكيد البريد الإلكتروني",
+  "authVerifyEmailSubtitle": "أرسلنا رمزًا مكونًا من 6 أرقام إلى {email}",
+  "@authVerifyEmailSubtitle": {
+    "placeholders": {
+      "email": {"type": "String"}
+    }
+  },
+  "authVerifyEmailLater": "لاحقًا",
+  "authVerifyEmailResent": "تم إرسال رمز جديد",
+  "emailVerificationBannerMessage": "بريدك الإلكتروني غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وإضافة التقييمات",
+  "emailVerificationBannerAction": "تأكيد الآن",
 
   "authForgotPasswordTitle": "نسيت كلمة المرور؟",
-  "authForgotPasswordSubtitle": "اختر طريقة الاستعادة للمتابعة",
-  "authMethodSms": "رسالة SMS",
-  "authMethodEmail": "البريد الإلكتروني",
-  "authSmsInfo": "سنرسل لك رمز تحقق مؤلف من 6 أرقام لإعادة تعيين كلمة المرور",
-  "authEmailInfo": "سنرسل لك رابط تحقق لإعادة تعيين كلمة المرور",
+  "authForgotPasswordSubtitle": "أدخل البريد الإلكتروني لحسابك وسنرسل لك رمز تحقق",
+  "authEmailInfo": "إذا كان البريد مسجلًا لدينا فسيصلك رمز من 6 أرقام خلال دقائق. إن لم تجده فتحقق من مجلد الرسائل غير المرغوب فيها",
   "authSendCode": "إرسال رمز التحقق",
   "authRememberPassword": "تذكرت كلمة المرور؟",
-  "authSentTitle": "تم الإرسال!",
-  "authSentSubtitleSms": "تحقق من رسائلك واتبع التعليمات لإعادة تعيين كلمة المرور",
-  "authSentSubtitleEmail": "تحقق من بريدك الإلكتروني واتبع التعليمات لإعادة تعيين كلمة المرور",
-  "authEnterCode": "إدخال رمز التحقق",
   "authResend": "إعادة الإرسال",
 
   "authOtpTitle": "أدخل رمز التحقق",
@@ -84,6 +102,7 @@
     }
   },
   "authOtpInvalidCode": "رمز التحقق غير صحيح",
+  "authResetCodeExpired": "انتهت صلاحية رمز التحقق. ارجع واطلب رمزًا جديدًا",
 
   "authResetPasswordTitle": "كلمة مرور جديدة",
   "authResetPasswordSubtitle": "أنشئ كلمة مرور قوية لحسابك",
@@ -102,17 +121,52 @@
   "onboardingSlide3Title": "تواصل مباشرة مع محامين موثوقين",
   "onboardingSlide3Subtitle": "احجز استشارة فيديو أو صوتية أو مكتوبة مع نخبة من المحامين المرخصين",
   "onboardingGetStarted": "ابدأ",
+  "onboardingSlideIndicator": "الشريحة {current} من {total}",
+  "@onboardingSlideIndicator": {
+    "description": "Screen-reader label for the onboarding page dots",
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
 
   "errorGeneric": "حدث خطأ غير متوقع",
   "errorNetwork": "تعذّر الاتصال بالشبكة، تحقق من الاتصال بالإنترنت",
   "errorInvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
   "errorServer": "حدث خطأ في الخادم، حاول لاحقًا",
   "errorTimeout": "انتهت مهلة الاتصال",
+  "errorTooManyAttempts": "محاولات كثيرة، يرجى المحاولة لاحقًا",
+  "errorTooManyAttemptsRetryIn": "{minutes, plural, =1{محاولات كثيرة، حاول مجددًا بعد دقيقة} =2{محاولات كثيرة، حاول مجددًا بعد دقيقتين} few{محاولات كثيرة، حاول مجددًا بعد {minutes} دقائق} other{محاولات كثيرة، حاول مجددًا بعد {minutes} دقيقة}}",
+  "@errorTooManyAttemptsRetryIn": {
+    "description": "Rate-limited (HTTP 429) with a known wait time",
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "errorAccountInactive": "هذا الحساب غير مفعّل، يرجى التواصل مع الدعم",
+  "errorEmailNotVerified": "أكّد بريدك الإلكتروني أولًا لإتمام هذا الإجراء",
+  "errorEmailAlreadyRegistered": "هذا البريد الإلكتروني مسجَّل مسبقًا",
+  "errorCommercialRegistrationTaken": "رقم السجل التجاري مستخدم في حساب آخر",
+  "errorBarLicenseTaken": "رقم إجازة المحاماة مستخدم في حساب آخر",
+  "errorTermsVersionOutdated": "تم تحديث شروط الخدمة، حدّث التطبيق ثم حاول مجددًا",
+  "errorVerificationCodeLocked": "محاولات خاطئة كثيرة، اطلب رمزًا جديدًا",
+  "errorContractStatusConflict": "لا يمكن تنفيذ هذا الإجراء على العقد بحالته الحالية. حدّث الصفحة وحاول مجددًا",
+  "errorLinkOpenFailed": "تعذّر فتح الرابط",
 
   "validationRequired": "هذا الحقل مطلوب",
   "validationInvalidEmail": "صيغة البريد الإلكتروني غير صحيحة",
   "validationPasswordTooShort": "كلمة المرور يجب ألا تقل عن 8 أحرف",
   "validationInvalidPhone": "رقم الهاتف غير صحيح",
+  "validationInvalidValue": "القيمة المدخلة غير صحيحة",
+  "validationPasswordNeedsLetterAndDigit": "كلمة المرور يجب أن تحتوي على حرف ورقم على الأقل",
+  "validationPasswordTooLong": "كلمة المرور طويلة جدًا",
+  "validationTooLong": "يجب ألا يزيد النص عن {max} حرفًا",
+  "@validationTooLong": {
+    "placeholders": {
+      "max": {"type": "int"}
+    }
+  },
+  "validationTermsRequired": "يجب الموافقة على شروط الخدمة وسياسة الخصوصية",
 
   "navHome": "الرئيسية",
   "navAi": "AI",
@@ -361,45 +415,46 @@
   "consultationEnd": "إنهاء الاستشارة",
   "consultationMessageHint": "اكتب رسالة...",
 
-  "notificationConsultationBookedTitle": "تم إرسال طلب الاستشارة",
-  "notificationConsultationBookedBody": "بانتظار موافقة المحامي {lawyerName} على طلب استشارتك",
-  "@notificationConsultationBookedBody": {
+  "notificationConsultationRequestedTitle": "طلب استشارة جديد",
+  "notificationConsultationRequestedBody": "أرسل لك {name} طلب استشارة",
+  "@notificationConsultationRequestedBody": {
     "placeholders": {
-      "lawyerName": {"type": "String"}
+      "name": {"type": "String"}
     }
   },
   "notificationConsultationAcceptedTitle": "تم قبول طلب الاستشارة",
-  "notificationConsultationAcceptedBody": "وافق المحامي {lawyerName} على طلب استشارتك",
+  "notificationConsultationAcceptedBody": "وافق {name} على طلب استشارتك",
   "@notificationConsultationAcceptedBody": {
     "placeholders": {
-      "lawyerName": {"type": "String"}
+      "name": {"type": "String"}
     }
   },
   "notificationConsultationRejectedTitle": "تم رفض طلب الاستشارة",
-  "notificationConsultationRejectedBody": "اعتذر المحامي {lawyerName} عن طلب استشارتك",
+  "notificationConsultationRejectedBody": "اعتذر {name} عن طلب استشارتك",
   "@notificationConsultationRejectedBody": {
     "placeholders": {
-      "lawyerName": {"type": "String"}
+      "name": {"type": "String"}
     }
   },
   "notificationConsultationCancelledTitle": "تم إلغاء الاستشارة",
-  "notificationConsultationCancelledBody": "تم إلغاء موعد استشارتك",
-  "notificationConsultationCompletedTitle": "انتهت الاستشارة",
-  "notificationConsultationCompletedBody": "انتهت جلسة استشارتك بنجاح",
-  "notificationNewMessageTitle": "رسالة جديدة",
-  "notificationNewAttachmentBody": "أرسل لك مرفقًا جديدًا",
-  "notificationDocumentUploadedTitle": "تم رفع مستند",
-  "notificationDocumentUploadedBody": "\"{title}\" أُضيف إلى خزنتك الرقمية",
-  "@notificationDocumentUploadedBody": {
+  "notificationConsultationCancelledBody": "ألغى {name} موعد الاستشارة",
+  "@notificationConsultationCancelledBody": {
     "placeholders": {
-      "title": {"type": "String"}
+      "name": {"type": "String"}
     }
   },
-  "notificationAiAnalysisTitle": "اكتمل تحليل العقد",
-  "notificationAiAnalysisBody": "تم الانتهاء من تحليل \"{documentTitle}\"",
-  "@notificationAiAnalysisBody": {
+  "notificationConsultationCompletedTitle": "انتهت الاستشارة",
+  "notificationConsultationCompletedBody": "انتهت استشارتك مع {name}",
+  "@notificationConsultationCompletedBody": {
     "placeholders": {
-      "documentTitle": {"type": "String"}
+      "name": {"type": "String"}
+    }
+  },
+  "notificationConsultationRescheduledTitle": "تم تغيير موعد الاستشارة",
+  "notificationConsultationRescheduledBody": "غيّر {name} موعد الاستشارة",
+  "@notificationConsultationRescheduledBody": {
+    "placeholders": {
+      "name": {"type": "String"}
     }
   },
 
@@ -593,6 +648,13 @@
   },
   "dashboardActiveSessionReady": "جاهزة للبدء الآن",
   "dashboardStartSession": "بدء الجلسة",
+  "dashboardVerificationUnverifiedTitle": "حسابك غير موثّق بعد",
+  "dashboardVerificationUnverifiedMessage": "لن يظهر ملفك للعملاء ولن يتمكنوا من حجز استشارة معك قبل توثيق حسابك",
+  "dashboardVerificationPendingTitle": "طلب التوثيق قيد المراجعة",
+  "dashboardVerificationPendingMessage": "سنراجع مستنداتك قريبًا، وسيظهر ملفك للعملاء بعد الموافقة",
+  "dashboardVerificationRejectedTitle": "تم رفض طلب التوثيق",
+  "dashboardVerificationRejectedMessage": "راجع ملفك وأعد رفع مستندات التوثيق",
+  "dashboardVerificationAction": "إكمال التوثيق",
 
   "earningsBalance": "إجمالي الأرباح",
   "earningsPending": "{amount} بانتظار الاستشارات القادمة",
@@ -623,6 +685,26 @@
   "lawyerUploadVerificationDocument": "رفع مستند توثيق",
   "lawyerVerificationDocumentPreviewTitle": "معاينة المستند",
   "lawyerVerificationSubmittedMessage": "تم إرسال المستند للمراجعة",
+  "lawyerVerificationDocumentsHint": "ارفع صورة هويتك وبطاقة النقابة: JPG أو PNG أو PDF، حتى 3 ملفات، و10 ميغابايت لكل ملف",
+  "lawyerVerificationRejectedReason": "سبب الرفض: {reason}",
+  "@lawyerVerificationRejectedReason": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
+  "lawyerVerificationFileTooLarge": "حجم أحد الملفات أكبر من 10 ميغابايت",
+  "lawyerVerificationTooManyFiles": "يمكنك رفع 3 ملفات كحد أقصى",
+  "lawyerVerificationInvalidFile": "نقبل فقط ملفات JPG أو PNG أو PDF",
+  "lawyerVerificationAlreadyPending": "مستنداتك قيد المراجعة بالفعل",
+  "notificationVerificationApprovedTitle": "تم توثيق حسابك",
+  "notificationVerificationApprovedBody": "أصبح ملفك ظاهرًا للعملاء ويمكنهم حجز استشارات معك",
+  "notificationVerificationRejectedTitle": "تم رفض طلب التوثيق",
+  "notificationVerificationRejectedBody": "السبب: {reason}",
+  "@notificationVerificationRejectedBody": {
+    "placeholders": {
+      "reason": {"type": "String"}
+    }
+  },
   "lawyerPriceLabel": "السعر",
   "lawyerBioRequiredError": "يرجى كتابة نبذة تعريفية قبل الحفظ",
   "lawyerExperienceInvalidError": "أدخل عدد سنوات صحيحًا",

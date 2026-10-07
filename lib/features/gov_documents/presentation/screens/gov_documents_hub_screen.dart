@@ -103,7 +103,7 @@ class _ProcedureCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconBadge(icon: type.icon, size: 48),
+          IconBadge(icon: type.icon),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(

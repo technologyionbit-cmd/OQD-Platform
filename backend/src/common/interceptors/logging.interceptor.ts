@@ -1,6 +1,8 @@
 import {
   CallHandler,
   ExecutionContext,
+  HttpException,
+  HttpStatus,
   Injectable,
   Logger,
   NestInterceptor,
@@ -43,9 +45,16 @@ export class LoggingInterceptor implements NestInterceptor {
             `[${requestId}] ${method} ${originalUrl} ${response.statusCode} +${Date.now() - start}ms`,
           );
         },
-        error: () => {
+        // The response status is not set yet when the handler throws (it
+        // still holds the route default, e.g. 204), so log the status the
+        // exception filter is about to send.
+        error: (error: unknown) => {
+          const status =
+            error instanceof HttpException
+              ? error.getStatus()
+              : HttpStatus.INTERNAL_SERVER_ERROR;
           this.logger.log(
-            `[${requestId}] ${method} ${originalUrl} ${response.statusCode} +${Date.now() - start}ms (error)`,
+            `[${requestId}] ${method} ${originalUrl} ${status} +${Date.now() - start}ms (error)`,
           );
         },
       }),

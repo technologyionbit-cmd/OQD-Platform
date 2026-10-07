@@ -17,25 +17,17 @@ class GovDocumentsRepositoryImpl implements GovDocumentsRepository {
 
   @override
   Future<Result<List<GovProcedure>>> getGovProcedures({required String locale}) =>
-      _guard(() => _remote.getGovProcedures(locale: locale));
+      _errorMapper.capture(() => _remote.getGovProcedures(locale: locale));
 
   @override
-  Future<Result<GovProcedureProgress>> getProgress(GovProcedureType type) => _guard(() => _remote.getProgress(type));
+  Future<Result<GovProcedureProgress>> getProgress(GovProcedureType type) => _errorMapper.capture(() => _remote.getProgress(type));
 
   @override
   Future<Result<GovProcedureProgress>> toggleDocument(GovProcedureType type, String documentId) =>
-      _guard(() => _remote.updateProgress(type, toggleDocumentId: documentId));
+      _errorMapper.capture(() => _remote.updateProgress(type, toggleDocumentId: documentId));
 
   @override
-  Future<Result<GovProcedureProgress>> start(GovProcedureType type) => _guard(() => _remote.updateProgress(type, start: true));
-
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
-  }
+  Future<Result<GovProcedureProgress>> start(GovProcedureType type) => _errorMapper.capture(() => _remote.updateProgress(type, start: true));
 }
 
 final govDocumentsRepositoryProvider = Provider<GovDocumentsRepository>((ref) {

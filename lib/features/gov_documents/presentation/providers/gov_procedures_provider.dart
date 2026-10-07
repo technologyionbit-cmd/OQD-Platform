@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/gov_documents/data/repositories/gov_documents_repository_impl.dart';
 import 'package:aqd_ionbit/features/gov_documents/domain/entities/gov_procedure.dart';
 import 'package:aqd_ionbit/features/gov_documents/domain/repositories/gov_documents_repository.dart';
@@ -24,7 +25,7 @@ class GovProceduresController extends AsyncNotifier<List<GovProcedure>> {
     final repository = ref.read(govDocumentsRepositoryProvider);
     final locale = ref.read(localeControllerProvider).languageCode;
     final result = await repository.getGovProcedures(locale: locale);
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (procedures) => AsyncData(procedures));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 }
 
@@ -36,11 +37,12 @@ final govProceduresProvider = AsyncNotifierProvider<GovProceduresController, Lis
 /// catalog, so N parallel single-procedure requests is simpler than a
 /// dedicated bulk endpoint.
 class GovProceduresProgressController extends AsyncNotifier<Map<GovProcedureType, GovProcedureProgress>> {
-  late final GovDocumentsRepository _repository;
+  GovDocumentsRepository get _repository => ref.read(govDocumentsRepositoryProvider);
 
   @override
   Future<Map<GovProcedureType, GovProcedureProgress>> build() async {
-    _repository = ref.watch(govDocumentsRepositoryProvider);
+    ref.watch(govDocumentsRepositoryProvider);
+    if (ref.watch(currentUserIdProvider) == null) return const {}; // Signed out: no one's data.
     final entries = await Future.wait(
       GovProcedureType.values.map((type) async {
         final result = await _repository.getProgress(type);

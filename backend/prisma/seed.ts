@@ -202,12 +202,14 @@ async function seedLawyers(): Promise<void> {
   for (const lawyer of LAWYERS) {
     const user = await prisma.user.upsert({
       where: { email: lawyer.email },
-      update: { fullName: lawyer.fullName },
+      // Seeded accounts count as verified so they can use every feature.
+      update: { fullName: lawyer.fullName, emailVerifiedAt: new Date() },
       create: {
         email: lawyer.email,
         fullName: lawyer.fullName,
         passwordHash,
         role: 'lawyer',
+        emailVerifiedAt: new Date(),
       },
     });
 

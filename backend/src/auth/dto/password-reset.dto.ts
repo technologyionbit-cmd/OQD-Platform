@@ -1,49 +1,33 @@
-import {
-  IsNotEmpty,
-  IsString,
-  Length,
-  Matches,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, Matches, MaxLength } from 'class-validator';
+import { StrongPassword } from './password.rules';
 
-const PASSWORD_RE = /^(?=.*[A-Za-z])(?=.*\d).+$/;
-const CODE_RE = /^[0-9]{6}$/;
+export const CODE_RE = /^[0-9]{6}$/;
 
-/** `destination` is channel-agnostic — an email or a phone number. The
- *  server infers the channel from its shape (docs §4). */
+/** Password reset works by email only for now; a phone channel would add
+ *  its own field rather than overload this one. */
 export class ForgotPasswordDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsEmail()
   @MaxLength(254)
-  destination!: string;
+  email!: string;
 }
 
 export class VerifyOtpDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsEmail()
   @MaxLength(254)
-  destination!: string;
+  email!: string;
 
   @Matches(CODE_RE, { message: 'Enter the 6-digit code.' })
   code!: string;
 }
 
 export class ResetPasswordDto {
-  @IsString()
-  @IsNotEmpty()
+  @IsEmail()
   @MaxLength(254)
-  destination!: string;
+  email!: string;
 
-  @Length(6, 6)
   @Matches(CODE_RE, { message: 'Enter the 6-digit code.' })
   code!: string;
 
-  @IsString()
-  @MinLength(8, { message: 'Password must be at least 8 characters.' })
-  @MaxLength(128)
-  @Matches(PASSWORD_RE, {
-    message: 'Password must contain at least one letter and one number.',
-  })
+  @StrongPassword()
   newPassword!: string;
 }

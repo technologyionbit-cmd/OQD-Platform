@@ -5,6 +5,7 @@ import 'package:aqd_ionbit/features/contracts/data/datasources/contracts_remote_
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_category.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dart';
+import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_option.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
@@ -63,12 +64,12 @@ class ContractsMockDataSource implements ContractsRemoteDataSource {
   }
 
   @override
-  Future<Contract> saveDraft({required ContractTemplate template, required Map<String, String> fieldValues, String? contractId}) {
+  Future<Contract> saveDraft({required ContractTemplate template, required Map<String, String> fieldValues, required Locale locale, String? contractId}) {
     return _save(template: template, fieldValues: fieldValues, status: ContractStatus.draft, contractId: contractId);
   }
 
   @override
-  Future<Contract> generateContract({required ContractTemplate template, required Map<String, String> fieldValues, String? contractId}) {
+  Future<Contract> generateContract({required ContractTemplate template, required Map<String, String> fieldValues, required Locale locale, String? contractId}) {
     return _save(template: template, fieldValues: fieldValues, status: ContractStatus.pendingSignature, contractId: contractId);
   }
 
@@ -153,209 +154,227 @@ class ContractsMockDataSource implements ContractsRemoteDataSource {
 }
 
 final _arTemplates = <ContractTemplate>[
-  ContractTemplate(
+  const ContractTemplate(
     id: 'employment',
     category: ContractCategory.employment,
     title: 'عقد عمل',
     fields: [
-      const ContractField(id: 'partyA', label: 'الطرف الأول (صاحب العمل)', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'الطرف الثاني (الموظف)', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'position', label: 'المسمى الوظيفي', type: ContractFieldType.text, isRequired: true),
-      const ContractField(
+      ContractField(id: 'partyA', label: 'الطرف الأول (صاحب العمل)', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'الطرف الثاني (الموظف)', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'position', label: 'المسمى الوظيفي', type: ContractFieldType.text, isRequired: true),
+      ContractField(
         id: 'employmentType',
         label: 'نوع الدوام',
         type: ContractFieldType.dropdown,
         isRequired: true,
-        options: ['دوام كامل', 'دوام جزئي', 'عن بعد'],
+        options: [
+          ContractFieldOption(value: 'fullTime', label: 'دوام كامل'),
+          ContractFieldOption(value: 'partTime', label: 'دوام جزئي'),
+          ContractFieldOption(value: 'remote', label: 'عن بعد'),
+        ],
       ),
-      const ContractField(id: 'salary', label: 'الراتب الشهري', type: ContractFieldType.currency, isRequired: true),
-      const ContractField(id: 'startDate', label: 'تاريخ بداية العمل', type: ContractFieldType.date, isRequired: true),
-      const ContractField(id: 'duration', label: 'مدة العقد (بالأشهر)', type: ContractFieldType.number, isRequired: true),
-      const ContractField(id: 'contactEmail', label: 'البريد الإلكتروني للتواصل', type: ContractFieldType.email, isRequired: false),
-      const ContractField(id: 'contactPhone', label: 'رقم هاتف للتواصل', type: ContractFieldType.phone, isRequired: false),
+      ContractField(id: 'salary', label: 'الراتب الشهري', type: ContractFieldType.currency, isRequired: true),
+      ContractField(id: 'startDate', label: 'تاريخ بداية العمل', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'duration', label: 'مدة العقد (بالأشهر)', type: ContractFieldType.number, isRequired: true),
+      ContractField(id: 'contactEmail', label: 'البريد الإلكتروني للتواصل', type: ContractFieldType.email, isRequired: false),
+      ContractField(id: 'contactPhone', label: 'رقم هاتف للتواصل', type: ContractFieldType.phone, isRequired: false),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'sale',
     category: ContractCategory.sale,
     title: 'عقد بيع',
     fields: [
-      const ContractField(id: 'partyA', label: 'البائع', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'المشتري', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'itemDescription', label: 'وصف السلعة / الممتلكات', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'price', label: 'السعر', type: ContractFieldType.currency, isRequired: true),
-      const ContractField(id: 'startDate', label: 'تاريخ البيع', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'البائع', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'المشتري', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'itemDescription', label: 'وصف السلعة / الممتلكات', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'price', label: 'السعر', type: ContractFieldType.currency, isRequired: true),
+      ContractField(id: 'startDate', label: 'تاريخ البيع', type: ContractFieldType.date, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'rental',
     category: ContractCategory.rental,
     title: 'عقد إيجار',
     fields: [
-      const ContractField(id: 'partyA', label: 'المؤجر', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'المستأجر', type: ContractFieldType.text, isRequired: true),
-      const ContractField(
+      ContractField(id: 'partyA', label: 'المؤجر', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'المستأجر', type: ContractFieldType.text, isRequired: true),
+      ContractField(
         id: 'propertyType',
         label: 'نوع العقار',
         type: ContractFieldType.dropdown,
         isRequired: true,
-        options: ['شقة', 'فيلا', 'مكتب', 'محل تجاري'],
+        options: [
+          ContractFieldOption(value: 'apartment', label: 'شقة'),
+          ContractFieldOption(value: 'villa', label: 'فيلا'),
+          ContractFieldOption(value: 'office', label: 'مكتب'),
+          ContractFieldOption(value: 'retailShop', label: 'محل تجاري'),
+        ],
       ),
-      const ContractField(id: 'propertyAddress', label: 'عنوان العقار', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'rentAmount', label: 'قيمة الإيجار الشهري', type: ContractFieldType.currency, isRequired: true),
-      const ContractField(id: 'startDate', label: 'تاريخ بداية الإيجار', type: ContractFieldType.date, isRequired: true),
-      const ContractField(id: 'duration', label: 'مدة العقد (بالأشهر)', type: ContractFieldType.number, isRequired: true),
+      ContractField(id: 'propertyAddress', label: 'عنوان العقار', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'rentAmount', label: 'قيمة الإيجار الشهري', type: ContractFieldType.currency, isRequired: true),
+      ContractField(id: 'startDate', label: 'تاريخ بداية الإيجار', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'duration', label: 'مدة العقد (بالأشهر)', type: ContractFieldType.number, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'partnership',
     category: ContractCategory.partnership,
     title: 'عقد شراكة',
     fields: [
-      const ContractField(id: 'partyA', label: 'الشريك الأول', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'الشريك الثاني', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'businessName', label: 'اسم المشروع / الشركة', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'sharePercentage', label: 'نسبة الشراكة (%)', type: ContractFieldType.number, isRequired: true),
-      const ContractField(id: 'startDate', label: 'تاريخ بدء الشراكة', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'الشريك الأول', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'الشريك الثاني', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'businessName', label: 'اسم المشروع / الشركة', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'sharePercentage', label: 'نسبة الشراكة (%)', type: ContractFieldType.number, isRequired: true),
+      ContractField(id: 'startDate', label: 'تاريخ بدء الشراكة', type: ContractFieldType.date, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'nda',
     category: ContractCategory.nda,
     title: 'اتفاقية عدم إفصاح',
     fields: [
-      const ContractField(id: 'partyA', label: 'الطرف المُفصِح', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'الطرف المُستلِم', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'purpose', label: 'الغرض من الإفصاح', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'duration', label: 'مدة السرية (بالأشهر)', type: ContractFieldType.number, isRequired: true),
-      const ContractField(id: 'startDate', label: 'تاريخ السريان', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'الطرف المُفصِح', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'الطرف المُستلِم', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'purpose', label: 'الغرض من الإفصاح', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'duration', label: 'مدة السرية (بالأشهر)', type: ContractFieldType.number, isRequired: true),
+      ContractField(id: 'startDate', label: 'تاريخ السريان', type: ContractFieldType.date, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'service_agreement',
     category: ContractCategory.serviceAgreement,
     title: 'عقد خدمات',
     fields: [
-      const ContractField(id: 'partyA', label: 'مقدم الخدمة', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'العميل', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'serviceDescription', label: 'وصف الخدمة', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'fee', label: 'قيمة الأتعاب', type: ContractFieldType.currency, isRequired: true),
-      const ContractField(id: 'startDate', label: 'تاريخ بدء الخدمة', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'مقدم الخدمة', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'العميل', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'serviceDescription', label: 'وصف الخدمة', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'fee', label: 'قيمة الأتعاب', type: ContractFieldType.currency, isRequired: true),
+      ContractField(id: 'startDate', label: 'تاريخ بدء الخدمة', type: ContractFieldType.date, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'other',
     category: ContractCategory.other,
     title: 'عقد آخر',
     fields: [
-      const ContractField(id: 'partyA', label: 'الطرف الأول', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'الطرف الثاني', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'subject', label: 'موضوع العقد', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'startDate', label: 'تاريخ العقد', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'الطرف الأول', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'الطرف الثاني', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'subject', label: 'موضوع العقد', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'startDate', label: 'تاريخ العقد', type: ContractFieldType.date, isRequired: true),
     ],
   ),
 ];
 
 final _enTemplates = <ContractTemplate>[
-  ContractTemplate(
+  const ContractTemplate(
     id: 'employment',
     category: ContractCategory.employment,
     title: 'Employment Contract',
     fields: [
-      const ContractField(id: 'partyA', label: 'First Party (Employer)', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'Second Party (Employee)', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'position', label: 'Job Title', type: ContractFieldType.text, isRequired: true),
-      const ContractField(
+      ContractField(id: 'partyA', label: 'First Party (Employer)', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'Second Party (Employee)', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'position', label: 'Job Title', type: ContractFieldType.text, isRequired: true),
+      ContractField(
         id: 'employmentType',
         label: 'Employment Type',
         type: ContractFieldType.dropdown,
         isRequired: true,
-        options: ['Full-time', 'Part-time', 'Remote'],
+        options: [
+          ContractFieldOption(value: 'fullTime', label: 'Full-time'),
+          ContractFieldOption(value: 'partTime', label: 'Part-time'),
+          ContractFieldOption(value: 'remote', label: 'Remote'),
+        ],
       ),
-      const ContractField(id: 'salary', label: 'Monthly Salary', type: ContractFieldType.currency, isRequired: true),
-      const ContractField(id: 'startDate', label: 'Start Date', type: ContractFieldType.date, isRequired: true),
-      const ContractField(id: 'duration', label: 'Contract Duration (months)', type: ContractFieldType.number, isRequired: true),
-      const ContractField(id: 'contactEmail', label: 'Contact Email', type: ContractFieldType.email, isRequired: false),
-      const ContractField(id: 'contactPhone', label: 'Contact Phone', type: ContractFieldType.phone, isRequired: false),
+      ContractField(id: 'salary', label: 'Monthly Salary', type: ContractFieldType.currency, isRequired: true),
+      ContractField(id: 'startDate', label: 'Start Date', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'duration', label: 'Contract Duration (months)', type: ContractFieldType.number, isRequired: true),
+      ContractField(id: 'contactEmail', label: 'Contact Email', type: ContractFieldType.email, isRequired: false),
+      ContractField(id: 'contactPhone', label: 'Contact Phone', type: ContractFieldType.phone, isRequired: false),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'sale',
     category: ContractCategory.sale,
     title: 'Sale Contract',
     fields: [
-      const ContractField(id: 'partyA', label: 'Seller', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'Buyer', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'itemDescription', label: 'Item / Property Description', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'price', label: 'Price', type: ContractFieldType.currency, isRequired: true),
-      const ContractField(id: 'startDate', label: 'Sale Date', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'Seller', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'Buyer', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'itemDescription', label: 'Item / Property Description', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'price', label: 'Price', type: ContractFieldType.currency, isRequired: true),
+      ContractField(id: 'startDate', label: 'Sale Date', type: ContractFieldType.date, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'rental',
     category: ContractCategory.rental,
     title: 'Rental Contract',
     fields: [
-      const ContractField(id: 'partyA', label: 'Landlord', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'Tenant', type: ContractFieldType.text, isRequired: true),
-      const ContractField(
+      ContractField(id: 'partyA', label: 'Landlord', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'Tenant', type: ContractFieldType.text, isRequired: true),
+      ContractField(
         id: 'propertyType',
         label: 'Property Type',
         type: ContractFieldType.dropdown,
         isRequired: true,
-        options: ['Apartment', 'Villa', 'Office', 'Retail Shop'],
+        options: [
+          ContractFieldOption(value: 'apartment', label: 'Apartment'),
+          ContractFieldOption(value: 'villa', label: 'Villa'),
+          ContractFieldOption(value: 'office', label: 'Office'),
+          ContractFieldOption(value: 'retailShop', label: 'Retail Shop'),
+        ],
       ),
-      const ContractField(id: 'propertyAddress', label: 'Property Address', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'rentAmount', label: 'Monthly Rent', type: ContractFieldType.currency, isRequired: true),
-      const ContractField(id: 'startDate', label: 'Lease Start Date', type: ContractFieldType.date, isRequired: true),
-      const ContractField(id: 'duration', label: 'Lease Duration (months)', type: ContractFieldType.number, isRequired: true),
+      ContractField(id: 'propertyAddress', label: 'Property Address', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'rentAmount', label: 'Monthly Rent', type: ContractFieldType.currency, isRequired: true),
+      ContractField(id: 'startDate', label: 'Lease Start Date', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'duration', label: 'Lease Duration (months)', type: ContractFieldType.number, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'partnership',
     category: ContractCategory.partnership,
     title: 'Partnership Contract',
     fields: [
-      const ContractField(id: 'partyA', label: 'First Partner', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'Second Partner', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'businessName', label: 'Business / Company Name', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'sharePercentage', label: 'Partnership Share (%)', type: ContractFieldType.number, isRequired: true),
-      const ContractField(id: 'startDate', label: 'Partnership Start Date', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'First Partner', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'Second Partner', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'businessName', label: 'Business / Company Name', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'sharePercentage', label: 'Partnership Share (%)', type: ContractFieldType.number, isRequired: true),
+      ContractField(id: 'startDate', label: 'Partnership Start Date', type: ContractFieldType.date, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'nda',
     category: ContractCategory.nda,
     title: 'NDA Agreement',
     fields: [
-      const ContractField(id: 'partyA', label: 'Disclosing Party', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'Receiving Party', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'purpose', label: 'Purpose of Disclosure', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'duration', label: 'Confidentiality Period (months)', type: ContractFieldType.number, isRequired: true),
-      const ContractField(id: 'startDate', label: 'Effective Date', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'Disclosing Party', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'Receiving Party', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'purpose', label: 'Purpose of Disclosure', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'duration', label: 'Confidentiality Period (months)', type: ContractFieldType.number, isRequired: true),
+      ContractField(id: 'startDate', label: 'Effective Date', type: ContractFieldType.date, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'service_agreement',
     category: ContractCategory.serviceAgreement,
     title: 'Service Agreement',
     fields: [
-      const ContractField(id: 'partyA', label: 'Service Provider', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'Client', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'serviceDescription', label: 'Service Description', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'fee', label: 'Fee Amount', type: ContractFieldType.currency, isRequired: true),
-      const ContractField(id: 'startDate', label: 'Service Start Date', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'Service Provider', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'Client', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'serviceDescription', label: 'Service Description', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'fee', label: 'Fee Amount', type: ContractFieldType.currency, isRequired: true),
+      ContractField(id: 'startDate', label: 'Service Start Date', type: ContractFieldType.date, isRequired: true),
     ],
   ),
-  ContractTemplate(
+  const ContractTemplate(
     id: 'other',
     category: ContractCategory.other,
     title: 'Other Contract',
     fields: [
-      const ContractField(id: 'partyA', label: 'First Party', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'partyB', label: 'Second Party', type: ContractFieldType.text, isRequired: true),
-      const ContractField(id: 'subject', label: 'Contract Subject', type: ContractFieldType.multiline, isRequired: true),
-      const ContractField(id: 'startDate', label: 'Contract Date', type: ContractFieldType.date, isRequired: true),
+      ContractField(id: 'partyA', label: 'First Party', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'partyB', label: 'Second Party', type: ContractFieldType.text, isRequired: true),
+      ContractField(id: 'subject', label: 'Contract Subject', type: ContractFieldType.multiline, isRequired: true),
+      ContractField(id: 'startDate', label: 'Contract Date', type: ContractFieldType.date, isRequired: true),
     ],
   ),
 ];

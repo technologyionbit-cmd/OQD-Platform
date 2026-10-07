@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/features/contracts/data/datasources/contracts_mock_data_source.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
+import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
 
 void main() {
   late ContractsMockDataSource dataSource;
@@ -44,13 +45,13 @@ void main() {
   });
 
   group('saveDraft / generateContract', () {
-    Future<dynamic> firstTemplate() async => (await dataSource.getTemplates(const Locale('ar'))).first;
+    Future<ContractTemplate> firstTemplate() async => (await dataSource.getTemplates(const Locale('ar'))).first;
 
     test('saveDraft creates a new contract with draft status', () async {
       final template = await firstTemplate();
       final before = await dataSource.getContracts();
 
-      final saved = await dataSource.saveDraft(template: template, fieldValues: {'partyA': 'أحمد', 'partyB': 'شركة الأفق'});
+      final saved = await dataSource.saveDraft(template: template, locale: const Locale('ar'), fieldValues: {'partyA': 'أحمد', 'partyB': 'شركة الأفق'});
 
       expect(saved.status, ContractStatus.draft);
       expect(saved.parties, ['أحمد', 'شركة الأفق']);
@@ -61,7 +62,7 @@ void main() {
     test('generateContract creates a new contract with pending-signature status', () async {
       final template = await firstTemplate();
 
-      final generated = await dataSource.generateContract(template: template, fieldValues: {'partyA': 'a', 'partyB': 'b'});
+      final generated = await dataSource.generateContract(template: template, locale: const Locale('ar'), fieldValues: {'partyA': 'a', 'partyB': 'b'});
 
       expect(generated.status, ContractStatus.pendingSignature);
       expect(generated.generatedContent, contains(template.title));
@@ -69,11 +70,12 @@ void main() {
 
     test('passing an existing contractId updates in place instead of creating a new one', () async {
       final template = await firstTemplate();
-      final draft = await dataSource.saveDraft(template: template, fieldValues: {'partyA': 'a', 'partyB': 'b'});
+      final draft = await dataSource.saveDraft(template: template, locale: const Locale('ar'), fieldValues: {'partyA': 'a', 'partyB': 'b'});
       final before = await dataSource.getContracts();
 
       final updated = await dataSource.generateContract(
         template: template,
+        locale: const Locale('ar'),
         fieldValues: {'partyA': 'a2', 'partyB': 'b2'},
         contractId: draft.id,
       );
@@ -87,7 +89,7 @@ void main() {
     test('updating an unknown contractId throws NotFoundFailure', () async {
       final template = await firstTemplate();
       expect(
-        () => dataSource.saveDraft(template: template, fieldValues: const {}, contractId: 'missing'),
+        () => dataSource.saveDraft(template: template, locale: const Locale('ar'), fieldValues: const {}, contractId: 'missing'),
         throwsA(isA<NotFoundFailure>()),
       );
     });

@@ -16,7 +16,7 @@ android {
     // it's present locally. ndkVersion IS pinned — all three plugins agree
     // on 27.0.12077973 and it's a small, already-cached download.
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -35,7 +35,7 @@ android {
         // flutter_secure_storage requires API 23+ (AndroidKeyStore APIs
         // aren't available below that) — tokens are never stored anywhere
         // else, so this floor is non-negotiable, not just Flutter's default.
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

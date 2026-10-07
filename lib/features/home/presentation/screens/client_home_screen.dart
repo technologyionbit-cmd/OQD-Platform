@@ -14,8 +14,10 @@ import 'package:aqd_ionbit/core/widgets/error_view.dart';
 import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/core/widgets/section_header.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contracts_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_card.dart';
+import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/providers/lawyers_controller.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/lawyer_card.dart';
 import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
@@ -90,6 +92,13 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     ),
   ];
 
+  /// Pull-to-refresh reloads every section the home shows, not just one.
+  Future<void> _refresh() => Future.wait([
+    ref.read(contractsControllerProvider.notifier).refresh(),
+    ref.read(lawyersControllerProvider.notifier).refresh(),
+    ref.read(notificationsControllerProvider.notifier).refresh(),
+  ]);
+
   void _openService(_ServiceTile tile) {
     if (tile.route == RoutePaths.clientLawyers) {
       context.go(tile.route);
@@ -113,7 +122,7 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(contractsControllerProvider.notifier).refresh(),
+        onRefresh: _refresh,
         child: ListView(
           children: [
             _ClientHomeHeader(
@@ -185,8 +194,8 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     BuildContext context,
     AppLocalizations l10n,
     List<_ServiceTile> services,
-    AsyncValue<dynamic> contractsState,
-    AsyncValue<dynamic> lawyersState,
+    AsyncValue<List<Contract>> contractsState,
+    AsyncValue<List<LawyerProfile>> lawyersState,
   ) {
     return [
       SectionHeader(title: l10n.clientHomeServicesTitle),
@@ -210,14 +219,14 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
       ),
       const SizedBox(height: AppSpacing.sm),
       switch (contractsState) {
-        AsyncData(value: final contracts) when (contracts as List).isEmpty => EmptyState(
+        AsyncData(value: final contracts) when contracts.isEmpty => EmptyState(
           icon: Icons.description_outlined,
           title: l10n.clientHomeNoContractsTitle,
           message: l10n.clientHomeNoContractsMessage,
         ),
         AsyncData(value: final contracts) => Column(
           children: [
-            for (final contract in (contracts as List).take(4)) ...[
+            for (final contract in contracts.take(4)) ...[
               ContractCard(contract: contract, onTap: () => context.push(RoutePaths.clientContractDetails(contract.id))),
               const SizedBox(height: AppSpacing.sm),
             ],
@@ -228,7 +237,7 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
       },
       Builder(
         builder: (context) {
-          final lawyers = (lawyersState.value as List?) ?? const [];
+          final lawyers = lawyersState.value ?? const [];
           if (lawyers.isEmpty) return const SizedBox.shrink();
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -290,7 +299,7 @@ class _ClientHomeHeader extends StatelessWidget {
                   ),
                   Badge(
                     isLabelVisible: unreadCount > 0,
-                    label: Text('$unreadCount'),
+                    label: Text(unreadCount > 99 ? '99+' : '$unreadCount'),
                     child: IconButton(
                       icon: const Icon(Icons.notifications_outlined, color: AppColors.onPrimary),
                       tooltip: l10n.clientNotificationsTitle,
@@ -313,7 +322,7 @@ class _ClientHomeHeader extends StatelessWidget {
                   prefixIcon: const Icon(Icons.search),
                   filled: true,
                   fillColor: AppColors.onPrimary,
-                  border: OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide.none),
+                  border: const OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide.none),
                   contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                 ),
               ),

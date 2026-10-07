@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:aqd_ionbit/core/errors/failure.dart';
+import 'package:aqd_ionbit/core/errors/failure_message.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
@@ -12,6 +13,7 @@ import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
 import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
+import 'package:aqd_ionbit/core/widgets/language_switch_button.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
 
@@ -43,14 +45,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _submit() async {
+    // The keyboard's "done" action bypasses the button's disabled state.
+    if (_isSubmitting) return;
     final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
 
-    final emailError = !Validators.isRequired(_emailController.text)
-        ? l10n.validationRequired
-        : !Validators.isValidEmail(_emailController.text)
-        ? l10n.validationInvalidEmail
-        : null;
+    final emailError =
+        !Validators.isRequired(_emailController.text)
+            ? l10n.validationRequired
+            : !Validators.isValidEmail(_emailController.text)
+            ? l10n.validationInvalidEmail
+            : null;
     final passwordError = !Validators.isRequired(_passwordController.text) ? l10n.validationRequired : null;
 
     setState(() {
@@ -69,21 +74,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     // On success the router's redirect (watching authControllerProvider)
     // navigates to the role's home — this screen never navigates itself.
+    // Leaving it disposes the AutofillGroup, which commits the credentials
+    // so the platform password manager offers to save them.
     if (result case ResultFailure(:final failure)) {
       setState(() => _formError = _messageFor(failure, l10n));
     }
   }
 
-  String _messageFor(Failure failure, AppLocalizations l10n) {
-    return switch (failure) {
-      UnauthorizedFailure() => l10n.errorInvalidCredentials,
-      ForbiddenFailure(:final message?) => message,
-      NetworkFailure() => l10n.errorNetwork,
-      TimeoutFailure() => l10n.errorTimeout,
-      ServerFailure() => l10n.errorServer,
-      _ => l10n.errorGeneric,
-    };
-  }
+  /// A 401 here means wrong credentials, not an expired session.
+  String _messageFor(Failure failure, AppLocalizations l10n) => switch (failure) {
+    UnauthorizedFailure() => l10n.errorInvalidCredentials,
+    _ => failure.localizedMessage(l10n),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -101,11 +103,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    const Align(alignment: AlignmentDirectional.centerEnd, child: LanguageSwitchButton()),
                     const Center(
-                      child: IconBadge(icon: Icons.gavel_rounded, backgroundColor: AppColors.navy, iconColor: Colors.white),
+                      child: IconBadge(
+                        icon: Icons.gavel_rounded,
+                        backgroundColor: AppColors.navy,
+                        iconColor: Colors.white,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    Text(l10n.authLoginTitle, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
+                    Text(
+                      l10n.authLoginTitle,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
                     const SizedBox(height: AppSpacing.xxs),
                     Text(
                       l10n.authLoginSubtitle,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/network/api_error_mapper.dart';
+import 'package:aqd_ionbit/core/network/auth_session_ports.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/features/auth/data/datasources/auth_data_source_provider.dart';
@@ -31,7 +32,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Result<({AuthUser user, AuthTokens tokens})>> login({required String email, required String password}) {
-    return _run(() async {
+    return _errorMapper.capture(() async {
       final result = await _remote.login(email: email, password: password);
       await _tokenManager.save(result.tokens);
       return result;
@@ -40,7 +41,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Result<({AuthUser user, AuthTokens tokens})>> register(RegisterRequest request) {
-    return _run(() async {
+    return _errorMapper.capture(() async {
       final result = await _remote.register(request);
       await _tokenManager.save(result.tokens);
       return result;
@@ -48,25 +49,60 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<AuthTokens>> refreshToken(String refreshToken) {
-    return _run(() async {
+  Future<Result<AuthUser?>> restoreSession() async {
+    final stored = await _tokenManager.loadFromStorage();
+    if (stored == null) return const Result.success(null);
+
+    // An expired access token is refreshed transparently by AuthInterceptor
+    // on the way — a 401 reaching here means the refresh was rejected too.
+    final result = await currentUser();
+    switch (result) {
+      case Success(:final data):
+        return Result.success(data);
+      case ResultFailure(failure: UnauthorizedFailure() || ForbiddenFailure()):
+        await clearLocalSession();
+        return const Result.success(null);
+      case ResultFailure(:final failure):
+        return Result.failure(failure);
+    }
+  }
+
+  @override
+  Future<RefreshOutcome> refreshSession() async {
+    final refreshToken = _tokenManager.current?.refreshToken;
+    if (refreshToken == null) return const RefreshRejected();
+
+    try {
       final tokens = await _remote.refreshToken(refreshToken);
       await _tokenManager.save(tokens);
-      return tokens;
-    });
+      return RefreshSucceeded(tokens);
+    } catch (error) {
+      return _isRefusal(_errorMapper.map(error)) ? const RefreshRejected() : const RefreshUnavailable();
+    }
   }
+
+  /// Only an explicit refusal from the server ends the session. Throttling
+  /// (429), server errors and connectivity problems are all retryable.
+  bool _isRefusal(Failure failure) => switch (failure) {
+    UnauthorizedFailure() || ForbiddenFailure() || ValidationFailure() => true,
+    ServerFailure(statusCode: 400) => true,
+    _ => false,
+  };
+
+  @override
+  Future<void> clearLocalSession() => _tokenManager.clear();
 
   @override
   Future<Result<AuthUser>> currentUser() {
     if (_tokenManager.current?.accessToken == null) {
       return Future.value(const Result.failure(UnauthorizedFailure()));
     }
-    return _run(_remote.currentUser);
+    return _errorMapper.capture(_remote.currentUser);
   }
 
   @override
   Future<Result<AuthUser>> updateProfile({required String fullName, required String email}) {
-    return _run(() => _remote.updateProfile(fullName: fullName, email: email));
+    return _errorMapper.capture(() => _remote.updateProfile(fullName: fullName, email: email));
   }
 
   @override
@@ -83,41 +119,41 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<void>> requestOtp({required String destination}) {
-    return _run(() => _remote.requestOtp(destination: destination));
+  Future<Result<AuthUser>> verifyEmail({required String code}) {
+    return _errorMapper.capture(() => _remote.verifyEmail(code: code));
   }
 
   @override
-  Future<Result<bool>> verifyOtp({required String destination, required String code}) {
-    return _run(() => _remote.verifyOtp(destination: destination, code: code));
+  Future<Result<void>> resendEmailVerification() => _errorMapper.capture(_remote.resendEmailVerification);
+
+  @override
+  Future<Result<void>> requestPasswordReset({required String email}) {
+    return _errorMapper.capture(() => _remote.requestPasswordReset(email: email));
   }
 
   @override
-  Future<Result<void>> resetPassword({required String destination, required String code, required String newPassword}) {
-    return _run(() => _remote.resetPassword(destination: destination, code: code, newPassword: newPassword));
+  Future<Result<void>> verifyPasswordResetCode({required String email, required String code}) {
+    return _errorMapper.capture(() => _remote.verifyPasswordResetCode(email: email, code: code));
+  }
+
+  @override
+  Future<Result<void>> resetPassword({required String email, required String code, required String newPassword}) {
+    return _errorMapper.capture(() => _remote.resetPassword(email: email, code: code, newPassword: newPassword));
   }
 
   @override
   Future<Result<void>> changePassword({required String currentPassword, required String newPassword}) {
-    return _run(() => _remote.changePassword(currentPassword: currentPassword, newPassword: newPassword));
+    return _errorMapper.capture(() => _remote.changePassword(currentPassword: currentPassword, newPassword: newPassword));
   }
 
   @override
-  Future<Result<List<AuthSession>>> listSessions() => _run(_remote.listSessions);
+  Future<Result<List<AuthSession>>> listSessions() => _errorMapper.capture(_remote.listSessions);
 
   @override
-  Future<Result<void>> revokeSession(String sessionId) => _run(() => _remote.revokeSession(sessionId));
+  Future<Result<void>> revokeSession(String sessionId) => _errorMapper.capture(() => _remote.revokeSession(sessionId));
 
   @override
-  Future<Result<void>> revokeOtherSessions() => _run(_remote.revokeOtherSessions);
-
-  Future<Result<T>> _run<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (error) {
-      return Result.failure(_errorMapper.map(error));
-    }
-  }
+  Future<Result<void>> revokeOtherSessions() => _errorMapper.capture(_remote.revokeOtherSessions);
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

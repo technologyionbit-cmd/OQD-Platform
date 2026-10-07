@@ -13,7 +13,7 @@ void main() {
     // cons_seed_8 hashes to the reliable connection profile — reaches
     // active immediately, and (per ConsultationRoomMockDataSource) also
     // reconnects reliably on retry after a simulated mid-call drop.
-    final consultation = voiceConsultation(id: 'cons_seed_8');
+    final consultation = voiceConsultation();
     await pumpVoiceCall(
       tester,
       user: testClient,

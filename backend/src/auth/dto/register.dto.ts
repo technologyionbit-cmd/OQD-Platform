@@ -1,5 +1,6 @@
 import { LawyerSpecialty } from '@prisma/client';
 import {
+  Equals,
   IsEmail,
   IsEnum,
   IsIn,
@@ -7,15 +8,14 @@ import {
   IsString,
   Matches,
   MaxLength,
-  MinLength,
   ValidateIf,
 } from 'class-validator';
+import { StrongPassword } from './password.rules';
 
 export const ACCOUNT_TYPES = ['individual', 'company', 'lawyer'] as const;
 export type AccountType = (typeof ACCOUNT_TYPES)[number];
 
 const PHONE_RE = /^\+?[0-9]{8,15}$/;
-const PASSWORD_RE = /^(?=.*[A-Za-z])(?=.*\d).+$/;
 
 /**
  * The three registration shapes the frontend's `RegisterRequest` union
@@ -32,16 +32,22 @@ export class RegisterDto {
   @MaxLength(254)
   email!: string;
 
-  @IsString()
-  @MinLength(8, { message: 'Password must be at least 8 characters.' })
-  @MaxLength(128)
-  @Matches(PASSWORD_RE, {
-    message: 'Password must contain at least one letter and one number.',
-  })
+  @StrongPassword()
   password!: string;
 
   @Matches(PHONE_RE, { message: 'Enter a valid phone number.' })
   phone!: string;
+
+  /** Must be `true`: the user ticked the terms/privacy checkbox. */
+  @Equals(true, { message: 'You must accept the terms to register.' })
+  acceptTerms!: boolean;
+
+  /** The terms version the user saw. Must equal the server's current
+   *  version (TERMS_VERSION), else 422 TERMS_VERSION_OUTDATED. */
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(32)
+  termsVersion!: string;
 
   // individual + lawyer
   @ValidateIf((o: RegisterDto) => o.accountType !== 'company')

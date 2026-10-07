@@ -5,10 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:aqd_ionbit/app.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
-import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
-
-class _MockTokenManager extends Mock implements TokenManager {}
+import 'support/test_doubles.dart';
 
 Future<void> _pumpApp(WidgetTester tester, {required Map<String, Object> initialPrefs}) async {
   SharedPreferences.setMockInitialValues(initialPrefs);
@@ -18,8 +16,8 @@ Future<void> _pumpApp(WidgetTester tester, {required Map<String, Object> initial
   // see TokenManager provider override below. This isn't a stand-in for
   // real backend integration (that's AuthMockDataSource's job); it's the
   // standard Riverpod seam for keeping tests off platform channels.
-  final tokenManager = _MockTokenManager();
-  when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => null);
+  final tokenManager = MockTokenManager();
+  when(tokenManager.loadFromStorage).thenAnswer((_) async => null);
   when(() => tokenManager.current).thenReturn(null);
 
   await tester.pumpWidget(

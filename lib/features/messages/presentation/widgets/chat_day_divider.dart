@@ -34,7 +34,7 @@ class ChatDayDivider extends StatelessWidget {
       child: Center(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
-          decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.smRadius),
+          decoration: const BoxDecoration(color: AppColors.surfaceVariant, borderRadius: AppRadii.smRadius),
           child: Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
         ),
       ),

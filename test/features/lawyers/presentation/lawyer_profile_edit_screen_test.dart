@@ -1,10 +1,13 @@
+import 'dart:async';
+
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:image_picker/image_picker.dart' show XFile;
+import 'package:file_picker_platform_interface/file_picker_platform_interface.dart';
 
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
@@ -12,9 +15,9 @@ import 'package:aqd_ionbit/core/theme/app_theme.dart';
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
 import 'package:aqd_ionbit/features/lawyers/data/repositories/lawyers_repository_impl.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/screens/lawyer_profile_edit_screen.dart';
+import '../../../support/signed_in_override.dart';
 
 /// Covers the validation added on top of the previously-unvalidated Save
 /// flow: a blank bio (or an invalid experience/price) must block the save
@@ -33,7 +36,7 @@ const _kTransparentPng = <int>[
 
 Future<ProviderContainer> _pump(WidgetTester tester, {bool isVerified = true}) async {
   final container = ProviderContainer(
-    overrides: [lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource())],
+    overrides: [signedInOverride, lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource())],
   );
   addTearDown(container.dispose);
 
@@ -64,6 +67,8 @@ Future<ProviderContainer> _pump(WidgetTester tester, {bool isVerified = true}) a
       container: container,
       child: MaterialApp.router(
         theme: AppTheme.light,
+        // Assertions below are written against the English strings.
+        locale: const Locale('en'),
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         routerConfig: router,
@@ -73,23 +78,70 @@ Future<ProviderContainer> _pump(WidgetTester tester, {bool isVerified = true}) a
   // Push (not initialLocation) so context.pop() on a successful save has
   // the dashboard route underneath it to return to, matching how this
   // screen is actually reached from AccountScreen's menu.
-  router.push(RoutePaths.lawyerProfileEdit);
+  unawaited(router.push(RoutePaths.lawyerProfileEdit));
   await tester.pumpAndSettle();
   return container;
 }
 
-class _FakeImagePickerPlatform extends ImagePickerPlatform {
-  _FakeImagePickerPlatform({this.result, this.shouldThrow = false});
+final class _PickedFile extends PlatformFile {
+  _PickedFile(this.name, this.bytes);
 
-  final XFile? result;
+  @override
+  final String name;
+  final Uint8List bytes;
+
+  @override
+  Uri get uri => Uri.parse('memory:///$name');
+
+  @override
+  XFile get xFile => XFile.fromData(bytes, name: name);
+
+  @override
+  int? lengthSync() => bytes.length;
+
+  @override
+  Future<int?> length() async => bytes.length;
+
+  @override
+  Future<Uint8List> readAsBytes() async => bytes;
+
+  @override
+  Stream<Uint8List> readAsByteStream() => Stream.value(bytes);
+}
+
+class _FakeFilePickerPlatform extends FilePickerPlatform {
+  _FakeFilePickerPlatform({this.result = const [], this.shouldThrow = false});
+
+  final List<PlatformFile> result;
   final bool shouldThrow;
 
   @override
-  Future<XFile?> getImageFromSource({required ImageSource source, ImagePickerOptions options = const ImagePickerOptions()}) async {
+  Future<List<PlatformFile>> pickFiles({
+    String? dialogTitle,
+    String? initialDirectory,
+    FileType type = FileType.any,
+    List<String>? allowedExtensions,
+    dynamic Function(FilePickerStatus)? onFileLoading,
+    int compressionQuality = 0,
+    AndroidOptions androidOptions = const AndroidOptions(),
+    DarwinOptions darwinOptions = const DarwinOptions(),
+    WindowsOptions windowsOptions = const WindowsOptions(),
+    LinuxOptions linuxOptions = const LinuxOptions(),
+    WebOptions webOptions = const WebOptions(),
+  }) async {
     if (shouldThrow) throw StateError('picker unavailable');
     return result;
   }
 }
+
+/// Swaps in [fake] for the test and restores the real picker afterwards.
+void _usePicker(_FakeFilePickerPlatform fake) {
+  final previous = FilePickerPlatform.instance;
+  FilePickerPlatform.instance = fake;
+  addTearDown(() => FilePickerPlatform.instance = previous);
+}
+
+_PickedFile _png([String name = 'doc.png']) => _PickedFile(name, Uint8List.fromList(_kTransparentPng));
 
 void main() {
   testWidgets('saving with a blank bio shows an inline error and does not navigate away', (tester) async {
@@ -126,16 +178,14 @@ void main() {
   });
 
   testWidgets('an already-verified lawyer has no upload button', (tester) async {
-    await _pump(tester, isVerified: true);
+    await _pump(tester);
 
     expect(find.text('Verified'), findsWidgets);
     expect(find.text('Upload Verification Document'), findsNothing);
   });
 
   testWidgets('upload -> preview -> submit -> status becomes Pending Review', (tester) async {
-    final previous = ImagePickerPlatform.instance;
-    ImagePickerPlatform.instance = _FakeImagePickerPlatform(result: XFile.fromData(Uint8List.fromList(_kTransparentPng), name: 'doc.png'));
-    addTearDown(() => ImagePickerPlatform.instance = previous);
+    _usePicker(_FakeFilePickerPlatform(result: [_png()]));
 
     await _pump(tester, isVerified: false);
     expect(find.text('Not verified yet'), findsWidgets);
@@ -160,9 +210,7 @@ void main() {
   });
 
   testWidgets('cancelling the document preview leaves verification status untouched', (tester) async {
-    final previous = ImagePickerPlatform.instance;
-    ImagePickerPlatform.instance = _FakeImagePickerPlatform(result: XFile.fromData(Uint8List.fromList(_kTransparentPng), name: 'doc.png'));
-    addTearDown(() => ImagePickerPlatform.instance = previous);
+    _usePicker(_FakeFilePickerPlatform(result: [_png()]));
 
     await _pump(tester, isVerified: false);
 
@@ -177,9 +225,7 @@ void main() {
   });
 
   testWidgets('a cancelled document pick is a silent no-op', (tester) async {
-    final previous = ImagePickerPlatform.instance;
-    ImagePickerPlatform.instance = _FakeImagePickerPlatform(result: null);
-    addTearDown(() => ImagePickerPlatform.instance = previous);
+    _usePicker(_FakeFilePickerPlatform());
 
     await _pump(tester, isVerified: false);
 
@@ -191,9 +237,7 @@ void main() {
   });
 
   testWidgets('a picker error shows feedback instead of failing silently', (tester) async {
-    final previous = ImagePickerPlatform.instance;
-    ImagePickerPlatform.instance = _FakeImagePickerPlatform(shouldThrow: true);
-    addTearDown(() => ImagePickerPlatform.instance = previous);
+    _usePicker(_FakeFilePickerPlatform(shouldThrow: true));
 
     await _pump(tester, isVerified: false);
 
@@ -201,5 +245,18 @@ void main() {
     await tester.pump(const Duration(milliseconds: 400));
 
     expect(find.text("Couldn't open the gallery. Please try again."), findsOneWidget);
+  });
+
+  testWidgets('more than three documents are refused before uploading', (tester) async {
+    _usePicker(_FakeFilePickerPlatform(result: [_png('a.png'), _png('b.png'), _png('c.png'), _png('d.png')]));
+
+    await _pump(tester, isVerified: false);
+
+    await tester.tap(find.text('Upload Verification Document'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('You can upload at most 3 files'), findsOneWidget);
+    expect(find.text('Not verified yet'), findsWidgets);
   });
 }

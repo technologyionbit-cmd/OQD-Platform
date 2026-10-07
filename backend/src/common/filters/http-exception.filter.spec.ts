@@ -4,12 +4,14 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { RateLimitedException } from '../errors/rate-limited.exception';
 import { HttpExceptionFilter } from './http-exception.filter';
 
 function createMockHost(overrides?: { method?: string; url?: string }) {
   const json = jest.fn();
   const status = jest.fn().mockReturnValue({ json });
-  const response = { status };
+  const header = jest.fn();
+  const response = { status, header };
   const request = {
     method: overrides?.method ?? 'GET',
     url: overrides?.url ?? '/v1/test',
@@ -22,7 +24,7 @@ function createMockHost(overrides?: { method?: string; url?: string }) {
     }),
   } as unknown as ArgumentsHost;
 
-  return { host, status, json };
+  return { host, status, json, header };
 }
 
 describe('HttpExceptionFilter', () => {
@@ -62,6 +64,18 @@ describe('HttpExceptionFilter', () => {
         code: 'VALIDATION_ERROR',
         errors: { email: ['already in use'] },
       },
+    });
+  });
+
+  it('sends Retry-After (whole seconds, at least 1) for a RateLimitedException', () => {
+    const { host, status, json, header } = createMockHost();
+
+    filter.catch(new RateLimitedException('Slow down.', 41.2), host);
+
+    expect(status).toHaveBeenCalledWith(429);
+    expect(header).toHaveBeenCalledWith('Retry-After', '42');
+    expect(json).toHaveBeenCalledWith({
+      error: { message: 'Slow down.', code: 'TOO_MANY_REQUESTS' },
     });
   });
 

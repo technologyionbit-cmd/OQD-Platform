@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
@@ -15,11 +16,11 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dar
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_preview_screen.dart';
-
-class MockContractsRepository extends Mock implements ContractsRepository {}
+import '../../../support/signed_in_override.dart';
+import '../../../support/role_test_harness.dart' show FixedLocaleController;
+import '../../../support/test_doubles.dart';
 
 const _template = ContractTemplate(
   id: 'sale',
@@ -38,8 +39,8 @@ Contract _resultContract(ContractStatus status) => Contract(
   title: _template.title,
   category: _template.category,
   status: status,
-  createdAt: DateTime(2026, 1, 1),
-  updatedAt: DateTime(2026, 1, 1),
+  createdAt: DateTime(2026),
+  updatedAt: DateTime(2026),
   parties: const ['أحمد', 'سارة'],
   fieldValues: _fieldValues,
   templateId: _template.id,
@@ -50,7 +51,7 @@ Future<ProviderContainer> _pump(WidgetTester tester, {required MockContractsRepo
   // A successful save/generate also refreshes the contracts list.
   when(() => repository.getContracts()).thenAnswer((_) async => const Result.success(<Contract>[]));
 
-  final container = ProviderContainer(overrides: [contractsRepositoryProvider.overrideWithValue(repository)]);
+  final container = ProviderContainer(overrides: [signedInOverride, localeControllerProvider.overrideWith(() => FixedLocaleController(const Locale('ar'))), contractsRepositoryProvider.overrideWithValue(repository)]);
   addTearDown(container.dispose);
   container.read(contractDraftControllerProvider.notifier)
     ..selectTemplate(_template)
@@ -85,6 +86,7 @@ Future<ProviderContainer> _pump(WidgetTester tester, {required MockContractsRepo
 void main() {
   setUpAll(() {
     registerFallbackValue(_template);
+    registerFallbackValue(const Locale('ar'));
   });
 
   testWidgets('renders parties and details sections from the filled draft', (tester) async {
@@ -98,21 +100,21 @@ void main() {
   testWidgets('save as draft persists via the repository and navigates to details', (tester) async {
     final repository = MockContractsRepository();
     when(
-      () => repository.saveDraft(template: _template, fieldValues: _fieldValues, contractId: null),
+      () => repository.saveDraft(template: _template, fieldValues: _fieldValues, locale: any(named: 'locale')),
     ).thenAnswer((_) async => Result.success(_resultContract(ContractStatus.draft)));
 
     await _pump(tester, repository: repository);
     await tester.tap(find.text('حفظ كمسودة'));
     await tester.pumpAndSettle();
 
-    verify(() => repository.saveDraft(template: _template, fieldValues: _fieldValues, contractId: null)).called(1);
+    verify(() => repository.saveDraft(template: _template, fieldValues: _fieldValues, locale: any(named: 'locale'))).called(1);
     expect(find.text('details c1'), findsOneWidget);
   });
 
   testWidgets('generate shows the success state with a link to the new contract', (tester) async {
     final repository = MockContractsRepository();
     when(
-      () => repository.generateContract(template: _template, fieldValues: _fieldValues, contractId: null),
+      () => repository.generateContract(template: _template, fieldValues: _fieldValues, locale: any(named: 'locale')),
     ).thenAnswer((_) async => Result.success(_resultContract(ContractStatus.pendingSignature)));
 
     await _pump(tester, repository: repository);

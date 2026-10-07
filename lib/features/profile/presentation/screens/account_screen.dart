@@ -18,7 +18,6 @@ import 'package:aqd_ionbit/features/billing/presentation/providers/subscription_
 import 'package:aqd_ionbit/features/consultations/presentation/providers/consultations_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contracts_controller.dart';
 import 'package:aqd_ionbit/features/documents/presentation/providers/documents_controller.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 
 /// Shared across all three roles — identity header (avatar, plan badge,
 /// activity stats), then the full reference menu (subscriptions, payment
@@ -85,10 +84,7 @@ class AccountScreen extends ConsumerWidget {
     final locale = ref.watch(localeControllerProvider);
     final subscription = ref.watch(subscriptionControllerProvider);
     final documentsCount = ref.watch(documentsControllerProvider).value?.length ?? 0;
-    final allConsultations = ref.watch(consultationsControllerProvider).value ?? const [];
-    final consultationsCount = user?.role == UserRole.lawyer
-        ? allConsultations.where((c) => c.lawyerId == kDemoLawyerId).length
-        : allConsultations.length;
+    final consultationsCount = ref.watch(consultationsControllerProvider).value?.length ?? 0;
     final contractsCount = ref.watch(contractsControllerProvider).value?.length ?? 0;
     final base = user != null ? _roleBase(user.role) : RoutePaths.clientBase;
 
@@ -196,10 +192,7 @@ class AccountScreen extends ConsumerWidget {
                             leading: const Icon(Icons.language_outlined),
                             title: Text(l10n.accountLanguage),
                             trailing: Text(locale.languageCode == 'ar' ? 'العربية' : 'English'),
-                            onTap: () {
-                              final next = locale.languageCode == 'ar' ? const Locale('en') : const Locale('ar');
-                              ref.read(localeControllerProvider.notifier).setLocale(next);
-                            },
+                            onTap: () => ref.read(localeControllerProvider.notifier).toggle(),
                           ),
                           const Divider(height: 1),
                           _MenuRow(

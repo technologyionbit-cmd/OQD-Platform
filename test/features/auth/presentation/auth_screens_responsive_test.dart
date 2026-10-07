@@ -6,17 +6,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
-import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
 import 'package:aqd_ionbit/core/theme/app_theme.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/login_screen.dart';
-import 'package:aqd_ionbit/features/auth/presentation/screens/onboarding_screen.dart';
+import 'package:aqd_ionbit/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/otp_verification_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/register_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/reset_password_screen.dart';
-
-class _MockTokenManager extends Mock implements TokenManager {}
+import '../../../support/test_doubles.dart';
 
 /// A small representative spread, not exhaustive — the point is to catch a
 /// RenderFlex overflow that only shows up at a real device extreme, not to
@@ -32,8 +30,8 @@ Future<void> _pumpAtSize(WidgetTester tester, Widget screen, Size size, {Locale 
 
   SharedPreferences.setMockInitialValues({});
   final prefs = await SharedPreferences.getInstance();
-  final tokenManager = _MockTokenManager();
-  when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => null);
+  final tokenManager = MockTokenManager();
+  when(tokenManager.loadFromStorage).thenAnswer((_) async => null);
   when(() => tokenManager.current).thenReturn(null);
 
   await tester.pumpWidget(
@@ -60,8 +58,8 @@ void main() {
     'LoginScreen': () => const LoginScreen(),
     'RegisterScreen': () => const RegisterScreen(),
     'ForgotPasswordScreen': () => const ForgotPasswordScreen(),
-    'OtpVerificationScreen': () => const OtpVerificationScreen(destination: 'client@aqd.test'),
-    'ResetPasswordScreen': () => const ResetPasswordScreen(destination: 'client@aqd.test', code: '1234'),
+    'OtpVerificationScreen': () => const OtpVerificationScreen(email: 'client@aqd.test'),
+    'ResetPasswordScreen': () => const ResetPasswordScreen(email: 'client@aqd.test', code: '123456'),
   };
 
   for (final entry in screens.entries) {

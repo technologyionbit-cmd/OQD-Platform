@@ -1,13 +1,8 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { createHash, randomBytes } from 'node:crypto';
 import type { ConsultationRoomSession, ConsultationRoomState } from '@prisma/client';
-import { ApiErrorCode } from '../common/errors/api-error-codes';
+import { badRequest, notFound, unauthorized } from '../common/errors/api-exceptions';
+import { ConsultationsService } from '../consultations/consultations.service';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import type { UpdateRoomMetricsDto } from './dto/update-room-metrics.dto';
@@ -36,7 +31,10 @@ export interface RoomTokenResult {
 
 @Injectable()
 export class ConsultationRoomService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly consultations: ConsultationsService,
+  ) {}
 
   async issueToken(user: AuthenticatedUser, consultationId: string): Promise<RoomTokenResult> {
     await this.consultationForParticipant(user, consultationId);
@@ -66,13 +64,13 @@ export class ConsultationRoomService {
     const session = await this.requireSession(user, consultationId);
     const token = await this.prisma.consultationRoomToken.findUnique({ where: { tokenHash: this.hash(roomToken) } });
     if (!token || token.sessionId !== session.id || token.userId !== user.id) {
-      throw this.unauthorizedToken();
+      throw unauthorized('Invalid or expired room token.');
     }
     if (token.consumedAt) {
-      throw this.unauthorizedToken();
+      throw unauthorized('Invalid or expired room token.');
     }
     if (token.expiresAt.getTime() <= Date.now()) {
-      throw this.unauthorizedToken();
+      throw unauthorized('Invalid or expired room token.');
     }
     this.assertTransition(session.state, 'join');
 
@@ -101,10 +99,7 @@ export class ConsultationRoomService {
     const session = await this.requireSession(user, consultationId);
     this.assertTransition(session.state, 'retry');
     if (session.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-      throw new BadRequestException({
-        message: 'Maximum reconnection attempts exhausted.',
-        code: ApiErrorCode.BAD_REQUEST,
-      });
+      throw badRequest('Maximum reconnection attempts exhausted.');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -170,45 +165,27 @@ export class ConsultationRoomService {
     await this.consultationForParticipant(user, consultationId);
     const session = await this.prisma.consultationRoomSession.findUnique({ where: { consultationId } });
     if (!session) {
-      throw new NotFoundException({ message: 'Room session not found — call room/token first.', code: ApiErrorCode.NOT_FOUND });
+      throw notFound('Room session not found — call room/token first.');
     }
     return session;
   }
 
+  /** Same participant check as the consultation itself, plus: the room
+   *  only opens for a confirmed booking. */
   private async consultationForParticipant(user: AuthenticatedUser, consultationId: string): Promise<void> {
-    const consultation = await this.prisma.consultation.findUnique({ where: { id: consultationId } });
-    if (!consultation) {
-      throw new NotFoundException({ message: 'Consultation not found.', code: ApiErrorCode.NOT_FOUND });
-    }
-    const isClient = consultation.clientUserId === user.id;
-    const isLawyer =
-      user.role === 'lawyer' &&
-      (await this.prisma.lawyerProfile.findUnique({ where: { userId: user.id } }))?.id === consultation.lawyerProfileId;
-    if (!isClient && !isLawyer) {
-      throw new ForbiddenException({ message: 'You are not a participant in this consultation.', code: ApiErrorCode.FORBIDDEN });
-    }
+    const consultation = await this.consultations.getById(user, consultationId);
     if (consultation.status !== 'confirmed') {
-      throw new BadRequestException({
-        message: `Consultation must be confirmed to open its room (current status: "${consultation.status}").`,
-        code: ApiErrorCode.BAD_REQUEST,
-      });
+      throw badRequest(`Consultation must be confirmed to open its room (current status: "${consultation.status}").`);
     }
   }
 
   private assertTransition(from: ConsultationRoomState, action: keyof typeof ALLOWED_FROM): void {
     if (!ALLOWED_FROM[action].includes(from)) {
-      throw new BadRequestException({
-        message: `Cannot ${action} a room session in state "${from}".`,
-        code: ApiErrorCode.BAD_REQUEST,
-      });
+      throw badRequest(`Cannot ${action} a room session in state "${from}".`);
     }
   }
 
   private hash(raw: string): string {
     return createHash('sha256').update(raw).digest('hex');
-  }
-
-  private unauthorizedToken(): UnauthorizedException {
-    return new UnauthorizedException({ message: 'Invalid or expired room token.', code: ApiErrorCode.UNAUTHORIZED });
   }
 }

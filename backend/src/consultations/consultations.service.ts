@@ -1,12 +1,8 @@
-import {
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import type { Consultation, ConsultationStatus } from '@prisma/client';
-import { ApiErrorCode } from '../common/errors/api-error-codes';
+import { Injectable } from '@nestjs/common';
+import type { Consultation, ConsultationStatus, NotificationType, Prisma } from '@prisma/client';
+import { badRequest, conflict, forbidden, notFound } from '../common/errors/api-exceptions';
+import { LawyersService } from '../lawyers/lawyers.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import type { CreateAvailabilitySlotDto } from './dto/create-availability-slot.dto';
@@ -29,7 +25,11 @@ const ALLOWED_TRANSITIONS: Record<ConsultationStatus, ConsultationStatus[]> = {
 
 @Injectable()
 export class ConsultationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notifications: NotificationsService,
+    private readonly lawyers: LawyersService,
+  ) {}
 
   // ---------------------------------------------------------------------------
   // Availability
@@ -40,7 +40,7 @@ export class ConsultationsService {
       where: { id: lawyerProfileId },
       select: { id: true },
     });
-    if (!exists) throw this.notFoundLawyer();
+    if (!exists) throw notFound('Lawyer not found.');
 
     return this.prisma.availabilitySlot.findMany({
       where: { lawyerProfileId },
@@ -53,14 +53,11 @@ export class ConsultationsService {
   }
 
   async addAvailabilitySlot(user: AuthenticatedUser, dto: CreateAvailabilitySlotDto) {
-    const profile = await this.lawyerProfileForUser(user);
+    const profile = await this.lawyers.profileForLawyer(user);
     const start = new Date(dto.start);
     const end = new Date(dto.end);
     if (!(start < end)) {
-      throw new BadRequestException({
-        message: 'Slot start must be before end.',
-        code: ApiErrorCode.BAD_REQUEST,
-      });
+      throw badRequest('Slot start must be before end.');
     }
     return this.prisma.availabilitySlot.create({
       data: { lawyerProfileId: profile.id, startAt: start, endAt: end },
@@ -68,16 +65,13 @@ export class ConsultationsService {
   }
 
   async removeAvailabilitySlot(user: AuthenticatedUser, slotId: string) {
-    const profile = await this.lawyerProfileForUser(user);
+    const profile = await this.lawyers.profileForLawyer(user);
     const slot = await this.prisma.availabilitySlot.findUnique({ where: { id: slotId } });
     if (!slot || slot.lawyerProfileId !== profile.id) {
-      throw new NotFoundException({ message: 'Slot not found.', code: ApiErrorCode.NOT_FOUND });
+      throw notFound('Slot not found.');
     }
     if (slot.isBooked) {
-      throw new ConflictException({
-        message: 'Cannot remove a booked slot — cancel the consultation instead.',
-        code: ApiErrorCode.CONFLICT,
-      });
+      throw conflict('Cannot remove a booked slot — cancel the consultation instead.');
     }
     await this.prisma.availabilitySlot.delete({ where: { id: slotId } });
   }
@@ -88,7 +82,7 @@ export class ConsultationsService {
 
   async book(user: AuthenticatedUser, dto: CreateConsultationDto): Promise<Consultation> {
     if (user.role !== 'client') {
-      throw this.forbidden('Only individual (client) accounts can book consultations.');
+      throw forbidden('Only individual (client) accounts can book consultations.');
     }
 
     const client = await this.prisma.user.findUniqueOrThrow({ where: { id: user.id } });
@@ -96,17 +90,14 @@ export class ConsultationsService {
       where: { id: dto.lawyerId },
     });
     if (!lawyerProfile || lawyerProfile.verificationStatus !== 'verified') {
-      throw this.notFoundLawyer();
+      throw notFound('Lawyer not found.');
     }
 
     const offering = await this.prisma.lawyerConsultationOffering.findUnique({
       where: { lawyerProfileId_consultationType: { lawyerProfileId: lawyerProfile.id, consultationType: dto.type } },
     });
     if (!offering || !offering.isActive) {
-      throw new BadRequestException({
-        message: 'This lawyer does not offer that consultation type.',
-        code: ApiErrorCode.BAD_REQUEST,
-      });
+      throw badRequest('This lawyer does not offer that consultation type.');
     }
 
     const scheduledAt = new Date(dto.scheduledAt);
@@ -114,7 +105,7 @@ export class ConsultationsService {
       where: { lawyerProfileId: lawyerProfile.id, startAt: scheduledAt },
     });
     if (!slot) {
-      throw new NotFoundException({ message: 'Slot not found.', code: ApiErrorCode.NOT_FOUND });
+      throw notFound('Slot not found.');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -127,13 +118,10 @@ export class ConsultationsService {
         data: { isBooked: true },
       });
       if (claimed.count === 0) {
-        throw new ConflictException({
-          message: 'This slot was just booked by someone else.',
-          code: ApiErrorCode.CONFLICT,
-        });
+        throw conflict('This slot was just booked by someone else.');
       }
 
-      return tx.consultation.create({
+      const consultation = await tx.consultation.create({
         data: {
           clientUserId: client.id,
           lawyerProfileId: lawyerProfile.id,
@@ -147,6 +135,13 @@ export class ConsultationsService {
           notes: dto.notes ?? '',
         },
       });
+      await this.notifications.notify(tx, {
+        userId: lawyerProfile.userId,
+        type: 'consultationRequested',
+        relatedId: consultation.id,
+        params: { actorName: client.fullName, scheduledAt: scheduledAt.toISOString() },
+      });
+      return consultation;
     });
   }
 
@@ -157,7 +152,7 @@ export class ConsultationsService {
   async list(user: AuthenticatedUser): Promise<Consultation[]> {
     const where =
       user.role === 'lawyer'
-        ? { lawyerProfileId: (await this.lawyerProfileForUser(user)).id }
+        ? { lawyerProfileId: (await this.lawyers.profileForLawyer(user)).id }
         : { clientUserId: user.id };
     return this.prisma.consultation.findMany({ where, orderBy: { scheduledAt: 'desc' } });
   }
@@ -171,23 +166,27 @@ export class ConsultationsService {
   // ---------------------------------------------------------------------------
 
   async accept(user: AuthenticatedUser, id: string): Promise<Consultation> {
-    const profile = await this.lawyerProfileForUser(user);
+    const profile = await this.lawyers.profileForLawyer(user);
     const consultation = await this.consultationOwnedByLawyer(profile.id, id);
     this.assertTransition(consultation.status, 'confirmed');
-    return this.prisma.consultation.update({ where: { id }, data: { status: 'confirmed' } });
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await this.transition(tx, consultation, 'confirmed');
+      await this.notifyOtherParty(tx, user, updated, 'consultationAccepted');
+      return updated;
+    });
   }
 
   async decline(user: AuthenticatedUser, id: string, reason?: string): Promise<Consultation> {
-    const profile = await this.lawyerProfileForUser(user);
+    const profile = await this.lawyers.profileForLawyer(user);
     const consultation = await this.consultationOwnedByLawyer(profile.id, id);
     this.assertTransition(consultation.status, 'declined');
-    return this.transitionAndFreeSlot(consultation, 'declined', reason);
+    return this.transitionAndFreeSlot(user, consultation, 'declined', 'consultationRejected', reason);
   }
 
   async cancel(user: AuthenticatedUser, id: string, reason?: string): Promise<Consultation> {
     const consultation = await this.consultationForParticipant(user, id);
     this.assertTransition(consultation.status, 'cancelled');
-    return this.transitionAndFreeSlot(consultation, 'cancelled', reason);
+    return this.transitionAndFreeSlot(user, consultation, 'cancelled', 'consultationCancelled', reason);
   }
 
   // Either participant can report completion — matches `markMissed`/
@@ -199,31 +198,32 @@ export class ConsultationsService {
   async complete(user: AuthenticatedUser, id: string): Promise<Consultation> {
     const consultation = await this.consultationForParticipant(user, id);
     this.assertTransition(consultation.status, 'completed');
-    return this.prisma.consultation.update({ where: { id }, data: { status: 'completed' } });
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await this.transition(tx, consultation, 'completed');
+      await this.notifyOtherParty(tx, user, updated, 'consultationCompleted');
+      return updated;
+    });
   }
 
   async markMissed(user: AuthenticatedUser, id: string): Promise<Consultation> {
     const consultation = await this.consultationForParticipant(user, id);
     this.assertTransition(consultation.status, 'missed');
-    return this.prisma.consultation.update({ where: { id }, data: { status: 'missed' } });
+    return this.prisma.$transaction((tx) => this.transition(tx, consultation, 'missed'));
   }
 
   async markFailed(user: AuthenticatedUser, id: string): Promise<Consultation> {
     const consultation = await this.consultationForParticipant(user, id);
     this.assertTransition(consultation.status, 'failed');
-    return this.prisma.consultation.update({ where: { id }, data: { status: 'failed' } });
+    return this.prisma.$transaction((tx) => this.transition(tx, consultation, 'failed'));
   }
 
   async reschedule(user: AuthenticatedUser, id: string, dto: RescheduleConsultationDto): Promise<Consultation> {
     if (user.role !== 'client') {
-      throw this.forbidden('Only the client can reschedule a consultation.');
+      throw forbidden('Only the client can reschedule a consultation.');
     }
     const consultation = await this.consultationForParticipant(user, id);
     if (consultation.status !== 'confirmed') {
-      throw new BadRequestException({
-        message: `Cannot reschedule a consultation in status "${consultation.status}".`,
-        code: ApiErrorCode.BAD_REQUEST,
-      });
+      throw badRequest(`Cannot reschedule a consultation in status "${consultation.status}".`);
     }
 
     const newScheduledAt = new Date(dto.scheduledAt);
@@ -231,7 +231,7 @@ export class ConsultationsService {
       where: { lawyerProfileId: consultation.lawyerProfileId, startAt: newScheduledAt },
     });
     if (!newSlot) {
-      throw new NotFoundException({ message: 'Slot not found.', code: ApiErrorCode.NOT_FOUND });
+      throw notFound('Slot not found.');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -240,19 +240,18 @@ export class ConsultationsService {
         data: { isBooked: true },
       });
       if (claimed.count === 0) {
-        throw new ConflictException({
-          message: 'This slot was just booked by someone else.',
-          code: ApiErrorCode.CONFLICT,
-        });
+        throw conflict('This slot was just booked by someone else.');
       }
       await tx.availabilitySlot.update({
         where: { id: consultation.availabilitySlotId },
         data: { isBooked: false },
       });
-      return tx.consultation.update({
+      const updated = await tx.consultation.update({
         where: { id },
         data: { availabilitySlotId: newSlot.id, scheduledAt: newScheduledAt },
       });
+      await this.notifyOtherParty(tx, user, updated, 'consultationRescheduled');
+      return updated;
     });
   }
 
@@ -262,24 +261,18 @@ export class ConsultationsService {
 
   async createReview(user: AuthenticatedUser, consultationId: string, dto: CreateReviewDto) {
     if (user.role !== 'client') {
-      throw this.forbidden('Only the client can review a consultation.');
+      throw forbidden('Only the client can review a consultation.');
     }
     const consultation = await this.consultationForParticipant(user, consultationId);
     if (consultation.status !== 'completed') {
-      throw new BadRequestException({
-        message: 'Only a completed consultation can be reviewed.',
-        code: ApiErrorCode.BAD_REQUEST,
-      });
+      throw badRequest('Only a completed consultation can be reviewed.');
     }
 
     const existing = await this.prisma.review.findUnique({
       where: { consultationId_reviewerUserId: { consultationId, reviewerUserId: user.id } },
     });
     if (existing) {
-      throw new ConflictException({
-        message: 'You already reviewed this consultation.',
-        code: ApiErrorCode.CONFLICT,
-      });
+      throw conflict('You already reviewed this consultation.');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -311,27 +304,16 @@ export class ConsultationsService {
   // Internals
   // ---------------------------------------------------------------------------
 
-  private async lawyerProfileForUser(user: AuthenticatedUser) {
-    if (user.role !== 'lawyer') {
-      throw this.forbidden('Only lawyer accounts can manage availability.');
-    }
-    const profile = await this.prisma.lawyerProfile.findUnique({ where: { userId: user.id } });
-    if (!profile) {
-      throw this.notFoundLawyer();
-    }
-    return profile;
-  }
-
   private async consultationForParticipant(user: AuthenticatedUser, id: string): Promise<Consultation> {
     const consultation = await this.prisma.consultation.findUnique({ where: { id } });
     if (!consultation) {
-      throw this.notFoundConsultation();
+      throw notFound('Consultation not found.');
     }
     const isClient = consultation.clientUserId === user.id;
     const isLawyer =
-      user.role === 'lawyer' && (await this.prisma.lawyerProfile.findUnique({ where: { userId: user.id } }))?.id === consultation.lawyerProfileId;
+      user.role === 'lawyer' && (await this.lawyers.profileForLawyer(user)).id === consultation.lawyerProfileId;
     if (!isClient && !isLawyer) {
-      throw this.forbidden('You are not a participant in this consultation.');
+      throw forbidden('You are not a participant in this consultation.');
     }
     return consultation;
   }
@@ -339,46 +321,85 @@ export class ConsultationsService {
   private async consultationOwnedByLawyer(lawyerProfileId: string, id: string): Promise<Consultation> {
     const consultation = await this.prisma.consultation.findUnique({ where: { id } });
     if (!consultation || consultation.lawyerProfileId !== lawyerProfileId) {
-      throw this.notFoundConsultation();
+      throw notFound('Consultation not found.');
     }
     return consultation;
   }
 
   private async transitionAndFreeSlot(
+    actor: AuthenticatedUser,
     consultation: Consultation,
     status: ConsultationStatus,
+    notificationType: NotificationType,
     cancellationReason?: string,
   ): Promise<Consultation> {
     return this.prisma.$transaction(async (tx) => {
+      const updated = await this.transition(
+        tx,
+        consultation,
+        status,
+        cancellationReason ? { cancellationReason } : {},
+      );
       await tx.availabilitySlot.update({
         where: { id: consultation.availabilitySlotId },
         data: { isBooked: false },
       });
-      return tx.consultation.update({
-        where: { id: consultation.id },
-        data: { status, ...(cancellationReason ? { cancellationReason } : {}) },
-      });
+      await this.notifyOtherParty(tx, actor, updated, notificationType);
+      return updated;
+    });
+  }
+
+  /**
+   * Moves [consultation] to [to] only if its status is still the one the
+   * caller checked. Two concurrent requests (accept + cancel, a double
+   * tap) cannot both win: the loser gets a 409 and sends no notification.
+   */
+  private async transition(
+    tx: Prisma.TransactionClient,
+    consultation: Consultation,
+    to: ConsultationStatus,
+    data: Prisma.ConsultationUpdateManyMutationInput = {},
+  ): Promise<Consultation> {
+    const moved = await tx.consultation.updateMany({
+      where: { id: consultation.id, status: consultation.status },
+      data: { ...data, status: to },
+    });
+    if (moved.count === 0) {
+      throw conflict('This consultation was just changed. Refresh and try again.');
+    }
+    return tx.consultation.findUniqueOrThrow({ where: { id: consultation.id } });
+  }
+
+  /** Tells the participant who did not act what [actor] just did. */
+  private async notifyOtherParty(
+    tx: Prisma.TransactionClient,
+    actor: AuthenticatedUser,
+    consultation: Consultation,
+    type: NotificationType,
+  ): Promise<void> {
+    const actorIsClient = actor.id === consultation.clientUserId;
+    const recipientUserId = actorIsClient
+      ? (
+          await tx.lawyerProfile.findUniqueOrThrow({
+            where: { id: consultation.lawyerProfileId },
+            select: { userId: true },
+          })
+        ).userId
+      : consultation.clientUserId;
+    await this.notifications.notify(tx, {
+      userId: recipientUserId,
+      type,
+      relatedId: consultation.id,
+      params: {
+        actorName: actorIsClient ? consultation.clientName : consultation.lawyerName,
+        scheduledAt: consultation.scheduledAt.toISOString(),
+      },
     });
   }
 
   private assertTransition(from: ConsultationStatus, to: ConsultationStatus): void {
     if (!ALLOWED_TRANSITIONS[from]?.includes(to)) {
-      throw new BadRequestException({
-        message: `Invalid consultation status transition: ${from} -> ${to}`,
-        code: ApiErrorCode.BAD_REQUEST,
-      });
+      throw badRequest(`Invalid consultation status transition: ${from} -> ${to}`);
     }
-  }
-
-  private notFoundLawyer(): NotFoundException {
-    return new NotFoundException({ message: 'Lawyer not found.', code: ApiErrorCode.NOT_FOUND });
-  }
-
-  private notFoundConsultation(): NotFoundException {
-    return new NotFoundException({ message: 'Consultation not found.', code: ApiErrorCode.NOT_FOUND });
-  }
-
-  private forbidden(message: string): ForbiddenException {
-    return new ForbiddenException({ message, code: ApiErrorCode.FORBIDDEN });
   }
 }

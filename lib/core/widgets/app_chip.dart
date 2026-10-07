@@ -19,6 +19,16 @@ class AppChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
 
+    // Selection is otherwise shown only by color — screen readers need it
+    // stated ("selected"), and the chip announced as a button.
+    return Semantics(
+      button: true,
+      selected: selected,
+      child: _buildChip(primary),
+    );
+  }
+
+  Widget _buildChip(Color primary) {
     return InkWell(
       onTap: onTap,
       borderRadius: AppRadii.mdRadius,

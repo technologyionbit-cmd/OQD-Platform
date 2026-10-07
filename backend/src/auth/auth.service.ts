@@ -1,12 +1,15 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import type { Prisma, User, UserRole } from '@prisma/client';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { ApiErrorCode } from '../common/errors/api-error-codes';
+import { ConfigService } from '@nestjs/config';
+import type {
+  Prisma,
+  User,
+  UserRole,
+  VerificationPurpose,
+} from '@prisma/client';
+import { forbidden, notFound, unauthorized } from '../common/errors/api-exceptions';
+import { RateLimitedException } from '../common/errors/rate-limited.exception';
+import type { AuthConfig } from '../config/configuration';
 import { PrismaService } from '../prisma/prisma.service';
 import type {
   AuthTokens,
@@ -27,19 +30,27 @@ import type {
 } from './dto/password-reset.dto';
 import type { AccountType, RegisterDto } from './dto/register.dto';
 import { PasswordService } from './services/password.service';
-import { OtpService } from './services/otp.service';
+import { OtpService, type OtpIssueFilter } from './services/otp.service';
 import { TokenService } from './services/token.service';
-
-const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 @Injectable()
 export class AuthService {
+  private readonly termsVersion: string;
+  private readonly resendCooldownSeconds: number;
+  private readonly resendMaxPerHour: number;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly passwords: PasswordService,
     private readonly tokens: TokenService,
     private readonly otp: OtpService,
-  ) {}
+    configService: ConfigService,
+  ) {
+    const auth = configService.get<AuthConfig>('auth')!;
+    this.termsVersion = auth.termsVersion;
+    this.resendCooldownSeconds = auth.otpResendCooldownSeconds;
+    this.resendMaxPerHour = auth.otpMaxPerHour;
+  }
 
   // ---------------------------------------------------------------------------
   // Registration
@@ -49,6 +60,15 @@ export class AuthService {
     dto: RegisterDto,
     ctx: RequestContext,
   ): Promise<{ user: AuthUserView; tokens: AuthTokens }> {
+    if (dto.termsVersion !== this.termsVersion) {
+      // The app showed an older terms text than the one now in force.
+      throw this.fieldError(
+        'termsVersion',
+        'The terms have changed. Review and accept the current version.',
+        ApiErrorCode.TERMS_VERSION_OUTDATED,
+      );
+    }
+
     const email = dto.email.trim().toLowerCase();
     await this.assertEmailAvailable(email);
 
@@ -68,6 +88,8 @@ export class AuthService {
             phone: dto.phone.trim(),
             passwordHash,
             role,
+            termsAcceptedAt: new Date(),
+            termsVersion: dto.termsVersion,
           },
         });
 
@@ -145,22 +167,18 @@ export class AuthService {
       where: { email: dto.email.trim().toLowerCase() },
     });
 
-    const ok =
-      user !== null &&
-      (await this.passwords.verify(dto.password, user.passwordHash));
+    // Same bcrypt work whether or not the account exists (timing-safe).
+    const ok = await this.passwords.verifyOrBurn(
+      dto.password,
+      user?.passwordHash ?? null,
+    );
 
     if (!user || !ok) {
-      throw new UnauthorizedException({
-        message: 'Invalid email or password.',
-        code: ApiErrorCode.UNAUTHORIZED,
-      });
+      throw unauthorized('Invalid email or password.');
     }
 
     if (user.status !== 'active') {
-      throw new ForbiddenException({
-        message: 'This account is not active.',
-        code: ApiErrorCode.FORBIDDEN,
-      });
+      throw forbidden('This account is not active.', ApiErrorCode.ACCOUNT_INACTIVE);
     }
 
     const tokens = await this.tokens.issueSession(user.id, user.role, ctx);
@@ -189,14 +207,7 @@ export class AuthService {
   // ---------------------------------------------------------------------------
 
   async me(userId: string): Promise<AuthUserView> {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || user.status !== 'active') {
-      throw new UnauthorizedException({
-        message: 'Session expired. Please sign in again.',
-        code: ApiErrorCode.UNAUTHORIZED,
-      });
-    }
-    return this.toView(user);
+    return this.toView(await this.activeUser(userId));
   }
 
   async updateProfile(
@@ -204,78 +215,166 @@ export class AuthService {
     dto: UpdateProfileDto,
   ): Promise<AuthUserView> {
     const email = dto.email.trim().toLowerCase();
-    const clash = await this.prisma.user.findUnique({ where: { email } });
-    if (clash && clash.id !== userId) {
-      throw this.fieldError('email', 'This email is already registered.');
+    const current = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!current) {
+      throw notFound('Account not found.');
     }
 
-    try {
-      const updated = await this.prisma.user.update({
+    const emailChanged = current.email.toLowerCase() !== email;
+    if (emailChanged) {
+      await this.assertEmailAvailable(email);
+    }
+
+    const updated = await this.prisma.user
+      .update({
         where: { id: userId },
-        data: { fullName: dto.fullName.trim(), email },
-      });
-      return this.toView(updated);
-    } catch (error) {
-      if (this.isRecordNotFound(error)) {
-        throw new NotFoundException({
-          message: 'Account not found.',
-          code: ApiErrorCode.NOT_FOUND,
-        });
-      }
-      throw error;
+        data: {
+          fullName: dto.fullName.trim(),
+          email,
+          // A new address is unproven until its owner enters the code.
+          ...(emailChanged ? { emailVerifiedAt: null } : {}),
+        },
+      })
+      .catch((error: unknown) => this.rethrowUniqueViolation(error));
+
+    if (emailChanged) {
+      await this.otp
+        .issue(email, 'emailVerification', userId)
+        .catch(() => undefined);
     }
+    return this.toView(updated);
   }
 
   // ---------------------------------------------------------------------------
-  // Password reset (OTP)
+  // Email verification
   // ---------------------------------------------------------------------------
 
-  async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
-    const destination = dto.destination.trim();
-    const user = await this.findByDestination(destination);
-    // Always issue against the destination (even with no user) so response
-    // timing/shape can't be used to enumerate accounts (docs §4).
-    await this.otp.issue(destination, 'passwordReset', user?.id ?? null);
-  }
+  /** Marks the email verified when [code] is the account's latest code.
+   *  Idempotent: an already-verified account just gets its view back. */
+  async verifyEmail(userId: string, code: string): Promise<AuthUserView> {
+    const user = await this.activeUser(userId);
+    if (user.emailVerifiedAt) return this.toView(user);
 
-  async verifyOtp(dto: VerifyOtpDto): Promise<{ valid: boolean }> {
-    const result = await this.otp.verify(
-      dto.destination.trim(),
-      dto.code,
-      'passwordReset',
-    );
-    return { valid: result.valid };
-  }
-
-  async resetPassword(dto: ResetPasswordDto): Promise<void> {
-    const destination = dto.destination.trim();
     const result = await this.otp.consume(
-      destination,
+      user.email,
+      code,
+      'emailVerification',
+      user.id,
+    );
+    if (!result.valid) {
+      throw this.invalidCode();
+    }
+
+    const verified = await this.prisma.user.update({
+      where: { id: user.id },
+      data: { emailVerifiedAt: new Date() },
+    });
+    return this.toView(verified);
+  }
+
+  /** Sends a new code within the send limits (see {@link assertCanSendCode};
+   *  the registration code counts). A no-op for an already verified account. */
+  async resendEmailVerification(userId: string): Promise<void> {
+    const user = await this.activeUser(userId);
+    if (user.emailVerifiedAt) return;
+
+    await this.assertCanSendCode({ userId: user.id }, 'emailVerification');
+    await this.otp.issue(user.email, 'emailVerification', user.id);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Password reset (emailed code)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Emails a reset code when [email] belongs to an account. Known and
+   * unknown addresses get the same 204, the same work and the same send
+   * limits, so the answer never reveals whether an account exists.
+   */
+  async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
+    const email = dto.email.trim().toLowerCase();
+    await this.assertCanSendCode({ destination: email }, 'passwordReset');
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    await this.otp.issue(email, 'passwordReset', user?.id ?? null);
+  }
+
+  /** Checks the code before the app asks for a new password. Does not
+   *  use the code up; wrong tries count toward its lock. */
+  async verifyOtp(dto: VerifyOtpDto): Promise<void> {
+    const result = await this.otp.verify(
+      dto.email.trim().toLowerCase(),
       dto.code,
       'passwordReset',
     );
     if (!result.valid) {
-      throw this.fieldError('code', 'Invalid or expired code.');
+      throw this.invalidCode();
     }
+  }
 
+  /**
+   * Sets the new password, marks the email verified (the code proved the
+   * user reads it) and signs the account out everywhere.
+   */
+  async resetPassword(dto: ResetPasswordDto): Promise<void> {
+    const email = dto.email.trim().toLowerCase();
+    const result = await this.otp.consume(email, dto.code, 'passwordReset');
     const user =
-      (result.userId
+      result.valid && result.userId
         ? await this.prisma.user.findUnique({ where: { id: result.userId } })
-        : null) ?? (await this.findByDestination(destination));
-
-    if (!user) {
-      // Valid code but no account (shouldn't normally happen) — succeed
-      // silently rather than leak that the destination is unknown.
-      return;
+        : null;
+    // The code proves control of this address only while it is still the
+    // account's email; after an email change it resets nothing.
+    if (!user || user.email !== email) {
+      throw this.invalidCode();
     }
 
     const passwordHash = await this.passwords.hash(dto.newPassword);
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { passwordHash },
+      data: {
+        passwordHash,
+        ...(user.emailVerifiedAt ? {} : { emailVerifiedAt: new Date() }),
+      },
     });
     // Security-sensitive change: force re-login everywhere (docs §4).
     await this.tokens.revokeAllForUser(user.id);
+  }
+
+  /**
+   * Send limits for emailed codes: one per cooldown, and a fixed number
+   * per rolling hour for [filter] (an account or an address). Over the
+   * limit it is a 429 whose Retry-After says when the next send fits.
+   */
+  private async assertCanSendCode(
+    filter: OtpIssueFilter,
+    purpose: VerificationPurpose,
+  ): Promise<void> {
+    const now = Date.now();
+    const hourMs = 60 * 60 * 1000;
+    const issued = await this.otp.issuedSince(
+      filter,
+      purpose,
+      new Date(now - hourMs),
+    );
+
+    const last = issued.at(-1);
+    const cooldownMs = this.resendCooldownSeconds * 1000;
+    if (last && now - last.getTime() < cooldownMs) {
+      throw new RateLimitedException(
+        'Wait before requesting another code.',
+        (cooldownMs - (now - last.getTime())) / 1000,
+      );
+    }
+    if (issued.length >= this.resendMaxPerHour) {
+      // The send that must leave the one-hour window before another fits.
+      const blocking = issued[issued.length - this.resendMaxPerHour];
+      throw new RateLimitedException(
+        'Too many codes requested. Try again later.',
+        (blocking.getTime() + hourMs - now) / 1000,
+      );
+    }
   }
 
   async changePassword(
@@ -285,10 +384,7 @@ export class AuthService {
   ): Promise<void> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      throw new UnauthorizedException({
-        message: 'Session expired. Please sign in again.',
-        code: ApiErrorCode.UNAUTHORIZED,
-      });
+      throw unauthorized('Session expired. Please sign in again.');
     }
 
     const ok = await this.passwords.verify(
@@ -322,10 +418,7 @@ export class AuthService {
   async revokeSession(userId: string, sessionId: string): Promise<void> {
     const revoked = await this.tokens.revokeSession(userId, sessionId);
     if (!revoked) {
-      throw new NotFoundException({
-        message: 'Session not found.',
-        code: ApiErrorCode.NOT_FOUND,
-      });
+      throw notFound('Session not found.');
     }
   }
 
@@ -343,7 +436,17 @@ export class AuthService {
       fullName: user.fullName,
       email: user.email,
       role: user.role,
+      emailVerified: user.emailVerifiedAt !== null,
     };
+  }
+
+  /** The caller's account, or 401 when it is gone or no longer active. */
+  private async activeUser(userId: string): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.status !== 'active') {
+      throw unauthorized('Session expired. Please sign in again.');
+    }
+    return user;
   }
 
   private roleFor(accountType: AccountType): UserRole {
@@ -360,51 +463,66 @@ export class AuthService {
   private async assertEmailAvailable(email: string): Promise<void> {
     const existing = await this.prisma.user.findUnique({ where: { email } });
     if (existing) {
-      throw this.fieldError('email', 'This email is already registered.');
+      throw this.emailTaken();
     }
   }
 
-  private findByDestination(destination: string): Promise<User | null> {
-    if (EMAIL_RE.test(destination)) {
-      return this.prisma.user.findUnique({
-        where: { email: destination.toLowerCase() },
-      });
-    }
-    return this.prisma.user.findFirst({ where: { phone: destination } });
+  private emailTaken(): UnprocessableEntityException {
+    return this.fieldError(
+      'email',
+      'This email is already registered.',
+      ApiErrorCode.EMAIL_ALREADY_REGISTERED,
+    );
   }
 
+  private invalidCode(): UnprocessableEntityException {
+    return this.fieldError(
+      'code',
+      'Invalid or expired code.',
+      ApiErrorCode.INVALID_VERIFICATION_CODE,
+    );
+  }
+
+  /** A 422 naming the offending field. [code] tells the app which
+   *  localized message to show; the English text is for logs only. */
   private fieldError(
     field: string,
     message: string,
+    code: ApiErrorCode = ApiErrorCode.VALIDATION_ERROR,
   ): UnprocessableEntityException {
     return new UnprocessableEntityException({
-      message: 'Validation failed',
-      code: ApiErrorCode.VALIDATION_ERROR,
+      message,
+      code,
       errors: { [field]: [message] },
     });
   }
 
+  /** Turns a unique-constraint race (two sign-ups with the same value at
+   *  once, past the pre-checks) into the same 422 the pre-check gives. */
   private rethrowUniqueViolation(error: unknown): never {
-    if (
-      this.isPrismaKnownError(error) &&
-      error.code === 'P2002' &&
-      Array.isArray(error.meta?.target)
-    ) {
-      const target = (error.meta.target as string[]).join(',');
-      if (target.includes('commercial_registration_number')) {
+    if (this.isPrismaKnownError(error) && error.code === 'P2002') {
+      const rawTarget = error.meta?.target;
+      const target = Array.isArray(rawTarget)
+        ? rawTarget.join(',')
+        : typeof rawTarget === 'string'
+          ? rawTarget
+          : '';
+      if (/commercial_?registration_?number/i.test(target)) {
         throw this.fieldError(
           'commercialRegistrationNumber',
           'This commercial registration number is already in use.',
+          ApiErrorCode.COMMERCIAL_REGISTRATION_TAKEN,
         );
       }
-      if (target.includes('bar_license_number')) {
+      if (/bar_?license_?number/i.test(target)) {
         throw this.fieldError(
           'barLicenseNumber',
           'This bar license number is already in use.',
+          ApiErrorCode.BAR_LICENSE_TAKEN,
         );
       }
       if (target.includes('email')) {
-        throw this.fieldError('email', 'This email is already registered.');
+        throw this.emailTaken();
       }
     }
     throw error as Error;
@@ -419,9 +537,5 @@ export class AuthService {
       'code' in error &&
       typeof error.code === 'string'
     );
-  }
-
-  private isRecordNotFound(error: unknown): boolean {
-    return this.isPrismaKnownError(error) && error.code === 'P2025';
   }
 }

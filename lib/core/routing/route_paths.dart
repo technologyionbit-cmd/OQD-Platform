@@ -9,6 +9,9 @@ class RoutePaths {
   static const otpVerification = '/otp-verification';
   static const resetPassword = '/reset-password';
 
+  /// Signed-in only; the router decides when it shows (see app_router).
+  static const verifyEmail = '/verify-email';
+
   // Role shells — each is a StatefulShellRoute branch prefix. Guard logic
   // in app_router.dart checks these prefixes, so keep every new
   // role-scoped route nested under its role's base.

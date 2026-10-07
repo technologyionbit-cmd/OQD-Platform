@@ -22,7 +22,7 @@ class GovDocumentsRemoteDataSourceImpl implements GovDocumentsRemoteDataSource {
 
   @override
   Future<List<GovProcedure>> getGovProcedures({required String locale}) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final res = await _dio.get<Map<String, dynamic>>('/gov-procedures');
       final rows = (res.data!['data'] as List).cast<Map<String, dynamic>>();
       _idsByType = {for (final row in rows) _parseType(row['type'] as String): row['id'] as String};
@@ -32,7 +32,7 @@ class GovDocumentsRemoteDataSourceImpl implements GovDocumentsRemoteDataSource {
 
   @override
   Future<GovProcedureProgress> getProgress(GovProcedureType type) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final id = await _resolveId(type);
       final res = await _dio.get<Map<String, dynamic>>('/gov-procedures/$id/progress');
       return _parseProgress(res.data!['data'] as Map<String, dynamic>);
@@ -41,7 +41,7 @@ class GovDocumentsRemoteDataSourceImpl implements GovDocumentsRemoteDataSource {
 
   @override
   Future<GovProcedureProgress> updateProgress(GovProcedureType type, {String? toggleDocumentId, bool? start}) {
-    return _call(() async {
+    return _errorMapper.guard(() async {
       final id = await _resolveId(type);
       final res = await _dio.patch<Map<String, dynamic>>(
         '/gov-procedures/$id/progress',
@@ -101,15 +101,5 @@ class GovDocumentsRemoteDataSourceImpl implements GovDocumentsRemoteDataSource {
   String _localized(dynamic jsonValue, String locale) {
     final map = jsonValue as Map<String, dynamic>;
     return (map[locale] ?? map['ar'] ?? map.values.first) as String;
-  }
-
-  /// Runs [action], translating any [DioException] (or unexpected error)
-  /// into a typed [Failure] before it escapes this layer.
-  Future<T> _call<T>(Future<T> Function() action) async {
-    try {
-      return await action();
-    } catch (error) {
-      throw _errorMapper.map(error);
-    }
   }
 }

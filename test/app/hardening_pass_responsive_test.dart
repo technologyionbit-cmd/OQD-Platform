@@ -13,7 +13,6 @@ import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
 import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
 import 'package:aqd_ionbit/features/lawyers/data/repositories/lawyers_repository_impl.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/domain/entities/verification_status.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/screens/lawyer_profile_edit_screen.dart';
 import 'package:aqd_ionbit/features/notifications/presentation/screens/notifications_screen.dart';
@@ -22,6 +21,7 @@ import '../features/consultation_room/presentation/voice_call_test_support.dart'
 import '../features/consultation_room/presentation/video_call_test_support.dart';
 import '../features/messages/presentation/chat_room_test_support.dart'
     show FixedAuthController, SingleConsultationDataSource, pumpChatRoom, readyConsultation, testClient;
+import '../support/signed_in_override.dart';
 
 /// Focused responsive coverage for the screens this hardening pass actually
 /// changed the layout of (a new dev-trigger icon in the call screens' AppBar
@@ -42,7 +42,7 @@ void _setSize(WidgetTester tester, Size size) {
 
 Future<void> _pumpLawyerProfileEdit(WidgetTester tester, {required Locale locale}) async {
   final container = ProviderContainer(
-    overrides: [lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource())],
+    overrides: [signedInOverride, lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource())],
   );
   addTearDown(container.dispose);
 

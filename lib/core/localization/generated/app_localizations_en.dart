@@ -12,6 +12,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appName => 'Aqd';
 
   @override
+  String get splashTagline => 'Your smart legal platform';
+
+  @override
+  String get splashLoading => 'Loading';
+
+  @override
   String get commonRetry => 'Retry';
 
   @override
@@ -25,6 +31,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get commonSkip => 'Skip';
+
+  @override
+  String get commonChangeLanguage => 'Change language';
 
   @override
   String get commonNext => 'Next';
@@ -141,45 +150,49 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPrivacyPolicy => 'Privacy Policy';
 
   @override
+  String get authTermsCheckboxPrefix => 'I agree to the ';
+
+  @override
+  String get authPasswordRulesHint =>
+      'At least 8 characters, with a letter and a number';
+
+  @override
+  String get authVerifyEmailTitle => 'Verify your email';
+
+  @override
+  String authVerifyEmailSubtitle(String email) {
+    return 'We sent a 6-digit code to $email';
+  }
+
+  @override
+  String get authVerifyEmailLater => 'Later';
+
+  @override
+  String get authVerifyEmailResent => 'A new code has been sent';
+
+  @override
+  String get emailVerificationBannerMessage =>
+      'Your email is not verified. Verify it to book consultations and leave reviews';
+
+  @override
+  String get emailVerificationBannerAction => 'Verify now';
+
+  @override
   String get authForgotPasswordTitle => 'Forgot Password?';
 
   @override
   String get authForgotPasswordSubtitle =>
-      'Choose a recovery method to continue';
-
-  @override
-  String get authMethodSms => 'SMS';
-
-  @override
-  String get authMethodEmail => 'Email';
-
-  @override
-  String get authSmsInfo =>
-      'We\'ll send a 6-digit verification code to reset your password';
+      'Enter your account email and we\'ll send you a verification code';
 
   @override
   String get authEmailInfo =>
-      'We\'ll send a verification link to reset your password';
+      'If this email has an account, a 6-digit code will arrive within minutes. Check your spam folder if you can\'t find it';
 
   @override
   String get authSendCode => 'Send Verification Code';
 
   @override
   String get authRememberPassword => 'Remember your password?';
-
-  @override
-  String get authSentTitle => 'Sent!';
-
-  @override
-  String get authSentSubtitleSms =>
-      'Check your messages and follow the instructions to reset your password';
-
-  @override
-  String get authSentSubtitleEmail =>
-      'Check your email and follow the instructions to reset your password';
-
-  @override
-  String get authEnterCode => 'Enter Verification Code';
 
   @override
   String get authResend => 'Resend';
@@ -202,6 +215,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authOtpInvalidCode => 'Invalid verification code';
+
+  @override
+  String get authResetCodeExpired =>
+      'The verification code has expired. Go back and request a new one';
 
   @override
   String get authResetPasswordTitle => 'New Password';
@@ -257,6 +274,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingGetStarted => 'Get Started';
 
   @override
+  String onboardingSlideIndicator(int current, int total) {
+    return 'Slide $current of $total';
+  }
+
+  @override
   String get errorGeneric => 'Something went wrong';
 
   @override
@@ -273,6 +295,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorTimeout => 'The connection timed out';
 
   @override
+  String get errorTooManyAttempts =>
+      'Too many attempts, please try again later';
+
+  @override
+  String errorTooManyAttemptsRetryIn(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'Too many attempts, try again in $minutes minutes',
+      one: 'Too many attempts, try again in 1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errorAccountInactive =>
+      'This account is not active, please contact support';
+
+  @override
+  String get errorEmailNotVerified =>
+      'Verify your email first to complete this action';
+
+  @override
+  String get errorEmailAlreadyRegistered => 'This email is already registered';
+
+  @override
+  String get errorCommercialRegistrationTaken =>
+      'This commercial registration number is used by another account';
+
+  @override
+  String get errorBarLicenseTaken =>
+      'This bar license number is used by another account';
+
+  @override
+  String get errorTermsVersionOutdated =>
+      'The terms of service have changed. Update the app and try again';
+
+  @override
+  String get errorVerificationCodeLocked =>
+      'Too many wrong attempts. Request a new code';
+
+  @override
+  String get errorContractStatusConflict =>
+      'This can\'t be done to the contract in its current state. Refresh and try again';
+
+  @override
+  String get errorLinkOpenFailed => 'Could not open the link';
+
+  @override
   String get validationRequired => 'This field is required';
 
   @override
@@ -284,6 +355,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get validationInvalidPhone => 'Enter a valid phone number';
+
+  @override
+  String get validationInvalidValue => 'Enter a valid value';
+
+  @override
+  String get validationPasswordNeedsLetterAndDigit =>
+      'Password must contain at least one letter and one number';
+
+  @override
+  String get validationPasswordTooLong => 'Password is too long';
+
+  @override
+  String validationTooLong(int max) {
+    return 'Must be at most $max characters';
+  }
+
+  @override
+  String get validationTermsRequired =>
+      'You must accept the Terms of Service and Privacy Policy';
 
   @override
   String get navHome => 'Home';
@@ -920,11 +1010,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get consultationMessageHint => 'Type a message...';
 
   @override
-  String get notificationConsultationBookedTitle => 'Consultation request sent';
+  String get notificationConsultationRequestedTitle =>
+      'New consultation request';
 
   @override
-  String notificationConsultationBookedBody(String lawyerName) {
-    return 'Waiting for $lawyerName to approve your consultation request';
+  String notificationConsultationRequestedBody(String name) {
+    return '$name sent you a consultation request';
   }
 
   @override
@@ -932,8 +1023,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'Consultation request accepted';
 
   @override
-  String notificationConsultationAcceptedBody(String lawyerName) {
-    return '$lawyerName approved your consultation request';
+  String notificationConsultationAcceptedBody(String name) {
+    return '$name approved your consultation request';
   }
 
   @override
@@ -941,44 +1032,33 @@ class AppLocalizationsEn extends AppLocalizations {
       'Consultation request declined';
 
   @override
-  String notificationConsultationRejectedBody(String lawyerName) {
-    return '$lawyerName declined your consultation request';
+  String notificationConsultationRejectedBody(String name) {
+    return '$name declined your consultation request';
   }
 
   @override
   String get notificationConsultationCancelledTitle => 'Consultation cancelled';
 
   @override
-  String get notificationConsultationCancelledBody =>
-      'Your consultation appointment was cancelled';
+  String notificationConsultationCancelledBody(String name) {
+    return '$name cancelled the consultation';
+  }
 
   @override
   String get notificationConsultationCompletedTitle => 'Consultation ended';
 
   @override
-  String get notificationConsultationCompletedBody =>
-      'Your consultation session has ended';
-
-  @override
-  String get notificationNewMessageTitle => 'New message';
-
-  @override
-  String get notificationNewAttachmentBody => 'Sent you a new attachment';
-
-  @override
-  String get notificationDocumentUploadedTitle => 'Document uploaded';
-
-  @override
-  String notificationDocumentUploadedBody(String title) {
-    return '\"$title\" was added to your digital vault';
+  String notificationConsultationCompletedBody(String name) {
+    return 'Your consultation with $name has ended';
   }
 
   @override
-  String get notificationAiAnalysisTitle => 'Contract analysis complete';
+  String get notificationConsultationRescheduledTitle =>
+      'Consultation rescheduled';
 
   @override
-  String notificationAiAnalysisBody(String documentTitle) {
-    return 'Finished analyzing \"$documentTitle\"';
+  String notificationConsultationRescheduledBody(String name) {
+    return '$name moved the consultation to a new time';
   }
 
   @override
@@ -1519,6 +1599,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboardStartSession => 'Start Session';
 
   @override
+  String get dashboardVerificationUnverifiedTitle =>
+      'Your account is not verified yet';
+
+  @override
+  String get dashboardVerificationUnverifiedMessage =>
+      'Clients can\'t see your profile or book you until your account is verified';
+
+  @override
+  String get dashboardVerificationPendingTitle => 'Verification under review';
+
+  @override
+  String get dashboardVerificationPendingMessage =>
+      'We\'ll review your documents soon; your profile goes live once approved';
+
+  @override
+  String get dashboardVerificationRejectedTitle => 'Verification rejected';
+
+  @override
+  String get dashboardVerificationRejectedMessage =>
+      'Review your profile and upload your verification documents again';
+
+  @override
+  String get dashboardVerificationAction => 'Complete verification';
+
+  @override
   String get earningsBalance => 'Total Earned';
 
   @override
@@ -1598,6 +1703,46 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get lawyerVerificationSubmittedMessage =>
       'Document submitted for review';
+
+  @override
+  String get lawyerVerificationDocumentsHint =>
+      'Upload your ID and bar card: JPG, PNG or PDF, up to 3 files, 10 MB each';
+
+  @override
+  String lawyerVerificationRejectedReason(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String get lawyerVerificationFileTooLarge =>
+      'One of the files is larger than 10 MB';
+
+  @override
+  String get lawyerVerificationTooManyFiles => 'You can upload at most 3 files';
+
+  @override
+  String get lawyerVerificationInvalidFile =>
+      'Only JPG, PNG or PDF files are accepted';
+
+  @override
+  String get lawyerVerificationAlreadyPending =>
+      'Your documents are already under review';
+
+  @override
+  String get notificationVerificationApprovedTitle =>
+      'Your account is verified';
+
+  @override
+  String get notificationVerificationApprovedBody =>
+      'Clients can now find your profile and book consultations with you';
+
+  @override
+  String get notificationVerificationRejectedTitle => 'Verification rejected';
+
+  @override
+  String notificationVerificationRejectedBody(String reason) {
+    return 'Reason: $reason';
+  }
 
   @override
   String get lawyerPriceLabel => 'Price';

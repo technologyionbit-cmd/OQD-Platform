@@ -26,7 +26,7 @@ Future<T?> showAppBottomSheet<T>(BuildContext context, {required WidgetBuilder b
                   width: 40,
                   height: 4,
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                  decoration: BoxDecoration(color: AppColors.border, borderRadius: AppRadii.smRadius),
+                  decoration: const BoxDecoration(color: AppColors.border, borderRadius: AppRadii.smRadius),
                 ),
               ),
               Builder(builder: builder),

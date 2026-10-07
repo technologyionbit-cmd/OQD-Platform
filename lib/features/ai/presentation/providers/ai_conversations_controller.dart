@@ -6,20 +6,22 @@ import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/features/ai/data/repositories/ai_repository_impl.dart';
 import 'package:aqd_ionbit/features/ai/domain/entities/ai_conversation.dart';
 import 'package:aqd_ionbit/features/ai/domain/repositories/ai_repository.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 
 class AiConversationsController extends AsyncNotifier<List<AiConversation>> {
-  late final AiRepository _repository;
+  AiRepository get _repository => ref.read(aiRepositoryProvider);
 
   @override
   FutureOr<List<AiConversation>> build() async {
-    _repository = ref.watch(aiRepositoryProvider);
+    ref.watch(aiRepositoryProvider);
+    if (ref.watch(currentUserIdProvider) == null) return const []; // Signed out: no one's data.
     final result = await _repository.getConversations();
     return result.fold((failure) => throw failure, (conversations) => conversations);
   }
 
   Future<void> refresh() async {
     final result = await _repository.getConversations();
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (conversations) => AsyncData(conversations));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 
   Future<Result<AiConversation>> sendMessage({required String text, String? conversationId}) async {

@@ -22,6 +22,7 @@ abstract interface class ContractsRepository {
   Future<Result<Contract>> saveDraft({
     required ContractTemplate template,
     required Map<String, String> fieldValues,
+    required Locale locale,
     String? contractId,
   });
 
@@ -31,6 +32,7 @@ abstract interface class ContractsRepository {
   Future<Result<Contract>> generateContract({
     required ContractTemplate template,
     required Map<String, String> fieldValues,
+    required Locale locale,
     String? contractId,
   });
 

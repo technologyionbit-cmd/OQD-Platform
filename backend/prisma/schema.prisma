@@ -33,6 +33,9 @@ enum UserRole {
   client
   lawyer
   company
+  /// Staff. Never self-registered: promote an existing account in the DB.
+  /// Reviews lawyer verification through /v1/admin.
+  admin
 }
 
 enum UserStatus {
@@ -165,6 +168,27 @@ enum ConsultationParticipantEventType {
   reconnect
 }
 
+/// Contract lifecycle (docs/backend/08-contracts-documents-signatures.md).
+/// `signed` is the final successful state in v1; `completed` exists for
+/// the app's enum but nothing moves a contract there yet.
+enum ContractStatus {
+  draft
+  pendingSignature
+  signed
+  completed
+  cancelled
+}
+
+enum ContractCategory {
+  employment
+  sale
+  rental
+  partnership
+  nda
+  serviceAgreement
+  other
+}
+
 // -----------------------------------------------------------------------------
 // 1. Identity & Access — docs/backend/01-domain-model.md §1
 // -----------------------------------------------------------------------------
@@ -181,6 +205,10 @@ model User {
   status           UserStatus @default(active)
   twoFactorEnabled Boolean    @default(false) @map("two_factor_enabled")
   lastLoginAt      DateTime?  @map("last_login_at") @db.Timestamptz
+  /// When the user accepted the terms/privacy policy, and which version.
+  /// Null only for accounts created before acceptance was recorded.
+  termsAcceptedAt  DateTime?  @map("terms_accepted_at") @db.Timestamptz
+  termsVersion     String?    @map("terms_version")
   createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz
   updatedAt        DateTime   @updatedAt @map("updated_at") @db.Timestamptz
   deletedAt        DateTime?  @map("deleted_at") @db.Timestamptz
@@ -195,6 +223,9 @@ model User {
   lawyerProfile            LawyerProfile?
   writtenReviews           Review[]
   bookedConsultations      Consultation[]
+  contracts                Contract[]
+  contractSignatures       ContractSignature[]
+  notifications            Notification[]
 
   @@index([role])
   @@map("users")
@@ -424,15 +455,21 @@ model LawyerProfile {
   reviewsCount                Int                      @default(0) @map("reviews_count")
   verificationStatus          LawyerVerificationStatus @default(unverified) @map("verification_status")
   verificationRejectionReason String?                  @map("verification_rejection_reason")
+  /// When the lawyer last sent documents for review.
+  verificationSubmittedAt     DateTime?                @map("verification_submitted_at") @db.Timestamptz
+  /// The admin who approved or rejected the latest submission, and when.
+  verificationReviewedById    String?                  @map("verification_reviewed_by_id") @db.Uuid
+  verificationReviewedAt      DateTime?                @map("verification_reviewed_at") @db.Timestamptz
   createdAt                   DateTime                 @default(now()) @map("created_at") @db.Timestamptz
   updatedAt                   DateTime                 @updatedAt @map("updated_at") @db.Timestamptz
 
-  user        User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  specialties LawyerProfileSpecialty[]
-  offerings   LawyerConsultationOffering[]
-  reviews     Review[]
-  availabilitySlots AvailabilitySlot[]
-  consultations     Consultation[]
+  user                  User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialties           LawyerProfileSpecialty[]
+  offerings             LawyerConsultationOffering[]
+  reviews               Review[]
+  availabilitySlots     AvailabilitySlot[]
+  consultations         Consultation[]
+  verificationDocuments LawyerVerificationDocument[]
 
   @@index([verificationStatus])
   @@map("lawyer_profiles")
@@ -468,6 +505,25 @@ model LawyerConsultationOffering {
 
   @@unique([lawyerProfileId, consultationType])
   @@map("lawyer_consultation_offerings")
+}
+
+/// A file a lawyer sent to prove their license (ID, bar card). Stored on
+/// private disk under `storageKey` (see FileStorageService); only the
+/// owner and admins can reach it through the API. Kept after review as
+/// the audit trail of what was approved.
+model LawyerVerificationDocument {
+  id              String   @id @default(uuid()) @db.Uuid
+  lawyerProfileId String   @map("lawyer_profile_id") @db.Uuid
+  storageKey      String   @unique @map("storage_key")
+  originalName    String   @map("original_name")
+  mimeType        String   @map("mime_type")
+  sizeBytes       Int      @map("size_bytes")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  lawyerProfile LawyerProfile @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+
+  @@index([lawyerProfileId, createdAt])
+  @@map("lawyer_verification_documents")
 }
 
 /// The frontend's "Reviews" section was two hardcoded static entries in
@@ -545,9 +601,9 @@ model Consultation {
   createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz
   updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz
 
-  client           User             @relation(fields: [clientUserId], references: [id], onDelete: Cascade)
-  lawyerProfile    LawyerProfile    @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
-  availabilitySlot AvailabilitySlot @relation(fields: [availabilitySlotId], references: [id], onDelete: Restrict)
+  client           User                     @relation(fields: [clientUserId], references: [id], onDelete: Cascade)
+  lawyerProfile    LawyerProfile            @relation(fields: [lawyerProfileId], references: [id], onDelete: Cascade)
+  availabilitySlot AvailabilitySlot         @relation(fields: [availabilitySlotId], references: [id], onDelete: Restrict)
   reviews          Review[]
   roomSession      ConsultationRoomSession?
 
@@ -623,4 +679,92 @@ model ConsultationParticipantEvent {
 
   @@index([sessionId])
   @@map("consultation_participant_events")
+}
+
+// -----------------------------------------------------------------------------
+// 7. Contracts — docs/backend/08-contracts-documents-signatures.md
+// -----------------------------------------------------------------------------
+
+/// A contract built from a template in the code catalog
+/// (src/contracts/contract-templates.ts). `templateKey` + `templateVersion`
+/// record which template text it was made from, so later template edits
+/// never change a generated or signed contract. `locale` is the language
+/// of `title` and `generatedContent`.
+model Contract {
+  id               String           @id @default(uuid()) @db.Uuid
+  ownerUserId      String           @map("owner_user_id") @db.Uuid
+  templateKey      String           @map("template_key")
+  templateVersion  Int              @map("template_version")
+  category         ContractCategory
+  locale           String
+  title            String
+  status           ContractStatus   @default(draft)
+  /// Field id -> value as the user entered it (strings only).
+  fieldValues      Json             @map("field_values")
+  parties          String[]
+  generatedContent String?          @map("generated_content")
+  generatedAt      DateTime?        @map("generated_at") @db.Timestamptz
+  signedAt         DateTime?        @map("signed_at") @db.Timestamptz
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+
+  owner      User                @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  signatures ContractSignature[]
+
+  @@index([ownerUserId, updatedAt])
+  @@map("contracts")
+}
+
+/// Evidence of one account signing one contract: when, and from which IP
+/// and client. One row per signer; append-only.
+model ContractSignature {
+  id         String   @id @default(uuid()) @db.Uuid
+  contractId String   @map("contract_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  signedAt   DateTime @default(now()) @map("signed_at") @db.Timestamptz
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([contractId, userId])
+  @@index([userId])
+  @@map("contract_signatures")
+}
+
+// -----------------------------------------------------------------------------
+// 8. Notifications
+// -----------------------------------------------------------------------------
+
+/// What happened. The app renders the title and body in the reader's
+/// language from the type and `params`.
+enum NotificationType {
+  consultationRequested
+  consultationAccepted
+  consultationRejected
+  consultationCancelled
+  consultationCompleted
+  consultationRescheduled
+  lawyerVerificationApproved
+  lawyerVerificationRejected
+}
+
+/// One event for one account. Written only by the server, in the same
+/// transaction as the change it reports.
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
+  /// Id of the entity it is about (for now always a consultation).
+  relatedId String?          @map("related_id") @db.Uuid
+  /// Values the text needs, e.g. {"actorName": "...", "scheduledAt": "..."}.
+  params    Json             @default("{}")
+  readAt    DateTime?        @map("read_at") @db.Timestamptz
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
 }

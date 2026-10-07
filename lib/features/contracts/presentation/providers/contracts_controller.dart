@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aqd_ionbit/core/errors/result.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/contracts/data/repositories/contracts_repository_impl.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
 import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
@@ -11,11 +12,12 @@ import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repo
 /// `AsyncData(contracts)` once loaded. Screens watch this instead of
 /// calling the repository themselves.
 class ContractsController extends AsyncNotifier<List<Contract>> {
-  late final ContractsRepository _repository;
+  ContractsRepository get _repository => ref.read(contractsRepositoryProvider);
 
   @override
   FutureOr<List<Contract>> build() async {
-    _repository = ref.watch(contractsRepositoryProvider);
+    ref.watch(contractsRepositoryProvider);
+    if (ref.watch(currentUserIdProvider) == null) return const []; // Signed out: no one's data.
     final result = await _repository.getContracts();
     return result.fold((failure) => throw failure, (contracts) => contracts);
   }
@@ -25,7 +27,7 @@ class ContractsController extends AsyncNotifier<List<Contract>> {
   /// just swapping the data in once it arrives.
   Future<void> refresh() async {
     final result = await _repository.getContracts();
-    state = result.fold((failure) => AsyncError(failure, StackTrace.current), (contracts) => AsyncData(contracts));
+    state = result.fold((failure) => AsyncError(failure, StackTrace.current), AsyncData.new);
   }
 
   Future<Result<void>> delete(String id) async {

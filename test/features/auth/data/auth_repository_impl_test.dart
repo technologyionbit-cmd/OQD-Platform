@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:aqd_ionbit/core/errors/failure.dart';
+import 'package:aqd_ionbit/core/network/auth_session_ports.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
@@ -9,13 +10,12 @@ import 'package:aqd_ionbit/features/auth/domain/entities/auth_session.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
+import '../../../support/test_doubles.dart';
 
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 
-class MockTokenManager extends Mock implements TokenManager {}
-
 void main() {
-  const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', role: UserRole.client);
+  const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', role: UserRole.client, emailVerified: true);
   const tokens = AuthTokens(accessToken: 'access', refreshToken: 'refresh');
 
   late MockAuthRemoteDataSource remote;
@@ -64,6 +64,8 @@ void main() {
       phone: '+962700000000',
       email: 'new@aqd.test',
       password: 'Password123',
+      acceptTerms: true,
+      termsVersion: '2026-09-28',
     );
 
     test('returns success and persists the returned tokens', () async {
@@ -112,16 +114,100 @@ void main() {
     });
   });
 
-  group('refreshToken', () {
+  group('refreshSession', () {
     test('persists the rotated tokens on success', () async {
       const rotated = AuthTokens(accessToken: 'access2', refreshToken: 'refresh2');
+      when(() => tokenManager.current).thenReturn(tokens);
       when(() => remote.refreshToken('refresh')).thenAnswer((_) async => rotated);
       when(() => tokenManager.save(rotated)).thenAnswer((_) async {});
 
-      final result = await repository.refreshToken('refresh');
+      final outcome = await repository.refreshSession();
 
-      expect(result.valueOrNull, rotated);
+      expect(outcome, isA<RefreshSucceeded>().having((o) => o.tokens, 'tokens', rotated));
       verify(() => tokenManager.save(rotated)).called(1);
+    });
+
+    test('is rejected without a network call when no refresh token is held', () async {
+      when(() => tokenManager.current).thenReturn(null);
+
+      expect(await repository.refreshSession(), isA<RefreshRejected>());
+      verifyNever(() => remote.refreshToken(any()));
+    });
+
+    final refusals = <Failure>[
+      const UnauthorizedFailure(),
+      const ForbiddenFailure(),
+      const ValidationFailure(),
+      const ServerFailure(statusCode: 400),
+    ];
+    for (final failure in refusals) {
+      test('is rejected when the server refuses the token (${failure.runtimeType})', () async {
+        when(() => tokenManager.current).thenReturn(tokens);
+        when(() => remote.refreshToken(any())).thenThrow(failure);
+
+        expect(await repository.refreshSession(), isA<RefreshRejected>());
+      });
+    }
+
+    final transient = <Failure>[
+      const NetworkFailure(),
+      const TimeoutFailure(),
+      const ServerFailure(statusCode: 503),
+      const RateLimitedFailure(retryAfter: Duration(minutes: 1)),
+    ];
+    for (final failure in transient) {
+      test('is unavailable, not rejected, on a transient failure (${failure.runtimeType})', () async {
+        when(() => tokenManager.current).thenReturn(tokens);
+        when(() => remote.refreshToken(any())).thenThrow(failure);
+
+        expect(await repository.refreshSession(), isA<RefreshUnavailable>());
+      });
+    }
+  });
+
+  group('restoreSession', () {
+    test('resolves to no user when nothing is stored', () async {
+      when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => null);
+
+      final result = await repository.restoreSession();
+
+      expect(result.isSuccess, isTrue);
+      expect(result.valueOrNull, isNull);
+      verifyNever(() => remote.currentUser());
+    });
+
+    test('resolves to the user when the stored session is still valid', () async {
+      when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => tokens);
+      when(() => tokenManager.current).thenReturn(tokens);
+      when(() => remote.currentUser()).thenAnswer((_) async => user);
+
+      final result = await repository.restoreSession();
+
+      expect(result.valueOrNull, user);
+    });
+
+    test('clears the stored tokens when the server no longer accepts them', () async {
+      when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => tokens);
+      when(() => tokenManager.current).thenReturn(tokens);
+      when(() => remote.currentUser()).thenThrow(const UnauthorizedFailure());
+      when(() => tokenManager.clear()).thenAnswer((_) async {});
+
+      final result = await repository.restoreSession();
+
+      expect(result.isSuccess, isTrue);
+      expect(result.valueOrNull, isNull);
+      verify(() => tokenManager.clear()).called(1);
+    });
+
+    test('keeps the stored tokens and reports the failure when the server is unreachable', () async {
+      when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => tokens);
+      when(() => tokenManager.current).thenReturn(tokens);
+      when(() => remote.currentUser()).thenThrow(const NetworkFailure());
+
+      final result = await repository.restoreSession();
+
+      expect(result.fold((f) => f, (_) => null), isA<NetworkFailure>());
+      verifyNever(() => tokenManager.clear());
     });
   });
 

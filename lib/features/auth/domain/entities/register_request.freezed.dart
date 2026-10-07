@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$RegisterRequest {
 
- String get phone; String get email; String get password;
+ String get phone; String get email; String get password; bool get acceptTerms; String get termsVersion;
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $RegisterRequestCopyWith<RegisterRequest> get copyWith => _$RegisterRequestCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterRequest&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterRequest&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.acceptTerms, acceptTerms) || other.acceptTerms == acceptTerms)&&(identical(other.termsVersion, termsVersion) || other.termsVersion == termsVersion));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,phone,email,password);
+int get hashCode => Object.hash(runtimeType,phone,email,password,acceptTerms,termsVersion);
 
 @override
 String toString() {
-  return 'RegisterRequest(phone: $phone, email: $email, password: $password)';
+  return 'RegisterRequest(phone: $phone, email: $email, password: $password, acceptTerms: $acceptTerms, termsVersion: $termsVersion)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $RegisterRequestCopyWith<$Res>  {
   factory $RegisterRequestCopyWith(RegisterRequest value, $Res Function(RegisterRequest) _then) = _$RegisterRequestCopyWithImpl;
 @useResult
 $Res call({
- String phone, String email, String password
+ String phone, String email, String password, bool acceptTerms, String termsVersion
 });
 
 
@@ -62,11 +62,13 @@ class _$RegisterRequestCopyWithImpl<$Res>
 
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? phone = null,Object? email = null,Object? password = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? phone = null,Object? email = null,Object? password = null,Object? acceptTerms = null,Object? termsVersion = null,}) {
   return _then(_self.copyWith(
 phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
+as String,acceptTerms: null == acceptTerms ? _self.acceptTerms : acceptTerms // ignore: cast_nullable_to_non_nullable
+as bool,termsVersion: null == termsVersion ? _self.termsVersion : termsVersion // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -155,12 +157,12 @@ return lawyer(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String fullName,  String phone,  String email,  String password)?  individual,TResult Function( String companyName,  String commercialRegistrationNumber,  String email,  String phone,  String password)?  company,TResult Function( String fullName,  String barLicenseNumber,  String mainSpecialty,  String email,  String phone,  String password)?  lawyer,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String fullName,  String phone,  String email,  String password,  bool acceptTerms,  String termsVersion)?  individual,TResult Function( String companyName,  String commercialRegistrationNumber,  String email,  String phone,  String password,  bool acceptTerms,  String termsVersion)?  company,TResult Function( String fullName,  String barLicenseNumber,  String mainSpecialty,  String email,  String phone,  String password,  bool acceptTerms,  String termsVersion)?  lawyer,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case IndividualRegisterRequest() when individual != null:
-return individual(_that.fullName,_that.phone,_that.email,_that.password);case CompanyRegisterRequest() when company != null:
-return company(_that.companyName,_that.commercialRegistrationNumber,_that.email,_that.phone,_that.password);case LawyerRegisterRequest() when lawyer != null:
-return lawyer(_that.fullName,_that.barLicenseNumber,_that.mainSpecialty,_that.email,_that.phone,_that.password);case _:
+return individual(_that.fullName,_that.phone,_that.email,_that.password,_that.acceptTerms,_that.termsVersion);case CompanyRegisterRequest() when company != null:
+return company(_that.companyName,_that.commercialRegistrationNumber,_that.email,_that.phone,_that.password,_that.acceptTerms,_that.termsVersion);case LawyerRegisterRequest() when lawyer != null:
+return lawyer(_that.fullName,_that.barLicenseNumber,_that.mainSpecialty,_that.email,_that.phone,_that.password,_that.acceptTerms,_that.termsVersion);case _:
   return orElse();
 
 }
@@ -178,12 +180,12 @@ return lawyer(_that.fullName,_that.barLicenseNumber,_that.mainSpecialty,_that.em
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String fullName,  String phone,  String email,  String password)  individual,required TResult Function( String companyName,  String commercialRegistrationNumber,  String email,  String phone,  String password)  company,required TResult Function( String fullName,  String barLicenseNumber,  String mainSpecialty,  String email,  String phone,  String password)  lawyer,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String fullName,  String phone,  String email,  String password,  bool acceptTerms,  String termsVersion)  individual,required TResult Function( String companyName,  String commercialRegistrationNumber,  String email,  String phone,  String password,  bool acceptTerms,  String termsVersion)  company,required TResult Function( String fullName,  String barLicenseNumber,  String mainSpecialty,  String email,  String phone,  String password,  bool acceptTerms,  String termsVersion)  lawyer,}) {final _that = this;
 switch (_that) {
 case IndividualRegisterRequest():
-return individual(_that.fullName,_that.phone,_that.email,_that.password);case CompanyRegisterRequest():
-return company(_that.companyName,_that.commercialRegistrationNumber,_that.email,_that.phone,_that.password);case LawyerRegisterRequest():
-return lawyer(_that.fullName,_that.barLicenseNumber,_that.mainSpecialty,_that.email,_that.phone,_that.password);}
+return individual(_that.fullName,_that.phone,_that.email,_that.password,_that.acceptTerms,_that.termsVersion);case CompanyRegisterRequest():
+return company(_that.companyName,_that.commercialRegistrationNumber,_that.email,_that.phone,_that.password,_that.acceptTerms,_that.termsVersion);case LawyerRegisterRequest():
+return lawyer(_that.fullName,_that.barLicenseNumber,_that.mainSpecialty,_that.email,_that.phone,_that.password,_that.acceptTerms,_that.termsVersion);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -197,12 +199,12 @@ return lawyer(_that.fullName,_that.barLicenseNumber,_that.mainSpecialty,_that.em
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String fullName,  String phone,  String email,  String password)?  individual,TResult? Function( String companyName,  String commercialRegistrationNumber,  String email,  String phone,  String password)?  company,TResult? Function( String fullName,  String barLicenseNumber,  String mainSpecialty,  String email,  String phone,  String password)?  lawyer,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String fullName,  String phone,  String email,  String password,  bool acceptTerms,  String termsVersion)?  individual,TResult? Function( String companyName,  String commercialRegistrationNumber,  String email,  String phone,  String password,  bool acceptTerms,  String termsVersion)?  company,TResult? Function( String fullName,  String barLicenseNumber,  String mainSpecialty,  String email,  String phone,  String password,  bool acceptTerms,  String termsVersion)?  lawyer,}) {final _that = this;
 switch (_that) {
 case IndividualRegisterRequest() when individual != null:
-return individual(_that.fullName,_that.phone,_that.email,_that.password);case CompanyRegisterRequest() when company != null:
-return company(_that.companyName,_that.commercialRegistrationNumber,_that.email,_that.phone,_that.password);case LawyerRegisterRequest() when lawyer != null:
-return lawyer(_that.fullName,_that.barLicenseNumber,_that.mainSpecialty,_that.email,_that.phone,_that.password);case _:
+return individual(_that.fullName,_that.phone,_that.email,_that.password,_that.acceptTerms,_that.termsVersion);case CompanyRegisterRequest() when company != null:
+return company(_that.companyName,_that.commercialRegistrationNumber,_that.email,_that.phone,_that.password,_that.acceptTerms,_that.termsVersion);case LawyerRegisterRequest() when lawyer != null:
+return lawyer(_that.fullName,_that.barLicenseNumber,_that.mainSpecialty,_that.email,_that.phone,_that.password,_that.acceptTerms,_that.termsVersion);case _:
   return null;
 
 }
@@ -214,13 +216,15 @@ return lawyer(_that.fullName,_that.barLicenseNumber,_that.mainSpecialty,_that.em
 
 
 class IndividualRegisterRequest implements RegisterRequest {
-  const IndividualRegisterRequest({required this.fullName, required this.phone, required this.email, required this.password});
+  const IndividualRegisterRequest({required this.fullName, required this.phone, required this.email, required this.password, required this.acceptTerms, required this.termsVersion});
   
 
  final  String fullName;
 @override final  String phone;
 @override final  String email;
 @override final  String password;
+@override final  bool acceptTerms;
+@override final  String termsVersion;
 
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -232,16 +236,16 @@ $IndividualRegisterRequestCopyWith<IndividualRegisterRequest> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is IndividualRegisterRequest&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is IndividualRegisterRequest&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.email, email) || other.email == email)&&(identical(other.password, password) || other.password == password)&&(identical(other.acceptTerms, acceptTerms) || other.acceptTerms == acceptTerms)&&(identical(other.termsVersion, termsVersion) || other.termsVersion == termsVersion));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,fullName,phone,email,password);
+int get hashCode => Object.hash(runtimeType,fullName,phone,email,password,acceptTerms,termsVersion);
 
 @override
 String toString() {
-  return 'RegisterRequest.individual(fullName: $fullName, phone: $phone, email: $email, password: $password)';
+  return 'RegisterRequest.individual(fullName: $fullName, phone: $phone, email: $email, password: $password, acceptTerms: $acceptTerms, termsVersion: $termsVersion)';
 }
 
 
@@ -252,7 +256,7 @@ abstract mixin class $IndividualRegisterRequestCopyWith<$Res> implements $Regist
   factory $IndividualRegisterRequestCopyWith(IndividualRegisterRequest value, $Res Function(IndividualRegisterRequest) _then) = _$IndividualRegisterRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String fullName, String phone, String email, String password
+ String fullName, String phone, String email, String password, bool acceptTerms, String termsVersion
 });
 
 
@@ -269,12 +273,14 @@ class _$IndividualRegisterRequestCopyWithImpl<$Res>
 
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? fullName = null,Object? phone = null,Object? email = null,Object? password = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? fullName = null,Object? phone = null,Object? email = null,Object? password = null,Object? acceptTerms = null,Object? termsVersion = null,}) {
   return _then(IndividualRegisterRequest(
 fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
+as String,acceptTerms: null == acceptTerms ? _self.acceptTerms : acceptTerms // ignore: cast_nullable_to_non_nullable
+as bool,termsVersion: null == termsVersion ? _self.termsVersion : termsVersion // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -286,7 +292,7 @@ as String,
 
 
 class CompanyRegisterRequest implements RegisterRequest {
-  const CompanyRegisterRequest({required this.companyName, required this.commercialRegistrationNumber, required this.email, required this.phone, required this.password});
+  const CompanyRegisterRequest({required this.companyName, required this.commercialRegistrationNumber, required this.email, required this.phone, required this.password, required this.acceptTerms, required this.termsVersion});
   
 
  final  String companyName;
@@ -294,6 +300,8 @@ class CompanyRegisterRequest implements RegisterRequest {
 @override final  String email;
 @override final  String phone;
 @override final  String password;
+@override final  bool acceptTerms;
+@override final  String termsVersion;
 
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -305,16 +313,16 @@ $CompanyRegisterRequestCopyWith<CompanyRegisterRequest> get copyWith => _$Compan
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CompanyRegisterRequest&&(identical(other.companyName, companyName) || other.companyName == companyName)&&(identical(other.commercialRegistrationNumber, commercialRegistrationNumber) || other.commercialRegistrationNumber == commercialRegistrationNumber)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CompanyRegisterRequest&&(identical(other.companyName, companyName) || other.companyName == companyName)&&(identical(other.commercialRegistrationNumber, commercialRegistrationNumber) || other.commercialRegistrationNumber == commercialRegistrationNumber)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.password, password) || other.password == password)&&(identical(other.acceptTerms, acceptTerms) || other.acceptTerms == acceptTerms)&&(identical(other.termsVersion, termsVersion) || other.termsVersion == termsVersion));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,companyName,commercialRegistrationNumber,email,phone,password);
+int get hashCode => Object.hash(runtimeType,companyName,commercialRegistrationNumber,email,phone,password,acceptTerms,termsVersion);
 
 @override
 String toString() {
-  return 'RegisterRequest.company(companyName: $companyName, commercialRegistrationNumber: $commercialRegistrationNumber, email: $email, phone: $phone, password: $password)';
+  return 'RegisterRequest.company(companyName: $companyName, commercialRegistrationNumber: $commercialRegistrationNumber, email: $email, phone: $phone, password: $password, acceptTerms: $acceptTerms, termsVersion: $termsVersion)';
 }
 
 
@@ -325,7 +333,7 @@ abstract mixin class $CompanyRegisterRequestCopyWith<$Res> implements $RegisterR
   factory $CompanyRegisterRequestCopyWith(CompanyRegisterRequest value, $Res Function(CompanyRegisterRequest) _then) = _$CompanyRegisterRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String companyName, String commercialRegistrationNumber, String email, String phone, String password
+ String companyName, String commercialRegistrationNumber, String email, String phone, String password, bool acceptTerms, String termsVersion
 });
 
 
@@ -342,13 +350,15 @@ class _$CompanyRegisterRequestCopyWithImpl<$Res>
 
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? companyName = null,Object? commercialRegistrationNumber = null,Object? email = null,Object? phone = null,Object? password = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? companyName = null,Object? commercialRegistrationNumber = null,Object? email = null,Object? phone = null,Object? password = null,Object? acceptTerms = null,Object? termsVersion = null,}) {
   return _then(CompanyRegisterRequest(
 companyName: null == companyName ? _self.companyName : companyName // ignore: cast_nullable_to_non_nullable
 as String,commercialRegistrationNumber: null == commercialRegistrationNumber ? _self.commercialRegistrationNumber : commercialRegistrationNumber // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
+as String,acceptTerms: null == acceptTerms ? _self.acceptTerms : acceptTerms // ignore: cast_nullable_to_non_nullable
+as bool,termsVersion: null == termsVersion ? _self.termsVersion : termsVersion // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -360,7 +370,7 @@ as String,
 
 
 class LawyerRegisterRequest implements RegisterRequest {
-  const LawyerRegisterRequest({required this.fullName, required this.barLicenseNumber, required this.mainSpecialty, required this.email, required this.phone, required this.password});
+  const LawyerRegisterRequest({required this.fullName, required this.barLicenseNumber, required this.mainSpecialty, required this.email, required this.phone, required this.password, required this.acceptTerms, required this.termsVersion});
   
 
  final  String fullName;
@@ -369,6 +379,8 @@ class LawyerRegisterRequest implements RegisterRequest {
 @override final  String email;
 @override final  String phone;
 @override final  String password;
+@override final  bool acceptTerms;
+@override final  String termsVersion;
 
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -380,16 +392,16 @@ $LawyerRegisterRequestCopyWith<LawyerRegisterRequest> get copyWith => _$LawyerRe
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LawyerRegisterRequest&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.barLicenseNumber, barLicenseNumber) || other.barLicenseNumber == barLicenseNumber)&&(identical(other.mainSpecialty, mainSpecialty) || other.mainSpecialty == mainSpecialty)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.password, password) || other.password == password));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LawyerRegisterRequest&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.barLicenseNumber, barLicenseNumber) || other.barLicenseNumber == barLicenseNumber)&&(identical(other.mainSpecialty, mainSpecialty) || other.mainSpecialty == mainSpecialty)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.password, password) || other.password == password)&&(identical(other.acceptTerms, acceptTerms) || other.acceptTerms == acceptTerms)&&(identical(other.termsVersion, termsVersion) || other.termsVersion == termsVersion));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,fullName,barLicenseNumber,mainSpecialty,email,phone,password);
+int get hashCode => Object.hash(runtimeType,fullName,barLicenseNumber,mainSpecialty,email,phone,password,acceptTerms,termsVersion);
 
 @override
 String toString() {
-  return 'RegisterRequest.lawyer(fullName: $fullName, barLicenseNumber: $barLicenseNumber, mainSpecialty: $mainSpecialty, email: $email, phone: $phone, password: $password)';
+  return 'RegisterRequest.lawyer(fullName: $fullName, barLicenseNumber: $barLicenseNumber, mainSpecialty: $mainSpecialty, email: $email, phone: $phone, password: $password, acceptTerms: $acceptTerms, termsVersion: $termsVersion)';
 }
 
 
@@ -400,7 +412,7 @@ abstract mixin class $LawyerRegisterRequestCopyWith<$Res> implements $RegisterRe
   factory $LawyerRegisterRequestCopyWith(LawyerRegisterRequest value, $Res Function(LawyerRegisterRequest) _then) = _$LawyerRegisterRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String fullName, String barLicenseNumber, String mainSpecialty, String email, String phone, String password
+ String fullName, String barLicenseNumber, String mainSpecialty, String email, String phone, String password, bool acceptTerms, String termsVersion
 });
 
 
@@ -417,7 +429,7 @@ class _$LawyerRegisterRequestCopyWithImpl<$Res>
 
 /// Create a copy of RegisterRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? fullName = null,Object? barLicenseNumber = null,Object? mainSpecialty = null,Object? email = null,Object? phone = null,Object? password = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? fullName = null,Object? barLicenseNumber = null,Object? mainSpecialty = null,Object? email = null,Object? phone = null,Object? password = null,Object? acceptTerms = null,Object? termsVersion = null,}) {
   return _then(LawyerRegisterRequest(
 fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,barLicenseNumber: null == barLicenseNumber ? _self.barLicenseNumber : barLicenseNumber // ignore: cast_nullable_to_non_nullable
@@ -425,6 +437,8 @@ as String,mainSpecialty: null == mainSpecialty ? _self.mainSpecialty : mainSpeci
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
+as String,acceptTerms: null == acceptTerms ? _self.acceptTerms : acceptTerms // ignore: cast_nullable_to_non_nullable
+as bool,termsVersion: null == termsVersion ? _self.termsVersion : termsVersion // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

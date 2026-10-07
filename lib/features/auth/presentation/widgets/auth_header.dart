@@ -27,7 +27,6 @@ class AuthHeader extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.xs, AppSpacing.md, AppSpacing.xxl),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
                 height: 40,

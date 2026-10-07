@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ContractField {
 
- String get id; String get label; ContractFieldType get type; bool get isRequired; List<String> get options; String? get hint;
+ String get id; String get label; ContractFieldType get type; bool get isRequired; List<ContractFieldOption> get options; String? get hint;
 /// Create a copy of ContractField
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,7 +45,7 @@ abstract mixin class $ContractFieldCopyWith<$Res>  {
   factory $ContractFieldCopyWith(ContractField value, $Res Function(ContractField) _then) = _$ContractFieldCopyWithImpl;
 @useResult
 $Res call({
- String id, String label, ContractFieldType type, bool isRequired, List<String> options, String? hint
+ String id, String label, ContractFieldType type, bool isRequired, List<ContractFieldOption> options, String? hint
 });
 
 
@@ -69,7 +69,7 @@ as String,label: null == label ? _self.label : label // ignore: cast_nullable_to
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as ContractFieldType,isRequired: null == isRequired ? _self.isRequired : isRequired // ignore: cast_nullable_to_non_nullable
 as bool,options: null == options ? _self.options : options // ignore: cast_nullable_to_non_nullable
-as List<String>,hint: freezed == hint ? _self.hint : hint // ignore: cast_nullable_to_non_nullable
+as List<ContractFieldOption>,hint: freezed == hint ? _self.hint : hint // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -155,7 +155,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String label,  ContractFieldType type,  bool isRequired,  List<String> options,  String? hint)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String label,  ContractFieldType type,  bool isRequired,  List<ContractFieldOption> options,  String? hint)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ContractField() when $default != null:
 return $default(_that.id,_that.label,_that.type,_that.isRequired,_that.options,_that.hint);case _:
@@ -176,7 +176,7 @@ return $default(_that.id,_that.label,_that.type,_that.isRequired,_that.options,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String label,  ContractFieldType type,  bool isRequired,  List<String> options,  String? hint)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String label,  ContractFieldType type,  bool isRequired,  List<ContractFieldOption> options,  String? hint)  $default,) {final _that = this;
 switch (_that) {
 case _ContractField():
 return $default(_that.id,_that.label,_that.type,_that.isRequired,_that.options,_that.hint);case _:
@@ -196,7 +196,7 @@ return $default(_that.id,_that.label,_that.type,_that.isRequired,_that.options,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String label,  ContractFieldType type,  bool isRequired,  List<String> options,  String? hint)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String label,  ContractFieldType type,  bool isRequired,  List<ContractFieldOption> options,  String? hint)?  $default,) {final _that = this;
 switch (_that) {
 case _ContractField() when $default != null:
 return $default(_that.id,_that.label,_that.type,_that.isRequired,_that.options,_that.hint);case _:
@@ -211,15 +211,15 @@ return $default(_that.id,_that.label,_that.type,_that.isRequired,_that.options,_
 
 
 class _ContractField implements ContractField {
-  const _ContractField({required this.id, required this.label, required this.type, required this.isRequired, final  List<String> options = const <String>[], this.hint}): _options = options;
+  const _ContractField({required this.id, required this.label, required this.type, required this.isRequired, final  List<ContractFieldOption> options = const <ContractFieldOption>[], this.hint}): _options = options;
   
 
 @override final  String id;
 @override final  String label;
 @override final  ContractFieldType type;
 @override final  bool isRequired;
- final  List<String> _options;
-@override@JsonKey() List<String> get options {
+ final  List<ContractFieldOption> _options;
+@override@JsonKey() List<ContractFieldOption> get options {
   if (_options is EqualUnmodifiableListView) return _options;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_options);
@@ -257,7 +257,7 @@ abstract mixin class _$ContractFieldCopyWith<$Res> implements $ContractFieldCopy
   factory _$ContractFieldCopyWith(_ContractField value, $Res Function(_ContractField) _then) = __$ContractFieldCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String label, ContractFieldType type, bool isRequired, List<String> options, String? hint
+ String id, String label, ContractFieldType type, bool isRequired, List<ContractFieldOption> options, String? hint
 });
 
 
@@ -281,7 +281,7 @@ as String,label: null == label ? _self.label : label // ignore: cast_nullable_to
 as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non_nullable
 as ContractFieldType,isRequired: null == isRequired ? _self.isRequired : isRequired // ignore: cast_nullable_to_non_nullable
 as bool,options: null == options ? _self._options : options // ignore: cast_nullable_to_non_nullable
-as List<String>,hint: freezed == hint ? _self.hint : hint // ignore: cast_nullable_to_non_nullable
+as List<ContractFieldOption>,hint: freezed == hint ? _self.hint : hint // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

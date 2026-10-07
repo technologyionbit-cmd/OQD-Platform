@@ -13,17 +13,16 @@ import 'package:aqd_ionbit/features/contracts/data/repositories/contracts_reposi
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_category.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_details_screen.dart';
-
-class MockContractsRepository extends Mock implements ContractsRepository {}
+import '../../../support/signed_in_override.dart';
+import '../../../support/test_doubles.dart';
 
 Contract _contract(ContractStatus status) => Contract(
   id: 'c1',
   title: 'عقد بيع',
   category: ContractCategory.sale,
   status: status,
-  createdAt: DateTime(2026, 1, 1),
+  createdAt: DateTime(2026),
   updatedAt: DateTime(2026, 1, 2),
   parties: const ['أحمد', 'سارة'],
   fieldValues: const {'partyA': 'أحمد'},
@@ -32,7 +31,7 @@ Contract _contract(ContractStatus status) => Contract(
 );
 
 Future<ProviderContainer> _pump(WidgetTester tester, {required MockContractsRepository repository}) async {
-  final container = ProviderContainer(overrides: [contractsRepositoryProvider.overrideWithValue(repository)]);
+  final container = ProviderContainer(overrides: [signedInOverride, contractsRepositoryProvider.overrideWithValue(repository)]);
   addTearDown(container.dispose);
 
   final router = GoRouter(
@@ -88,7 +87,7 @@ void main() {
   testWidgets('a draft contract can be deleted after confirmation', (tester) async {
     final repository = MockContractsRepository();
     when(() => repository.getContractById('c1')).thenAnswer((_) async => Result.success(_contract(ContractStatus.draft)));
-    when(() => repository.getContracts()).thenAnswer((_) async => const Result.success(<Contract>[]));
+    when(repository.getContracts).thenAnswer((_) async => const Result.success(<Contract>[]));
     when(() => repository.deleteContract('c1')).thenAnswer((_) async => const Result.success(null));
 
     // Taller than the default 800x600 test surface — the details screen's

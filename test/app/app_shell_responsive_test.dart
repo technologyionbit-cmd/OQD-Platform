@@ -89,7 +89,7 @@ void main() {
         expect(tester.takeException(), isNull);
 
         for (final field in template.fields) {
-          draftNotifier.setFieldValue(field.id, field.type.name == 'dropdown' ? field.options.first : 'Test value');
+          draftNotifier.setFieldValue(field.id, field.type.name == 'dropdown' ? field.options.first.value : 'Test value');
         }
 
         router.go(RoutePaths.clientContractsNewPreview);

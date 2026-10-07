@@ -198,7 +198,7 @@ void main() {
 
   testWidgets('a cancelled image pick is a silent no-op, a picker error shows feedback', (tester) async {
     final previous = ImagePickerPlatform.instance;
-    ImagePickerPlatform.instance = FakeImagePickerPlatform(result: null);
+    ImagePickerPlatform.instance = FakeImagePickerPlatform();
     addTearDown(() => ImagePickerPlatform.instance = previous);
 
     final consultation = readyConsultation(id: 'cons_image_cancel');

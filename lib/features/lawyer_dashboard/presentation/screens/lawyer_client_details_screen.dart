@@ -12,7 +12,6 @@ import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/core/widgets/section_header.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/providers/consultations_controller.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/widgets/consultation_card.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 
 class LawyerClientDetailsScreen extends ConsumerWidget {
   const LawyerClientDetailsScreen({super.key, required this.clientName});
@@ -29,7 +28,7 @@ class LawyerClientDetailsScreen extends ConsumerWidget {
       body: switch (consultationsState) {
         AsyncData(value: final consultations) => Builder(
           builder: (context) {
-            final history = consultations.where((c) => c.lawyerId == kDemoLawyerId && c.clientName == clientName).toList()
+            final history = consultations.where((c) => c.clientName == clientName).toList()
               ..sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
             return SafeArea(
               child: ListView(

@@ -13,16 +13,21 @@ import 'package:aqd_ionbit/core/storage/app_preferences.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
-import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
-
-/// Shared by every Phase 5 router/shell test — pumping an authenticated
-/// `AqdApp` needs the same mock repository/token-manager/provider-override
-/// boilerplate regardless of which role or screen size the test actually
-/// cares about, so it lives here once instead of three times.
-class MockAuthRepository extends Mock implements AuthRepository {}
-
-class MockTokenManager extends Mock implements TokenManager {}
+import 'package:aqd_ionbit/features/consultation_room/data/datasources/consultation_room_data_source_provider.dart';
+import 'package:aqd_ionbit/features/consultation_room/data/datasources/consultation_room_mock_data_source.dart';
+import 'package:aqd_ionbit/features/consultations/data/datasources/consultations_data_source_provider.dart';
+import 'package:aqd_ionbit/features/consultations/data/datasources/consultations_mock_data_source.dart';
+import 'package:aqd_ionbit/features/contracts/data/datasources/contracts_data_source_provider.dart';
+import 'package:aqd_ionbit/features/contracts/data/datasources/contracts_mock_data_source.dart';
+import 'package:aqd_ionbit/features/gov_documents/data/datasources/gov_documents_data_source_provider.dart';
+import 'package:aqd_ionbit/features/gov_documents/data/datasources/gov_documents_mock_data_source.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
+import 'package:aqd_ionbit/features/notifications/data/datasources/notifications_data_source_provider.dart';
+import 'package:aqd_ionbit/features/notifications/data/datasources/notifications_mock_data_source.dart';
+import 'test_doubles.dart';
+export 'test_doubles.dart' show MockAuthRepository, MockTokenManager;
 
 /// Overrides [LocaleController.build] so a test can pin the locale
 /// directly instead of driving the language-toggle UI to get there.
@@ -34,9 +39,9 @@ class FixedLocaleController extends LocaleController {
   Locale build() => _locale;
 }
 
-const testClient = AuthUser(id: 'u_client', fullName: 'Client User', email: 'client@aqd.test', role: UserRole.client);
-const testLawyer = AuthUser(id: 'u_lawyer', fullName: 'Lawyer User', email: 'lawyer@aqd.test', role: UserRole.lawyer);
-const testCompany = AuthUser(id: 'u_company', fullName: 'Company User', email: 'company@aqd.test', role: UserRole.company);
+const testClient = AuthUser(id: 'u_client', fullName: 'Client User', email: 'client@aqd.test', role: UserRole.client, emailVerified: true);
+const testLawyer = AuthUser(id: 'u_lawyer', fullName: 'Lawyer User', email: 'lawyer@aqd.test', role: UserRole.lawyer, emailVerified: true);
+const testCompany = AuthUser(id: 'u_company', fullName: 'Company User', email: 'company@aqd.test', role: UserRole.company, emailVerified: true);
 const _testTokens = AuthTokens(accessToken: 'access', refreshToken: 'refresh');
 
 class RoleTestHarness {
@@ -67,17 +72,26 @@ Future<RoleTestHarness> pumpAuthenticatedApp(
 
   final repository = MockAuthRepository();
   final tokenManager = MockTokenManager();
-  when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => null);
+  when(tokenManager.loadFromStorage).thenAnswer((_) async => null);
   when(() => tokenManager.current).thenReturn(null);
   when(
     () => repository.login(email: any(named: 'email'), password: any(named: 'password')),
   ).thenAnswer((_) async => Result.success((user: user, tokens: _testTokens)));
-  when(() => repository.logout()).thenAnswer((_) async {});
+  when(repository.restoreSession).thenAnswer((_) async => const Result.success(null));
+  when(repository.logout).thenAnswer((_) async {});
 
   final container = ProviderContainer(
     overrides: [
       appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
       authRepositoryProvider.overrideWithValue(repository),
+      // These features talk to the real API; screens under test get the
+      // seeded in-memory data instead.
+      consultationRoomRemoteDataSourceProvider.overrideWithValue(ConsultationRoomMockDataSource()),
+      consultationsRemoteDataSourceProvider.overrideWithValue(ConsultationsMockDataSource()),
+      contractsRemoteDataSourceProvider.overrideWithValue(ContractsMockDataSource()),
+      govDocumentsRemoteDataSourceProvider.overrideWithValue(GovDocumentsMockDataSource()),
+      lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource()),
+      notificationsRemoteDataSourceProvider.overrideWithValue(NotificationsMockDataSource()),
       tokenManagerProvider.overrideWithValue(tokenManager),
       localeControllerProvider.overrideWith(() => FixedLocaleController(locale)),
     ],

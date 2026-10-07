@@ -1,22 +1,17 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
-import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
-import 'package:aqd_ionbit/core/localization/locale_controller.dart';
-import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/current_user_id_provider.dart';
 import 'package:aqd_ionbit/features/messages/data/repositories/messages_repository_impl.dart';
 import 'package:aqd_ionbit/features/messages/domain/entities/message.dart';
 import 'package:aqd_ionbit/features/messages/domain/entities/message_type.dart';
 import 'package:aqd_ionbit/features/messages/domain/repositories/messages_repository.dart';
 import 'package:aqd_ionbit/features/messages/presentation/providers/chat_state.dart';
 import 'package:aqd_ionbit/features/messages/presentation/providers/chat_unread_controller.dart';
-import 'package:aqd_ionbit/features/notifications/domain/entities/notification_type.dart';
-import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
 
 const _notReadyFailure = UnknownFailure(message: 'Chat not loaded yet.');
 
@@ -31,11 +26,12 @@ class ChatController extends AsyncNotifier<ChatState> {
   ChatController(this.consultationId);
 
   final String consultationId;
-  late final MessagesRepository _repository;
+  MessagesRepository get _repository => ref.read(messagesRepositoryProvider);
 
   @override
   FutureOr<ChatState> build() async {
-    _repository = ref.watch(messagesRepositoryProvider);
+    ref.watch(messagesRepositoryProvider);
+    ref.watch(currentUserIdProvider);
     final result = await _repository.getMessages(consultationId);
     return result.fold((failure) => throw failure, (messages) => ChatState(messages: messages));
   }
@@ -86,38 +82,7 @@ class ChatController extends AsyncNotifier<ChatState> {
       (message) => state = AsyncData(base.copyWith(messages: [...base.messages, message], isSending: false)),
     );
     ref.invalidate(chatUnreadCountsProvider);
-    // Deliberately not awaited: the sender's own success feedback (bubble
-    // appended, composer cleared, snackbar) must not sit behind a
-    // notification round-trip meant for the *other* party.
-    if (result.isSuccess) unawaited(_notifyNewMessage(type: type, text: text, senderRole: senderRole));
     return result;
-  }
-
-  /// The one place a "new chat message" notification is actually raised —
-  /// the old per-consultation `ConsultationMessage` thread used to do this,
-  /// but that thread was a dead-end duplicate of this real chat (see
-  /// `ConsultationDetailsScreen`'s history) and never reflected what a
-  /// client/lawyer actually sent here. No `BuildContext` is available on a
-  /// plain [AsyncNotifier], so the delegate is loaded directly off the
-  /// persisted locale — same trick `ConsultationsController` uses.
-  Future<void> _notifyNewMessage({required MessageType type, required String text, required UserRole senderRole}) async {
-    Locale locale;
-    try {
-      locale = ref.read(localeControllerProvider);
-    } catch (_) {
-      locale = const Locale('ar');
-    }
-    final l10n = await AppLocalizations.delegate.load(locale);
-    await ref
-        .read(notificationsControllerProvider.notifier)
-        .create(
-          type: NotificationType.newMessage,
-          title: l10n.notificationNewMessageTitle,
-          body: type == MessageType.text ? text : l10n.notificationNewAttachmentBody,
-          relatedId: consultationId,
-          // The notification is for whoever *didn't* send this message.
-          recipientUserId: senderRole == UserRole.client ? kDemoLawyerUserId : kDemoClientUserId,
-        );
   }
 
   /// Appends an already-built lawyer reply (constructed by the screen from

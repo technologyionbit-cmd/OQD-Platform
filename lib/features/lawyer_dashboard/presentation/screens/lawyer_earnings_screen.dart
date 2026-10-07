@@ -18,7 +18,6 @@ import 'package:aqd_ionbit/core/widgets/section_header.dart';
 import 'package:aqd_ionbit/features/consultations/domain/entities/consultation.dart';
 import 'package:aqd_ionbit/features/consultations/domain/entities/consultation_status.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/providers/consultations_controller.dart';
-import 'package:aqd_ionbit/features/lawyers/domain/entities/lawyer_profile.dart';
 import 'package:aqd_ionbit/features/lawyers/presentation/widgets/consultation_type_x.dart';
 
 /// Earnings are derived entirely from the consultations feature's own
@@ -38,7 +37,7 @@ class LawyerEarningsScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l10n.navEarnings)),
       body: switch (consultationsState) {
         AsyncData(value: final consultations) => _EarningsBody(
-          consultations: consultations.where((c) => c.lawyerId == kDemoLawyerId).toList(),
+          consultations: consultations,
         ),
         AsyncError() => ErrorView(message: l10n.errorGeneric, onRetry: () => ref.read(consultationsControllerProvider.notifier).refresh()),
         _ => const LoadingView(),
@@ -72,7 +71,7 @@ class _EarningsBody extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(gradient: AppGradients.navyHeader, borderRadius: AppRadii.lgRadius),
+          decoration: const BoxDecoration(gradient: AppGradients.navyHeader, borderRadius: AppRadii.lgRadius),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

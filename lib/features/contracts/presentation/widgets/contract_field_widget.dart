@@ -67,11 +67,13 @@ class _ContractFieldWidgetState extends ConsumerState<ContractFieldWidget> {
     final selectedOption = ref.watch(contractDraftControllerProvider.select((state) => state.fieldValues[widget.field.id]));
 
     return switch (widget.field.type) {
+      // Items are the stable option values; only the shown label follows
+      // the language, so a draft survives switching languages.
       ContractFieldType.dropdown => AppDropdown<String>(
         label: label,
-        value: (selectedOption?.isEmpty ?? true) ? null : selectedOption,
-        items: widget.field.options,
-        itemLabel: (option) => option,
+        value: widget.field.options.any((option) => option.value == selectedOption) ? selectedOption : null,
+        items: [for (final option in widget.field.options) option.value],
+        itemLabel: (value) => widget.field.options.firstWhere((option) => option.value == value).label,
         errorText: errorText,
         onChanged: (value) => _setValue(value ?? ''),
       ),

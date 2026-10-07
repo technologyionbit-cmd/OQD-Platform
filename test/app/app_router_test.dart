@@ -20,7 +20,7 @@ void main() {
     SharedPreferences.setMockInitialValues({'prefs.onboarding_seen': true});
     final prefs = await SharedPreferences.getInstance();
     final tokenManager = MockTokenManager();
-    when(() => tokenManager.loadFromStorage()).thenAnswer((_) async => null);
+    when(tokenManager.loadFromStorage).thenAnswer((_) async => null);
     when(() => tokenManager.current).thenReturn(null);
 
     final container = ProviderContainer(

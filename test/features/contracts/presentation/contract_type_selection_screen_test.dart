@@ -14,11 +14,10 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_category.
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_template.dart';
-import 'package:aqd_ionbit/features/contracts/domain/repositories/contracts_repository.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contract_type_selection_screen.dart';
-
-class MockContractsRepository extends Mock implements ContractsRepository {}
+import '../../../support/signed_in_override.dart';
+import '../../../support/test_doubles.dart';
 
 class _FixedLocaleController extends LocaleController {
   @override
@@ -45,7 +44,7 @@ Future<ProviderContainer> _pump(WidgetTester tester) async {
   when(() => repository.getTemplates(locale: any(named: 'locale'))).thenAnswer((_) async => Result.success(_templates));
 
   final container = ProviderContainer(
-    overrides: [
+    overrides: [signedInOverride, 
       contractsRepositoryProvider.overrideWithValue(repository),
       localeControllerProvider.overrideWith(_FixedLocaleController.new),
     ],

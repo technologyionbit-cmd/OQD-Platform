@@ -22,25 +22,15 @@ import 'package:aqd_ionbit/features/lawyers/domain/entities/consultation_type.da
 import 'package:aqd_ionbit/features/messages/data/datasources/messages_data_source_provider.dart';
 import 'package:aqd_ionbit/features/messages/data/datasources/messages_mock_data_source.dart';
 import 'package:aqd_ionbit/features/messages/presentation/screens/chat_room_screen.dart';
+import '../../../support/test_doubles.dart';
+export '../../../support/test_doubles.dart' show FixedAuthController;
 
 /// Shared fixtures for `ChatRoomScreen` widget tests, split across several
 /// files (one file = one isolate for `flutter test`) rather than one giant
 /// file — keeps each run's Timer/AnimationController lifecycle isolated per
 /// file instead of accumulating across a long list of `testWidgets`.
-const testClient = AuthUser(id: 'u_client_1', fullName: 'أحمد العتيبي', email: 'client@aqd.test', role: UserRole.client);
-const testLawyer = AuthUser(id: 'u_lawyer_1', fullName: 'سارة المطيري', email: 'lawyer@aqd.test', role: UserRole.lawyer);
-
-/// Fixes `authControllerProvider`'s state to a known user without needing a
-/// mock repository — mirrors `FixedLocaleController` in
-/// `test/support/role_test_harness.dart` for the same reason (pin state,
-/// skip unrelated boilerplate).
-class FixedAuthController extends AuthController {
-  FixedAuthController(this._user);
-  final AuthUser? _user;
-
-  @override
-  Future<AuthUser?> build() async => _user;
-}
+const testClient = AuthUser(id: 'u_client_1', fullName: 'أحمد العتيبي', email: 'client@aqd.test', role: UserRole.client, emailVerified: true);
+const testLawyer = AuthUser(id: 'u_lawyer_1', fullName: 'سارة المطيري', email: 'lawyer@aqd.test', role: UserRole.lawyer, emailVerified: true);
 
 /// A single-consultation fake, letting tests control `scheduledAt`/`status`
 /// precisely (e.g. "scheduled right now" so the session is immediately

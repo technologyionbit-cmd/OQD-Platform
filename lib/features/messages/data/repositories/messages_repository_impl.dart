@@ -18,7 +18,7 @@ class MessagesRepositoryImpl implements MessagesRepository {
   final ApiErrorMapper _errorMapper;
 
   @override
-  Future<Result<List<Message>>> getMessages(String consultationId) => _guard(() => _remote.getMessages(consultationId));
+  Future<Result<List<Message>>> getMessages(String consultationId) => _errorMapper.capture(() => _remote.getMessages(consultationId));
 
   @override
   Future<Result<Message>> sendMessage({
@@ -29,7 +29,7 @@ class MessagesRepositoryImpl implements MessagesRepository {
     String text = '',
     String? attachmentUrl,
   }) {
-    return _guard(
+    return _errorMapper.capture(
       () => _remote.sendMessage(
         consultationId: consultationId,
         senderId: senderId,
@@ -43,20 +43,12 @@ class MessagesRepositoryImpl implements MessagesRepository {
 
   @override
   Future<Result<void>> markAllRead({required String consultationId, required UserRole viewerRole}) {
-    return _guard(() => _remote.markAllRead(consultationId: consultationId, viewerRole: viewerRole));
+    return _errorMapper.capture(() => _remote.markAllRead(consultationId: consultationId, viewerRole: viewerRole));
   }
 
   @override
   Future<Result<Map<String, int>>> getUnreadCounts({required UserRole viewerRole}) {
-    return _guard(() => _remote.getUnreadCounts(viewerRole: viewerRole));
-  }
-
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
+    return _errorMapper.capture(() => _remote.getUnreadCounts(viewerRole: viewerRole));
   }
 }
 

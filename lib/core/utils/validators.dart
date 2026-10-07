@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Presentation-layer validation only — this makes forms responsive and
 /// friendly, it is NOT a security boundary. The backend re-validates and
 /// remains authoritative; see `errorInvalidCredentials` / [ValidationFailure]
@@ -20,7 +22,28 @@ class Validators {
 
   static bool isValidEmail(String? value) => value != null && _emailRegExp.hasMatch(value.trim());
 
-  static bool isPasswordLongEnough(String? value) => value != null && value.length >= 8;
+  // Password rules and field lengths mirror the backend DTOs
+  // (backend/src/auth/dto) so the form rejects what the server would.
+  // Text fields enforce the lengths as their `maxLength`.
+  static const passwordMinLength = 8;
+
+  /// bcrypt reads only the first 72 bytes; the server refuses longer
+  /// passwords. Counted in UTF-8 bytes — an Arabic letter is 2 bytes.
+  static const passwordMaxBytes = 72;
+  static const nameMaxLength = 120;
+  static const companyNameMaxLength = 160;
+  static const registryNumberMaxLength = 60;
+  static const emailMaxLength = 254;
+
+  static final _letterRegExp = RegExp('[A-Za-z]');
+  static final _digitRegExp = RegExp('[0-9]');
+
+  static bool isPasswordLongEnough(String? value) => value != null && value.length >= passwordMinLength;
+
+  /// At least one Latin letter and one digit — the server's rule.
+  static bool hasLetterAndDigit(String? value) => value != null && _letterRegExp.hasMatch(value) && _digitRegExp.hasMatch(value);
+
+  static bool isPasswordWithinByteLimit(String? value) => value != null && utf8.encode(value).length <= passwordMaxBytes;
 
   static bool isValidPhone(String? value) => value != null && _phoneRegExp.hasMatch(value.trim().replaceAll(' ', ''));
 

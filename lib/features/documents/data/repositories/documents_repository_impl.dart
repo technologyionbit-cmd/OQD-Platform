@@ -16,31 +16,23 @@ class DocumentsRepositoryImpl implements DocumentsRepository {
   final ApiErrorMapper _errorMapper;
 
   @override
-  Future<Result<List<Document>>> getDocuments() => _guard(_remote.getDocuments);
+  Future<Result<List<Document>>> getDocuments() => _errorMapper.capture(_remote.getDocuments);
 
   @override
   Future<Result<Document>> addGeneratedContractDocument({required String contractId, required String title}) {
-    return _guard(() => _remote.addGeneratedContractDocument(contractId: contractId, title: title));
+    return _errorMapper.capture(() => _remote.addGeneratedContractDocument(contractId: contractId, title: title));
   }
 
   @override
-  Future<Result<Document>> uploadDocument({required String title}) => _guard(() => _remote.uploadDocument(title: title));
+  Future<Result<Document>> uploadDocument({required String title}) => _errorMapper.capture(() => _remote.uploadDocument(title: title));
 
   @override
   Future<Result<Document>> renameDocument({required String id, required String newTitle}) {
-    return _guard(() => _remote.renameDocument(id: id, newTitle: newTitle));
+    return _errorMapper.capture(() => _remote.renameDocument(id: id, newTitle: newTitle));
   }
 
   @override
-  Future<Result<void>> deleteDocument(String id) => _guard(() => _remote.deleteDocument(id));
-
-  Future<Result<T>> _guard<T>(Future<T> Function() action) async {
-    try {
-      return Result.success(await action());
-    } catch (e) {
-      return Result.failure(_errorMapper.map(e));
-    }
-  }
+  Future<Result<void>> deleteDocument(String id) => _errorMapper.capture(() => _remote.deleteDocument(id));
 }
 
 final documentsRepositoryProvider = Provider<DocumentsRepository>((ref) {

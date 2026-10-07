@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart' show DateFormat;
 
+import 'package:aqd_ionbit/core/errors/failure.dart';
+import 'package:aqd_ionbit/core/errors/failure_message.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
@@ -10,6 +13,7 @@ import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_card.dart';
 import 'package:aqd_ionbit/core/widgets/empty_state.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field.dart';
+import 'package:aqd_ionbit/features/contracts/domain/entities/contract_field_type.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 
 class ContractPreviewScreen extends ConsumerStatefulWidget {
@@ -32,7 +36,7 @@ class _ContractPreviewScreenState extends ConsumerState<ContractPreviewScreen> {
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
-    result.fold((failure) => _showError(l10n), (contract) {
+    result.fold((failure) => _showError(failure, l10n), (contract) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.contractDraftSavedMessage)));
       context.go(RoutePaths.contractDetailsFor(widget.routeBase, contract.id));
     });
@@ -45,11 +49,11 @@ class _ContractPreviewScreenState extends ConsumerState<ContractPreviewScreen> {
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
-    result.fold((failure) => _showError(l10n), (contract) => setState(() => _generatedContractId = contract.id));
+    result.fold((failure) => _showError(failure, l10n), (contract) => setState(() => _generatedContractId = contract.id));
   }
 
-  void _showError(AppLocalizations l10n) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.errorGeneric)));
+  void _showError(Failure failure, AppLocalizations l10n) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(failure.localizedMessage(l10n))));
   }
 
   @override
@@ -159,7 +163,7 @@ class _FieldValueList extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
-                  values[entries[i].id]!,
+                  _display(context, entries[i], values[entries[i].id]!),
                   textAlign: TextAlign.end,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
@@ -170,6 +174,19 @@ class _FieldValueList extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  /// Dropdowns store a language-independent value and dates an ISO string;
+  /// show the option's label and a readable date instead.
+  String _display(BuildContext context, ContractField field, String value) {
+    return switch (field.type) {
+      ContractFieldType.dropdown => field.options.where((option) => option.value == value).firstOrNull?.label ?? value,
+      ContractFieldType.date => switch (DateTime.tryParse(value)) {
+        final date? => DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag()).format(date),
+        null => value,
+      },
+      _ => value,
+    };
   }
 }
 
