@@ -8,7 +8,8 @@ import { createHash, randomInt } from 'node:crypto';
 import type { VerificationChannel, VerificationPurpose } from '@prisma/client';
 import { ApiErrorCode } from '../../common/errors/api-error-codes';
 import { PrismaService } from '../../prisma/prisma.service';
-import type { AuthConfig } from '../../config/configuration';
+import type { AuthConfig, SmsConfig } from '../../config/configuration';
+import { sendNgtSms } from './ngt-sms.client';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -24,9 +25,10 @@ export interface OtpVerification {
  * stored only as a SHA-256 hash in `verification_codes`, expire after
  * `OTP_TTL_MINUTES`, and lock out after `OTP_MAX_ATTEMPTS` failed tries.
  *
- * No email/SMS provider is wired in this phase — the generated code is
- * written to the server log (dev only). Swapping in a real provider is a
- * change confined to {@link deliver}.
+ * SMS codes go out through NGT SMSPRO when `NGT_SMS_LOGIN_PASSWORD` is set.
+ * Otherwise (and for email, which has no provider yet) the code is written
+ * to the server log — non-production only. Delivery is confined to
+ * {@link deliver}.
  */
 @Injectable()
 export class OtpService {
@@ -34,6 +36,7 @@ export class OtpService {
   private readonly ttlMinutes: number;
   private readonly maxAttempts: number;
   private readonly isProduction: boolean;
+  private readonly sms: SmsConfig | undefined;
 
   /** Dev/test only — last code issued per destination, so local manual
    *  testing and e2e specs can complete the reset flow without an email
@@ -49,6 +52,8 @@ export class OtpService {
     this.maxAttempts = cfg.otpMaxAttempts;
     this.isProduction =
       configService.get<{ isProduction: boolean }>('app')!.isProduction;
+    const sms = configService.get<SmsConfig>('sms');
+    this.sms = sms?.loginPassword ? sms : undefined;
   }
 
   /** Dev/test helper — see {@link devCodes}. Returns undefined in production. */
@@ -81,7 +86,7 @@ export class OtpService {
     if (!this.isProduction) {
       this.devCodes.set(destination.trim(), code);
     }
-    this.deliver(destination, code, purpose);
+    await this.deliver(destination, code, purpose);
   }
 
   /** Check a code without consuming it (the verify-otp screen step). */
@@ -150,11 +155,30 @@ export class OtpService {
     return createHash('sha256').update(code).digest('hex');
   }
 
-  private deliver(
+  private async deliver(
     destination: string,
     code: string,
     purpose: VerificationPurpose,
-  ): void {
+  ): Promise<void> {
+    if (this.sms && this.channelFor(destination) === 'sms') {
+      try {
+        const result = await sendNgtSms(
+          this.sms,
+          destination,
+          `Your verification code is ${code}`,
+        );
+        if (!result.ok) {
+          this.logger.error(`SMS send failed: ${result.code}`);
+        }
+      } catch (err) {
+        // Never surface provider failures — the endpoint must not reveal
+        // anything about the destination. Never log the message (has the code).
+        this.logger.error(`SMS send error: ${(err as Error).message}`);
+      }
+      return;
+    }
+    // Never log codes in production.
+    if (this.isProduction) return;
     this.logger.log(
       `[dev] ${purpose} code for ${destination}: ${code} (expires in ${this.ttlMinutes}m)`,
     );

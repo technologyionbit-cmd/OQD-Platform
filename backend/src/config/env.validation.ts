@@ -21,4 +21,13 @@ export const envValidationSchema = Joi.object({
   BCRYPT_ROUNDS: Joi.number().integer().min(10).max(15).default(12),
   OTP_TTL_MINUTES: Joi.number().integer().min(1).default(10),
   OTP_MAX_ATTEMPTS: Joi.number().integer().min(1).default(5),
+
+  // NGT SMSPRO gateway (OTP over SMS). Leave the password empty to fall back
+  // to logging codes in the server log (dev only).
+  NGT_SMS_BASE_URL: Joi.string()
+    .uri()
+    .default('https://sendsms.ngt.jo/http/send_sms_http.php'),
+  NGT_SMS_LOGIN_NAME: Joi.string().allow('').default(''),
+  NGT_SMS_LOGIN_PASSWORD: Joi.string().allow('').default(''),
+  NGT_SMS_SENDER_ID: Joi.string().allow('').default(''),
 });

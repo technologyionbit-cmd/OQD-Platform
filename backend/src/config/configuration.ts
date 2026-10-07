@@ -24,12 +24,20 @@ export interface AuthConfig {
   otpMaxAttempts: number;
 }
 
+export interface SmsConfig {
+  baseUrl: string;
+  loginName: string;
+  loginPassword: string;
+  senderId: string;
+}
+
 export interface Configuration {
   app: AppConfig;
   database: DatabaseConfig;
   cors: CorsConfig;
   jwt: JwtConfig;
   auth: AuthConfig;
+  sms: SmsConfig;
 }
 
 /**
@@ -64,5 +72,13 @@ export default (): Configuration => ({
     bcryptRounds: parseInt(process.env.BCRYPT_ROUNDS ?? '12', 10),
     otpTtlMinutes: parseInt(process.env.OTP_TTL_MINUTES ?? '10', 10),
     otpMaxAttempts: parseInt(process.env.OTP_MAX_ATTEMPTS ?? '5', 10),
+  },
+  sms: {
+    baseUrl:
+      process.env.NGT_SMS_BASE_URL ??
+      'https://sendsms.ngt.jo/http/send_sms_http.php',
+    loginName: process.env.NGT_SMS_LOGIN_NAME ?? '',
+    loginPassword: process.env.NGT_SMS_LOGIN_PASSWORD ?? '',
+    senderId: process.env.NGT_SMS_SENDER_ID ?? '',
   },
 });
