@@ -92,19 +92,20 @@ void main() {
   });
 
   testWidgets('an unbooked slot can still be removed', (tester) async {
-    await _pump(tester);
-
-    // Today's day only has the handful of seed slots correlated to a live
-    // booking (see the test above) — every one of those is booked, so
-    // switch to tomorrow's fully-generated calendar (~15% randomly booked,
-    // the rest open) to find a removable slot.
-    await tester.tap(find.byType(InkWell).at(1));
-    await tester.pumpAndSettle();
+    // Today's seed slots are all booked, and the generated calendar skips
+    // Fridays/Saturdays, so "tomorrow" may have no open slot at all. Add one
+    // for today (selected by default) so the test doesn't depend on the date.
+    final dataSource = ConsultationsMockDataSource();
+    final today = DateTime.now();
+    final start = DateTime(today.year, today.month, today.day);
+    await tester.runAsync(
+      () => dataSource.addAvailabilitySlot(lawyerId: kDemoLawyerId, start: start, end: start.add(const Duration(hours: 1))),
+    );
+    await _pump(tester, dataSource: dataSource);
 
     // Only unbooked ("Open") slots render a close/remove icon at all —
-    // booked ones show a chevron instead (see the test above) — so finding
-    // any close icon is sufficient to prove an open slot remains removable.
-    final removeButton = find.byIcon(Icons.close).first;
+    // booked ones show a chevron instead (see the test above).
+    final removeButton = find.byIcon(Icons.close);
     expect(removeButton, findsOneWidget);
 
     await tester.tap(removeButton);
