@@ -20,8 +20,8 @@
 
 | # | الخطوة | Status |
 |---|---|---|
-| 0.1 | دمج `feature/sms-otp` على `main` ورفعه | In progress |
-| 0.2 | إصلاح `backend/package-lock.json` مشان `npm ci` يشتغل على السيرفر (`@emnapi/core` و `@emnapi/runtime`) | Not started |
+| 0.1 | دمج `feature/sms-otp` على `main` ورفعه | Done |
+| 0.2 | إصلاح `backend/package-lock.json` مشان `npm ci` يشتغل على السيرفر (`@emnapi/core` و `@emnapi/runtime`) | In progress |
 | 0.3 | إصلاح الفحص الفاشل `lawyer_schedule_screen_test` ("an unbooked slot can still be removed") | Not started |
 
 ### المرحلة 1 — الحساب والأمان
@@ -114,4 +114,6 @@
 
 ## ملاحظات تنفيذ
 
-- (فاضي لهلأ)
+- 0.2: كان الـ lock ناقصه `@emnapi/core` و `@emnapi/runtime` المتداخلين تحت `@unrs/resolver-binding-wasm32-wasi`، ومثبّت `@emnapi/wasi-threads@1.2.1` بدل `1.2.3`، فـ `npm ci` كان يرفض. انحلت بـ `npm install --package-lock-only`.
+- 0.2 (إضافة): `npm audit fix` بدون `--force` رقّع ثغرة critical بـ `proxy-addr` (تزوير IP عبر IPv6، بتأثر على `TRUST_PROXY` و rate limiting)، وثغرات moderate بـ `multer` و `joi`. ضايل ثغرتين moderate بـ `js-yaml` عن طريق `@nestjs/swagger`، حلها بدّه swagger 12 (breaking). منأجلها لأنه Swagger لازم ينقفل بالـ production أصلاً (9.2).
+- على السيرفر استخدم `npm ci` العادي (مع dev)، لأنه `prisma` CLI موجود بـ devDependencies ومطلوب لـ `prisma migrate deploy`.
