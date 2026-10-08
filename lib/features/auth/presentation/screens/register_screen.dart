@@ -10,6 +10,7 @@ import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
+import 'package:aqd_ionbit/core/utils/jordan_mobile.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_chip.dart';
@@ -120,7 +121,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         errors['specialty'] = _specialty == null ? l10n.validationRequired : null;
     }
 
-    errors['phone'] = Validators.isValidPhone(_phoneController.text) ? null : l10n.validationInvalidPhone;
+    errors['phone'] = Validators.isValidJordanMobile(_phoneController.text) ? null : l10n.validationInvalidJordanMobile;
     errors['email'] = !Validators.isRequired(_emailController.text)
         ? l10n.validationRequired
         : !Validators.isValidEmail(_emailController.text)
@@ -139,7 +140,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   RegisterRequest _buildRequest() {
-    final phone = _phoneController.text.trim();
+    // Validated before this runs, so it normalizes.
+    final phone = JordanMobile.normalize(_phoneController.text) ?? _phoneController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     const termsVersion = AppConfig.termsVersion;
@@ -188,7 +190,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     setState(() => _isSubmitting = false);
 
     // On success the router (watching authControllerProvider) moves on to
-    // email verification — this screen never navigates itself.
+    // phone verification — this screen never navigates itself.
     if (result case ResultFailure(:final failure)) {
       setState(() => _applyFailure(failure, l10n));
     }
@@ -200,6 +202,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void _applyFailure(Failure failure, AppLocalizations l10n) {
     final codeField = switch (failure.code) {
       ApiErrorCodes.emailAlreadyRegistered => 'email',
+      ApiErrorCodes.phoneAlreadyRegistered => 'phone',
       ApiErrorCodes.commercialRegistrationTaken => 'registrationNumber',
       ApiErrorCodes.barLicenseTaken => 'licenseNumber',
       _ => null,
@@ -237,7 +240,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   String _genericFieldMessage(String key, AppLocalizations l10n) => switch (key) {
     'email' => l10n.validationInvalidEmail,
-    'phone' => l10n.validationInvalidPhone,
+    'phone' => l10n.validationInvalidJordanMobile,
     'password' => l10n.authPasswordRulesHint,
     'terms' => l10n.validationTermsRequired,
     _ => l10n.validationInvalidValue,
@@ -386,6 +389,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       AppTextField(
         controller: _phoneController,
         label: l10n.authPhoneLabel,
+        hintText: l10n.authPhoneHint,
         errorText: _errors['phone'],
         keyboardType: TextInputType.phone,
         textInputAction: TextInputAction.next,

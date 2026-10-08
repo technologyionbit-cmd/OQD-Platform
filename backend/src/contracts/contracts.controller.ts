@@ -24,7 +24,7 @@ import {
 import type { AuthenticatedUser, RequestContext } from '../auth/auth.types';
 import { ClientContext } from '../auth/decorators/client-context.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { RequireVerifiedEmail } from '../auth/guards/email-verified.guard';
+import { RequireVerifiedPhone } from '../auth/guards/phone-verified.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiErrorResponseDto } from '../common/openapi/api-error.dto';
 import { BEARER_AUTH } from '../common/openapi/setup-openapi';
@@ -152,12 +152,12 @@ export class ContractsController {
 
   @Post(':id/sign')
   @HttpCode(HttpStatus.OK)
-  @RequireVerifiedEmail()
+  @RequireVerifiedPhone()
   @ApiOperation({
     summary: 'Sign a generated contract',
     description:
       'Records who signed, when, and from which IP and client. Needs a ' +
-      'verified email (403 EMAIL_NOT_VERIFIED).',
+      'verified phone number (403 PHONE_NOT_VERIFIED).',
   })
   async sign(
     @CurrentUser() user: AuthenticatedUser,

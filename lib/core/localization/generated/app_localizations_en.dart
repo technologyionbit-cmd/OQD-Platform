@@ -81,6 +81,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPhoneLabel => 'Phone number';
 
   @override
+  String get authPhoneHint => '07XXXXXXXX';
+
+  @override
   String get authLoginSubmit => 'Sign In';
 
   @override
@@ -157,36 +160,36 @@ class AppLocalizationsEn extends AppLocalizations {
       'At least 8 characters, with a letter and a number';
 
   @override
-  String get authVerifyEmailTitle => 'Verify your email';
+  String get authVerifyPhoneTitle => 'Verify your phone number';
 
   @override
-  String authVerifyEmailSubtitle(String email) {
-    return 'We sent a 6-digit code to $email';
+  String authVerifyPhoneSubtitle(String phone) {
+    return 'We texted a 6-digit code to $phone';
   }
 
   @override
-  String get authVerifyEmailLater => 'Later';
+  String get authVerifyPhoneLater => 'Later';
 
   @override
-  String get authVerifyEmailResent => 'A new code has been sent';
+  String get authCodeResent => 'A new code has been sent';
 
   @override
-  String get emailVerificationBannerMessage =>
-      'Your email is not verified. Verify it to book consultations and leave reviews';
+  String get phoneVerificationBannerMessage =>
+      'Your phone number is not verified. Verify it to book consultations, sign contracts and leave reviews';
 
   @override
-  String get emailVerificationBannerAction => 'Verify now';
+  String get phoneVerificationBannerAction => 'Verify now';
 
   @override
   String get authForgotPasswordTitle => 'Forgot Password?';
 
   @override
   String get authForgotPasswordSubtitle =>
-      'Enter your account email and we\'ll send you a verification code';
+      'Enter your account phone number and we\'ll text you a verification code';
 
   @override
-  String get authEmailInfo =>
-      'If this email has an account, a 6-digit code will arrive within minutes. Check your spam folder if you can\'t find it';
+  String get authPhoneInfo =>
+      'If this number has an account, a 6-digit code will arrive by SMS within minutes';
 
   @override
   String get authSendCode => 'Send Verification Code';
@@ -286,7 +289,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not connect, check your internet connection';
 
   @override
-  String get errorInvalidCredentials => 'Invalid email or password';
+  String get errorInvalidCredentials => 'Invalid phone number or password';
 
   @override
   String get errorServer => 'A server error occurred, please try again later';
@@ -314,11 +317,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'This account is not active, please contact support';
 
   @override
-  String get errorEmailNotVerified =>
-      'Verify your email first to complete this action';
+  String get errorPhoneNotVerified =>
+      'Verify your phone number first to complete this action';
 
   @override
   String get errorEmailAlreadyRegistered => 'This email is already registered';
+
+  @override
+  String get errorPhoneAlreadyRegistered =>
+      'This phone number is used by another account';
 
   @override
   String get errorCommercialRegistrationTaken =>
@@ -355,6 +362,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get validationInvalidPhone => 'Enter a valid phone number';
+
+  @override
+  String get validationInvalidJordanMobile =>
+      'Enter a valid Jordanian mobile number, e.g. 0791234567';
 
   @override
   String get validationInvalidValue => 'Enter a valid value';

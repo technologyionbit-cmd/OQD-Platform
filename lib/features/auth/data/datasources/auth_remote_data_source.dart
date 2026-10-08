@@ -12,7 +12,7 @@ import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 /// path — never a raw [DioException] — so [AuthRepositoryImpl] maps errors
 /// uniformly.
 abstract interface class AuthRemoteDataSource {
-  Future<({AuthUser user, AuthTokens tokens})> login({required String email, required String password});
+  Future<({AuthUser user, AuthTokens tokens})> login({required String phone, required String password});
 
   Future<({AuthUser user, AuthTokens tokens})> register(RegisterRequest request);
 
@@ -25,18 +25,18 @@ abstract interface class AuthRemoteDataSource {
 
   Future<void> logout(String refreshToken);
 
-  /// Confirms the signed-in user's email with the emailed [code] and
+  /// Confirms the signed-in user's phone with the texted [code] and
   /// returns the updated user.
-  Future<AuthUser> verifyEmail({required String code});
+  Future<AuthUser> verifyPhone({required String code});
 
-  /// Asks the server to email a new verification code.
-  Future<void> resendEmailVerification();
+  /// Asks the server to text a new verification code.
+  Future<void> resendPhoneVerification();
 
-  Future<void> requestPasswordReset({required String email});
+  Future<void> requestPasswordReset({required String phone});
 
-  Future<void> verifyPasswordResetCode({required String email, required String code});
+  Future<void> verifyPasswordResetCode({required String phone, required String code});
 
-  Future<void> resetPassword({required String email, required String code, required String newPassword});
+  Future<void> resetPassword({required String phone, required String code, required String newPassword});
 
   Future<void> changePassword({required String currentPassword, required String newPassword});
 

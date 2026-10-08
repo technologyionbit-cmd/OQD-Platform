@@ -242,6 +242,12 @@ abstract class AppLocalizations {
   /// **'رقم الهاتف'**
   String get authPhoneLabel;
 
+  /// No description provided for @authPhoneHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'07XXXXXXXX'**
+  String get authPhoneHint;
+
   /// No description provided for @authLoginSubmit.
   ///
   /// In ar, this message translates to:
@@ -386,41 +392,41 @@ abstract class AppLocalizations {
   /// **'8 أحرف على الأقل، وتحتوي على حرف ورقم'**
   String get authPasswordRulesHint;
 
-  /// No description provided for @authVerifyEmailTitle.
+  /// No description provided for @authVerifyPhoneTitle.
   ///
   /// In ar, this message translates to:
-  /// **'تأكيد البريد الإلكتروني'**
-  String get authVerifyEmailTitle;
+  /// **'تأكيد رقم الهاتف'**
+  String get authVerifyPhoneTitle;
 
-  /// No description provided for @authVerifyEmailSubtitle.
+  /// No description provided for @authVerifyPhoneSubtitle.
   ///
   /// In ar, this message translates to:
-  /// **'أرسلنا رمزًا مكونًا من 6 أرقام إلى {email}'**
-  String authVerifyEmailSubtitle(String email);
+  /// **'أرسلنا رسالة نصية فيها رمز من 6 أرقام إلى {phone}'**
+  String authVerifyPhoneSubtitle(String phone);
 
-  /// No description provided for @authVerifyEmailLater.
+  /// No description provided for @authVerifyPhoneLater.
   ///
   /// In ar, this message translates to:
   /// **'لاحقًا'**
-  String get authVerifyEmailLater;
+  String get authVerifyPhoneLater;
 
-  /// No description provided for @authVerifyEmailResent.
+  /// No description provided for @authCodeResent.
   ///
   /// In ar, this message translates to:
   /// **'تم إرسال رمز جديد'**
-  String get authVerifyEmailResent;
+  String get authCodeResent;
 
-  /// No description provided for @emailVerificationBannerMessage.
+  /// No description provided for @phoneVerificationBannerMessage.
   ///
   /// In ar, this message translates to:
-  /// **'بريدك الإلكتروني غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وإضافة التقييمات'**
-  String get emailVerificationBannerMessage;
+  /// **'رقم هاتفك غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وتوقيع العقود وإضافة التقييمات'**
+  String get phoneVerificationBannerMessage;
 
-  /// No description provided for @emailVerificationBannerAction.
+  /// No description provided for @phoneVerificationBannerAction.
   ///
   /// In ar, this message translates to:
   /// **'تأكيد الآن'**
-  String get emailVerificationBannerAction;
+  String get phoneVerificationBannerAction;
 
   /// No description provided for @authForgotPasswordTitle.
   ///
@@ -431,14 +437,14 @@ abstract class AppLocalizations {
   /// No description provided for @authForgotPasswordSubtitle.
   ///
   /// In ar, this message translates to:
-  /// **'أدخل البريد الإلكتروني لحسابك وسنرسل لك رمز تحقق'**
+  /// **'أدخل رقم الهاتف المسجَّل في حسابك وسنرسل لك رمز تحقق برسالة نصية'**
   String get authForgotPasswordSubtitle;
 
-  /// No description provided for @authEmailInfo.
+  /// No description provided for @authPhoneInfo.
   ///
   /// In ar, this message translates to:
-  /// **'إذا كان البريد مسجلًا لدينا فسيصلك رمز من 6 أرقام خلال دقائق. إن لم تجده فتحقق من مجلد الرسائل غير المرغوب فيها'**
-  String get authEmailInfo;
+  /// **'إذا كان الرقم مسجلًا لدينا فسيصلك رمز من 6 أرقام برسالة نصية خلال دقائق'**
+  String get authPhoneInfo;
 
   /// No description provided for @authSendCode.
   ///
@@ -611,7 +617,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorInvalidCredentials.
   ///
   /// In ar, this message translates to:
-  /// **'البريد الإلكتروني أو كلمة المرور غير صحيحة'**
+  /// **'رقم الهاتف أو كلمة المرور غير صحيحة'**
   String get errorInvalidCredentials;
 
   /// No description provided for @errorServer.
@@ -644,17 +650,23 @@ abstract class AppLocalizations {
   /// **'هذا الحساب غير مفعّل، يرجى التواصل مع الدعم'**
   String get errorAccountInactive;
 
-  /// No description provided for @errorEmailNotVerified.
+  /// No description provided for @errorPhoneNotVerified.
   ///
   /// In ar, this message translates to:
-  /// **'أكّد بريدك الإلكتروني أولًا لإتمام هذا الإجراء'**
-  String get errorEmailNotVerified;
+  /// **'أكّد رقم هاتفك أولًا لإتمام هذا الإجراء'**
+  String get errorPhoneNotVerified;
 
   /// No description provided for @errorEmailAlreadyRegistered.
   ///
   /// In ar, this message translates to:
   /// **'هذا البريد الإلكتروني مسجَّل مسبقًا'**
   String get errorEmailAlreadyRegistered;
+
+  /// No description provided for @errorPhoneAlreadyRegistered.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم الهاتف هذا مسجَّل في حساب آخر'**
+  String get errorPhoneAlreadyRegistered;
 
   /// No description provided for @errorCommercialRegistrationTaken.
   ///
@@ -715,6 +727,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'رقم الهاتف غير صحيح'**
   String get validationInvalidPhone;
+
+  /// No description provided for @validationInvalidJordanMobile.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل رقم موبايل أردني صحيح، مثل 0791234567'**
+  String get validationInvalidJordanMobile;
 
   /// No description provided for @validationInvalidValue.
   ///

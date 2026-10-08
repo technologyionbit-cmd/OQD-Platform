@@ -14,15 +14,15 @@ import { PrismaService } from '../../prisma/prisma.service';
 import type { AuthenticatedUser } from '../auth.types';
 
 /**
- * Lets a request through only when the caller's email is verified; else
- * 403 EMAIL_NOT_VERIFIED. Runs after {@link JwtAuthGuard} (it reads
+ * Lets a request through only when the caller's phone number is verified;
+ * else 403 PHONE_NOT_VERIFIED. Runs after {@link JwtAuthGuard} (it reads
  * `request.user`), so put it on routes that guard already protects.
  *
  * Reads the database on each call rather than trusting a token claim, so
- * verifying (or changing the email) takes effect at once.
+ * verifying takes effect at once.
  */
 @Injectable()
-export class EmailVerifiedGuard implements CanActivate {
+export class PhoneVerifiedGuard implements CanActivate {
   constructor(private readonly prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -34,27 +34,27 @@ export class EmailVerifiedGuard implements CanActivate {
     const user = userId
       ? await this.prisma.user.findUnique({
           where: { id: userId },
-          select: { emailVerifiedAt: true },
+          select: { phoneVerifiedAt: true },
         })
       : null;
 
-    if (!user?.emailVerifiedAt) {
+    if (!user?.phoneVerifiedAt) {
       throw forbidden(
-        'Verify your email address to continue.',
-        ApiErrorCode.EMAIL_NOT_VERIFIED,
+        'Verify your phone number to continue.',
+        ApiErrorCode.PHONE_NOT_VERIFIED,
       );
     }
     return true;
   }
 }
 
-/** Marks a route as needing a verified email (see {@link EmailVerifiedGuard}). */
-export function RequireVerifiedEmail() {
+/** Marks a route as needing a verified phone (see {@link PhoneVerifiedGuard}). */
+export function RequireVerifiedPhone() {
   return applyDecorators(
-    UseGuards(EmailVerifiedGuard),
+    UseGuards(PhoneVerifiedGuard),
     ApiForbiddenResponse({
       type: ApiErrorResponseDto,
-      description: 'Email not verified yet (code EMAIL_NOT_VERIFIED).',
+      description: 'Phone number not verified yet (code PHONE_NOT_VERIFIED).',
     }),
   );
 }

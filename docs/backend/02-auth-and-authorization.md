@@ -28,26 +28,26 @@ Tokens are opaque to the frontend (no JWT-claims inspection anywhere) — the ba
 ## 2. Registration
 
 1. Client submits one of the three `RegisterRequest` shapes.
-2. Backend validates: email uniqueness (case-insensitive), password policy (frontend only enforces min-length-8 client-side; backend must be authoritative — see §7), phone format, and for company/lawyer the registration-number/bar-license uniqueness.
-3. Backend creates `User` (`emailVerifiedAt = null`), and:
+2. Backend validates: email uniqueness (case-insensitive), phone uniqueness (`PHONE_ALREADY_REGISTERED`), password policy (backend is authoritative — see §7), phone format (Jordanian mobile only — 77/78/79, any common spelling, stored as `+9627XXXXXXXX`; `src/auth/dto/phone.rules.ts`, mirrored by the app's `JordanMobile`), and for company/lawyer the registration-number/bar-license uniqueness.
+3. Backend creates `User` (`phoneVerifiedAt = null`), and:
    - company → creates `Organization` (`ownerUserId = user.id`, `verificationStatus = unverified`) and an `OrganizationMember` row for the owner with `role = owner, status = active`.
    - lawyer → creates `LawyerRegistrationDetail` and a `LawyerProfile` (`verificationStatus = unverified`).
-4. Backend sends an email-verification code (see §4) — **does not block registration success on verification**, matching the frontend's flow where OTP is a separate screen, not gating registration itself for the demo accounts. (Recommendation: require verification before allowing consultation booking / contract signing / payment — gate at the *action* level, not login.)
+4. Backend texts a phone-verification code (see §4) — **does not block registration success on verification**. Sensitive actions (booking, reviews, contract signing) answer 403 `PHONE_NOT_VERIFIED` until `POST /auth/phone/verify` succeeds — gated at the *action* level, not login. Email is contact information only: no code is ever emailed.
 5. Returns `{user, tokens}` — the frontend logs the user in immediately on successful registration.
 
 ## 3. Login
 
-Standard email+password. Rate-limit per email and per IP (see [14-security.md](14-security.md)). On success, issue access+refresh tokens, create a `RefreshToken` row capturing device/IP for the Active Sessions UI, update `User.lastLoginAt`.
+Phone number + password (any spelling of the number; normalized before lookup). Rate-limit per number and per IP (see [14-security.md](14-security.md)). On success, issue access+refresh tokens, create a `RefreshToken` row capturing device/IP for the Active Sessions UI, update `User.lastLoginAt`.
 
-Frontend never surfaces a generic "auth error" state for a failed login — `AuthController.login` deliberately restores the previous state and returns a `Result.failure` for the *screen* to render inline (never a global error banner). Backend error responses for login failure should be a single generic "invalid credentials" (never reveal whether the email exists) mapped by the frontend's `ApiErrorMapper` to `UnauthorizedFailure`.
+Frontend never surfaces a generic "auth error" state for a failed login — `AuthController.login` deliberately restores the previous state and returns a `Result.failure` for the *screen* to render inline (never a global error banner). Backend error responses for login failure should be a single generic "invalid credentials" (never reveal whether the number exists) mapped by the frontend's `ApiErrorMapper` to `UnauthorizedFailure`.
 
-## 4. Email/Phone verification & password reset (OTP)
+## 4. Phone verification & password reset (SMS OTP)
 
-Frontend's `requestOtp`/`verifyOtp`/`resetPassword` are channel-agnostic — the backend infers email vs. SMS purely from the shape of `destination`. Recommend making this explicit only in the request DTO's derived `channel` field (server infers from regex, same as the frontend does) rather than requiring the client to pass it — this preserves the exact frontend calling convention.
+Every code is texted to the account's phone number through NGT SMSPRO (`src/auth/services/ngt-sms.client.ts`). `NGT_SMS_LOGIN_NAME`/`NGT_SMS_LOGIN_PASSWORD`/`NGT_SMS_SENDER_ID` are required when `NODE_ENV=production`; elsewhere an empty password logs the code to the server log instead. Endpoints: `POST /auth/phone/verify` + `/auth/phone/resend` (signed in), `POST /auth/password/forgot` → `/verify-otp` → `/reset` (all take `phone`).
 
-- `requestOtp(destination)`: generate a 6-digit numeric code (frontend's `OtpVerificationScreen` is hardcoded to 6 digits with a 30s resend cooldown — mirror both), store as `VerificationCode` (hashed), send via email or SMS provider matching the destination shape. Always return success even for a non-existent destination (prevents account enumeration) — but do not actually create a `User` for password-reset destinations that don't exist.
-- `verifyOtp(destination, code)`: compare against the hashed, non-expired, non-consumed code; increment `attemptCount` on failure; lock out after 5 attempts within the code's TTL.
-- `resetPassword(destination, code, newPassword)`: re-validate the code, hash the new password, revoke **all** existing `RefreshToken`s for that user (force re-login everywhere — the frontend's own `SecurityPrivacyScreen` "End all sessions" affordance implies this should already be the behavior for a security-sensitive action like password reset).
+- `requestOtp(phone)`: generate a 6-digit numeric code, store as `VerificationCode` (hashed), text it. One per `OTP_RESEND_COOLDOWN_SECONDS`, at most `OTP_MAX_PER_HOUR` per account (verification) or per number (reset). Always return success even for a non-existent destination (prevents account enumeration) — but do not actually create a `User` for password-reset destinations that don't exist.
+- `verifyOtp(phone, code)`: compare against the hashed, non-expired, non-consumed code; increment `attemptCount` on failure; lock out after 5 attempts within the code's TTL.
+- `resetPassword(phone, code, newPassword)`: re-validate the code, hash the new password, mark the phone verified, revoke **all** existing `RefreshToken`s for that user (force re-login everywhere — the frontend's own `SecurityPrivacyScreen` "End all sessions" affordance implies this should already be the behavior for a security-sensitive action like password reset).
 
 ## 5. Token refresh & session management
 

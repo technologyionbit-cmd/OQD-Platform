@@ -11,18 +11,20 @@ import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
+import 'package:aqd_ionbit/core/utils/jordan_mobile.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_scaffold.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/otp_code_field.dart';
 
-/// Step 2 of the password reset: the 6-digit code emailed to [email]. A
+/// Step 2 of the password reset: the 6-digit code texted to [phone]. A
 /// right code opens the new-password screen, which sends it again.
 class OtpVerificationScreen extends ConsumerStatefulWidget {
-  const OtpVerificationScreen({super.key, required this.email});
+  const OtpVerificationScreen({super.key, required this.phone});
 
-  final String email;
+  /// Normalized, +9627XXXXXXXX.
+  final String phone;
 
   /// Matches the server's default OTP_RESEND_COOLDOWN_SECONDS. A 429 with
   /// Retry-After replaces it with the server's actual wait.
@@ -78,13 +80,13 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       _isSubmitting = true;
       _error = null;
     });
-    final result = await ref.read(authRepositoryProvider).verifyPasswordResetCode(email: widget.email, code: code);
+    final result = await ref.read(authRepositoryProvider).verifyPasswordResetCode(phone: widget.phone, code: code);
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
     switch (result) {
       case Success():
-        context.pushReplacement(RoutePaths.resetPassword, extra: (email: widget.email, code: code));
+        context.pushReplacement(RoutePaths.resetPassword, extra: (phone: widget.phone, code: code));
       case ResultFailure(:final failure):
         setState(() => _error = _messageFor(failure, l10n));
     }
@@ -98,14 +100,14 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       _isResending = true;
       _error = null;
     });
-    final result = await ref.read(authRepositoryProvider).requestPasswordReset(email: widget.email);
+    final result = await ref.read(authRepositoryProvider).requestPasswordReset(phone: widget.phone);
     if (!mounted) return;
     setState(() => _isResending = false);
 
     switch (result) {
       case Success():
         setState(() => _startCooldown(OtpVerificationScreen.resendCooldown));
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.authVerifyEmailResent)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.authCodeResent)));
       case ResultFailure(failure: RateLimitedFailure(:final retryAfter?)):
         // The server knows the real wait; the countdown shows it.
         setState(() => _startCooldown(retryAfter));
@@ -131,9 +133,9 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return AuthScaffold(
-      icon: Icons.mark_email_read_outlined,
+      icon: Icons.sms_outlined,
       title: l10n.authOtpTitle,
-      subtitle: l10n.authOtpSubtitle(widget.email),
+      subtitle: l10n.authOtpSubtitle(JordanMobile.display(widget.phone)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

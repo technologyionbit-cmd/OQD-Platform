@@ -12,11 +12,11 @@ import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
-import 'package:aqd_ionbit/features/auth/presentation/providers/email_verification_prompt.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/phone_verification_prompt.dart';
 import '../../../support/test_doubles.dart';
 
 void main() {
-  const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', role: UserRole.client, emailVerified: true);
+  const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', phone: '+962791234567', role: UserRole.client, phoneVerified: true);
   const tokens = AuthTokens(accessToken: 'access', refreshToken: 'refresh');
 
   late MockAuthRepository repository;
@@ -90,10 +90,10 @@ void main() {
   test('login() moves state to the authenticated user on success', () async {
     await container.read(authControllerProvider.future);
     when(
-      () => repository.login(email: any(named: 'email'), password: any(named: 'password')),
+      () => repository.login(phone: any(named: 'phone'), password: any(named: 'password')),
     ).thenAnswer((_) async => const Result.success((user: user, tokens: tokens)));
 
-    final result = await container.read(authControllerProvider.notifier).login(email: user.email, password: 'Password123');
+    final result = await container.read(authControllerProvider.notifier).login(phone: user.phone!, password: 'Password123');
 
     expect(result.isSuccess, isTrue);
     expect(container.read(authControllerProvider).value, user);
@@ -102,10 +102,10 @@ void main() {
   test('login() reports the Failure and leaves state unauthenticated on bad credentials', () async {
     await container.read(authControllerProvider.future);
     when(
-      () => repository.login(email: any(named: 'email'), password: any(named: 'password')),
+      () => repository.login(phone: any(named: 'phone'), password: any(named: 'password')),
     ).thenAnswer((_) async => const Result.failure(UnauthorizedFailure()));
 
-    final result = await container.read(authControllerProvider.notifier).login(email: user.email, password: 'wrong');
+    final result = await container.read(authControllerProvider.notifier).login(phone: user.phone!, password: 'wrong');
 
     expect(result.isFailure, isTrue);
     expect(container.read(authControllerProvider).value, isNull);
@@ -114,9 +114,9 @@ void main() {
   test('logout() clears the authenticated user', () async {
     await container.read(authControllerProvider.future);
     when(
-      () => repository.login(email: any(named: 'email'), password: any(named: 'password')),
+      () => repository.login(phone: any(named: 'phone'), password: any(named: 'password')),
     ).thenAnswer((_) async => const Result.success((user: user, tokens: tokens)));
-    await container.read(authControllerProvider.notifier).login(email: user.email, password: 'Password123');
+    await container.read(authControllerProvider.notifier).login(phone: user.phone!, password: 'Password123');
     when(() => repository.logout()).thenAnswer((_) async {});
 
     await container.read(authControllerProvider.notifier).logout();
@@ -124,8 +124,8 @@ void main() {
     expect(container.read(authControllerProvider).value, isNull);
   });
 
-  group('email verification', () {
-    const unverified = AuthUser(id: 'u2', fullName: 'New User', email: 'new@aqd.test', role: UserRole.client, emailVerified: false);
+  group('phone verification', () {
+    const unverified = AuthUser(id: 'u2', fullName: 'New User', email: 'new@aqd.test', phone: '+962791234567', role: UserRole.client, phoneVerified: false);
     const request = RegisterRequest.individual(
       fullName: 'New User',
       phone: '0791234567',
@@ -141,45 +141,45 @@ void main() {
 
       await container.read(authControllerProvider.notifier).register(request);
 
-      expect(container.read(emailVerificationPromptProvider), isTrue);
+      expect(container.read(phoneVerificationPromptProvider), isTrue);
       expect(container.read(authControllerProvider).value, unverified);
     });
 
     test('verifying replaces the user and turns the prompt off', () async {
-      const verified = AuthUser(id: 'u2', fullName: 'New User', email: 'new@aqd.test', role: UserRole.client, emailVerified: true);
-      when(() => repository.verifyEmail(code: '123456')).thenAnswer((_) async => const Result.success(verified));
+      const verified = AuthUser(id: 'u2', fullName: 'New User', email: 'new@aqd.test', phone: '+962791234567', role: UserRole.client, phoneVerified: true);
+      when(() => repository.verifyPhone(code: '123456')).thenAnswer((_) async => const Result.success(verified));
       await container.read(authControllerProvider.future);
-      container.read(emailVerificationPromptProvider.notifier).show();
+      container.read(phoneVerificationPromptProvider.notifier).show();
 
-      await container.read(authControllerProvider.notifier).verifyEmail('123456');
+      await container.read(authControllerProvider.notifier).verifyPhone('123456');
 
       expect(container.read(authControllerProvider).value, verified);
-      expect(container.read(emailVerificationPromptProvider), isFalse);
+      expect(container.read(phoneVerificationPromptProvider), isFalse);
     });
 
     test('a failed verification keeps the user and the prompt', () async {
       when(() => repository.restoreSession()).thenAnswer((_) async => const Result.success(unverified));
-      when(() => repository.verifyEmail(code: '000000')).thenAnswer(
+      when(() => repository.verifyPhone(code: '000000')).thenAnswer(
         (_) async => const Result.failure(ValidationFailure(code: ApiErrorCodes.invalidVerificationCode)),
       );
       await container.read(authControllerProvider.future);
-      container.read(emailVerificationPromptProvider.notifier).show();
+      container.read(phoneVerificationPromptProvider.notifier).show();
 
-      final result = await container.read(authControllerProvider.notifier).verifyEmail('000000');
+      final result = await container.read(authControllerProvider.notifier).verifyPhone('000000');
 
       expect(result, isA<ResultFailure<AuthUser>>());
       expect(container.read(authControllerProvider).value, unverified);
-      expect(container.read(emailVerificationPromptProvider), isTrue);
+      expect(container.read(phoneVerificationPromptProvider), isTrue);
     });
 
     test('logging out turns the prompt off', () async {
       when(() => repository.logout()).thenAnswer((_) async {});
       await container.read(authControllerProvider.future);
-      container.read(emailVerificationPromptProvider.notifier).show();
+      container.read(phoneVerificationPromptProvider.notifier).show();
 
       await container.read(authControllerProvider.notifier).logout();
 
-      expect(container.read(emailVerificationPromptProvider), isFalse);
+      expect(container.read(phoneVerificationPromptProvider), isFalse);
     });
   });
 }

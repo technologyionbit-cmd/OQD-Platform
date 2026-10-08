@@ -19,12 +19,12 @@ import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
-import 'package:aqd_ionbit/features/auth/presentation/screens/verify_email_screen.dart';
+import 'package:aqd_ionbit/features/auth/presentation/screens/verify_phone_screen.dart';
 import '../../../support/test_doubles.dart';
 
 typedef _SessionResult = Result<({AuthUser user, AuthTokens tokens})>;
 
-const _newUser = AuthUser(id: 'u1', fullName: 'Ahmad', email: 'ahmad@aqd.test', role: UserRole.client, emailVerified: false);
+const _newUser = AuthUser(id: 'u1', fullName: 'Ahmad', email: 'ahmad@aqd.test', phone: '+962791234567', role: UserRole.client, phoneVerified: false);
 const _tokens = AuthTokens(accessToken: 'access', refreshToken: 'refresh');
 const _config = AppConfig(
   apiBaseUrl: 'http://localhost/v1',
@@ -136,7 +136,7 @@ void main() {
     expect(name.controller!.text.length, 120);
   });
 
-  testWidgets('sends the accepted terms version and lands on email verification', (tester) async {
+  testWidgets('sends the accepted terms and the normalized phone, and lands on phone verification', (tester) async {
     registerAnswers(() async => const Result.success((user: _newUser, tokens: _tokens)));
     await pumpRegister(tester);
     await fillIndividual(tester);
@@ -146,8 +146,9 @@ void main() {
     final request = verify(() => repository.register(captureAny())).captured.single as RegisterRequest;
     expect(request.acceptTerms, isTrue);
     expect(request.termsVersion, AppConfig.termsVersion);
-    expect(find.byType(VerifyEmailScreen), findsOneWidget);
-    expect(find.text('أرسلنا رمزًا مكونًا من 6 أرقام إلى ahmad@aqd.test'), findsOneWidget);
+    expect(request.phone, '+962791234567');
+    expect(find.byType(VerifyPhoneScreen), findsOneWidget);
+    expect(find.text('أرسلنا رسالة نصية فيها رمز من 6 أرقام إلى 0791234567'), findsOneWidget);
   });
 
   testWidgets('a taken email is shown on the email field in Arabic, never the server text', (tester) async {
@@ -199,6 +200,26 @@ void main() {
     expect(registration.decoration!.errorText, 'رقم السجل التجاري مستخدم في حساب آخر');
   });
 
+  testWidgets('a taken phone number is shown on the phone field', (tester) async {
+    registerAnswers(
+      () async => const Result.failure(
+        ValidationFailure(
+          message: 'This phone number is already registered.',
+          code: ApiErrorCodes.phoneAlreadyRegistered,
+          fieldErrors: {
+            'phone': ['This phone number is already registered.'],
+          },
+        ),
+      ),
+    );
+    await pumpRegister(tester);
+    await fillIndividual(tester);
+
+    await submit(tester);
+
+    expect(tester.widget<TextField>(field('رقم الهاتف')).decoration!.errorText, 'رقم الهاتف هذا مسجَّل في حساب آخر');
+  });
+
   testWidgets('plain field errors get a localized message, not the server text', (tester) async {
     registerAnswers(
       () async => const Result.failure(
@@ -215,7 +236,7 @@ void main() {
 
     await submit(tester);
 
-    expect(tester.widget<TextField>(field('رقم الهاتف')).decoration!.errorText, 'رقم الهاتف غير صحيح');
+    expect(tester.widget<TextField>(field('رقم الهاتف')).decoration!.errorText, 'أدخل رقم موبايل أردني صحيح، مثل 0791234567');
     expect(find.text('Enter a valid phone number.'), findsNothing);
   });
 

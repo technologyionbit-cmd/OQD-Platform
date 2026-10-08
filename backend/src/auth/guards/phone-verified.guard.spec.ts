@@ -1,14 +1,14 @@
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import type { PrismaService } from '../../prisma/prisma.service';
-import { EmailVerifiedGuard } from './email-verified.guard';
+import { PhoneVerifiedGuard } from './phone-verified.guard';
 
-describe('EmailVerifiedGuard', () => {
-  const guardFor = (emailVerifiedAt: Date | null | undefined) =>
-    new EmailVerifiedGuard({
+describe('PhoneVerifiedGuard', () => {
+  const guardFor = (phoneVerifiedAt: Date | null | undefined) =>
+    new PhoneVerifiedGuard({
       user: {
         findUnique: () =>
           Promise.resolve(
-            emailVerifiedAt === undefined ? null : { emailVerifiedAt },
+            phoneVerifiedAt === undefined ? null : { phoneVerifiedAt },
           ),
       },
     } as unknown as PrismaService);
@@ -28,14 +28,14 @@ describe('EmailVerifiedGuard', () => {
     ['an unverified user', null, { id: 'u1' }],
     ['a deleted user', undefined, { id: 'u1' }],
     ['a request without a user', new Date(), undefined],
-  ])('refuses %s with 403 EMAIL_NOT_VERIFIED', async (_, verifiedAt, user) => {
+  ])('refuses %s with 403 PHONE_NOT_VERIFIED', async (_, verifiedAt, user) => {
     const error = await guardFor(verifiedAt)
       .canActivate(contextFor(user))
       .catch((e: unknown) => e);
 
     expect(error).toBeInstanceOf(ForbiddenException);
     expect((error as ForbiddenException).getResponse()).toMatchObject({
-      code: 'EMAIL_NOT_VERIFIED',
+      code: 'PHONE_NOT_VERIFIED',
     });
   });
 });

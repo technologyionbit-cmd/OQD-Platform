@@ -39,13 +39,13 @@ export interface AuthConfig {
   bcryptRounds: number;
   otpTtlMinutes: number;
   otpMaxAttempts: number;
-  /** Sign-in attempts allowed per email per window, on top of per-IP limits. */
+  /** Sign-in attempts allowed per phone number per window, on top of per-IP limits. */
   loginMaxAttempts: number;
   loginAttemptWindowMinutes: number;
-  /** Minimum wait between two emailed codes (verification or reset). */
+  /** Minimum wait between two texted codes (verification or reset). */
   otpResendCooldownSeconds: number;
-  /** Emailed codes allowed per rolling hour — per account for
-   *  verification, per address for password reset. */
+  /** Texted codes allowed per rolling hour — per account for
+   *  verification, per number for password reset. */
   otpMaxPerHour: number;
   /** Terms/privacy version registration must accept. Bump it when the
    *  published terms change; the app sends the version it showed. */

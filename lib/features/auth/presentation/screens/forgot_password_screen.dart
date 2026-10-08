@@ -12,6 +12,7 @@ import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
+import 'package:aqd_ionbit/core/utils/jordan_mobile.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
@@ -19,9 +20,9 @@ import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_scaffold.dart';
 
-/// Step 1 of the password reset: the account email. The server answers
-/// the same whether or not the email has an account, so on success this
-/// always moves on to the code screen.
+/// Step 1 of the password reset: the account phone number. The server
+/// answers the same whether or not the number has an account, so on
+/// success this always moves on to the code screen.
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -30,15 +31,15 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
 
-  String? _emailError;
+  String? _phoneError;
   String? _formError;
   bool _isSubmitting = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
@@ -47,29 +48,29 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     if (_isSubmitting) return;
     final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
-    final email = _emailController.text.trim();
+    final phone = JordanMobile.normalize(_phoneController.text);
 
-    final emailError = !Validators.isRequired(email)
+    final phoneError = !Validators.isRequired(_phoneController.text)
         ? l10n.validationRequired
-        : !Validators.isValidEmail(email)
-        ? l10n.validationInvalidEmail
+        : phone == null
+        ? l10n.validationInvalidJordanMobile
         : null;
     setState(() {
-      _emailError = emailError;
+      _phoneError = phoneError;
       _formError = null;
-      _isSubmitting = emailError == null;
+      _isSubmitting = phone != null;
     });
-    if (emailError != null) return;
+    if (phone == null) return;
 
-    final result = await ref.read(authRepositoryProvider).requestPasswordReset(email: email);
+    final result = await ref.read(authRepositoryProvider).requestPasswordReset(phone: phone);
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
     switch (result) {
       case Success():
-        unawaited(context.push(RoutePaths.otpVerification, extra: email));
+        unawaited(context.push(RoutePaths.otpVerification, extra: phone));
       case ResultFailure(failure: ValidationFailure(code: ApiErrorCodes.validationError)):
-        setState(() => _emailError = l10n.validationInvalidEmail);
+        setState(() => _phoneError = l10n.validationInvalidJordanMobile);
       case ResultFailure(:final failure):
         setState(() => _formError = failure.localizedMessage(l10n));
     }
@@ -80,7 +81,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return AuthScaffold(
-      icon: Icons.mark_email_unread_outlined,
+      icon: Icons.sms_outlined,
       title: l10n.authForgotPasswordTitle,
       subtitle: l10n.authForgotPasswordSubtitle,
       child: AutofillGroup(
@@ -88,13 +89,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             AppTextField(
-              controller: _emailController,
-              label: l10n.authEmailLabel,
-              errorText: _emailError,
-              maxLength: Validators.emailMaxLength,
-              keyboardType: TextInputType.emailAddress,
+              controller: _phoneController,
+              label: l10n.authPhoneLabel,
+              hintText: l10n.authPhoneHint,
+              errorText: _phoneError,
+              keyboardType: TextInputType.phone,
               textInputAction: TextInputAction.done,
-              autofillHints: const [AutofillHints.email],
+              autofillHints: const [AutofillHints.telephoneNumber],
               onSubmitted: (_) => _send(),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -106,7 +107,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                 children: [
                   Icon(Icons.info_outline, size: 18, color: context.statusColors.info.foreground),
                   const SizedBox(width: AppSpacing.xs),
-                  Expanded(child: Text(l10n.authEmailInfo, style: Theme.of(context).textTheme.bodySmall)),
+                  Expanded(child: Text(l10n.authPhoneInfo, style: Theme.of(context).textTheme.bodySmall)),
                 ],
               ),
             ),

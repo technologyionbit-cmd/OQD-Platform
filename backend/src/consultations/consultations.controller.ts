@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
-import { RequireVerifiedEmail } from '../auth/guards/email-verified.guard';
+import { RequireVerifiedPhone } from '../auth/guards/phone-verified.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -15,7 +15,7 @@ export class ConsultationsController {
   constructor(private readonly consultations: ConsultationsService) {}
 
   @Post()
-  @RequireVerifiedEmail()
+  @RequireVerifiedPhone()
   async book(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateConsultationDto) {
     return { data: await this.consultations.book(user, dto) };
   }
@@ -78,7 +78,7 @@ export class ConsultationsController {
   }
 
   @Post(':id/reviews')
-  @RequireVerifiedEmail()
+  @RequireVerifiedPhone()
   async review(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id', ParseUUIDPipe) id: string,

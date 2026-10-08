@@ -47,7 +47,7 @@ import {
   ResetPasswordDto,
   VerifyOtpDto,
 } from './dto/password-reset.dto';
-import { VerifyEmailDto } from './dto/email-verification.dto';
+import { VerifyPhoneDto } from './dto/phone-verification.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginAttemptsGuard } from './guards/login-attempts.guard';
@@ -66,18 +66,20 @@ export class AuthController {
   @ApiOperation({
     summary: 'Create an account',
     description:
-      'Signs the user in at once and emails a 6-digit verification code ' +
-      '(logged on the server until an email provider exists). The account ' +
-      'works, but sensitive actions answer 403 EMAIL_NOT_VERIFIED until ' +
-      'POST /auth/email/verify succeeds. Passwords: 8+ characters, at most ' +
-      '72 bytes (UTF-8), at least one letter and one number.',
+      'Signs the user in at once and texts a 6-digit verification code ' +
+      'to the phone number (Jordanian mobile, any common spelling; stored ' +
+      'as +9627XXXXXXXX). The account works, but sensitive actions answer ' +
+      '403 PHONE_NOT_VERIFIED until POST /auth/phone/verify succeeds. ' +
+      'Passwords: 8+ characters, at most 72 bytes (UTF-8), at least one ' +
+      'letter and one number.',
   })
   @ApiCreatedResponse({ type: SessionResponseDto })
   @ApiUnprocessableEntityResponse({
     type: ApiErrorResponseDto,
     description:
       'VALIDATION_ERROR (errors per field), EMAIL_ALREADY_REGISTERED, ' +
-      'COMMERCIAL_REGISTRATION_TAKEN, BAR_LICENSE_TAKEN, or ' +
+      'PHONE_ALREADY_REGISTERED, COMMERCIAL_REGISTRATION_TAKEN, ' +
+      'BAR_LICENSE_TAKEN, or ' +
       'TERMS_VERSION_OUTDATED (termsVersion is not the current one).',
   })
   async register(
@@ -94,14 +96,15 @@ export class AuthController {
   @ApiOperation({
     summary: 'Sign in',
     description:
-      'Wrong email and wrong password are indistinguishable (same 401, ' +
-      'same timing). Limited per IP and per email (LOGIN_MAX_ATTEMPTS per ' +
+      'Signs in with the phone number and password. Wrong number and ' +
+      'wrong password are indistinguishable (same 401, same timing). ' +
+      'Limited per IP and per number (LOGIN_MAX_ATTEMPTS per ' +
       'LOGIN_ATTEMPT_WINDOW_MINUTES); a 429 carries Retry-After in seconds.',
   })
   @ApiOkResponse({ type: SessionResponseDto })
   @ApiUnauthorizedResponse({
     type: ApiErrorResponseDto,
-    description: 'Invalid email or password (code UNAUTHORIZED).',
+    description: 'Invalid phone number or password (code UNAUTHORIZED).',
   })
   @ApiForbiddenResponse({
     type: ApiErrorResponseDto,
@@ -155,7 +158,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Update name and email',
     description:
-      'Changing the email marks it unverified and sends a new code. ' +
+      'The email is contact information only (no code, no sign-in). ' +
       '422 EMAIL_ALREADY_REGISTERED when another account uses it.',
   })
   @ApiOkResponse({ type: UserResponseDto })
@@ -166,15 +169,15 @@ export class AuthController {
     return { data: { user: await this.auth.updateProfile(user.id, dto) } };
   }
 
-  @Post('email/verify')
+  @Post('phone/verify')
   @HttpCode(HttpStatus.OK)
   @Throttle(STRICT_THROTTLE)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth(BEARER_AUTH)
   @ApiOperation({
-    summary: 'Verify the account email',
+    summary: 'Verify the account phone number',
     description:
-      'Checks the latest code sent to the signed-in user. Already ' +
+      'Checks the latest code texted to the signed-in user. Already ' +
       'verified: returns the user unchanged. OTP_MAX_ATTEMPTS wrong tries ' +
       'lock the code (VERIFICATION_CODE_LOCKED) until a new one is sent.',
   })
@@ -186,20 +189,20 @@ export class AuthController {
       'VERIFICATION_CODE_LOCKED.',
   })
   @ApiUnauthorizedResponse({ type: ApiErrorResponseDto })
-  async verifyEmail(
+  async verifyPhone(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() dto: VerifyEmailDto,
+    @Body() dto: VerifyPhoneDto,
   ) {
-    return { data: { user: await this.auth.verifyEmail(user.id, dto.code) } };
+    return { data: { user: await this.auth.verifyPhone(user.id, dto.code) } };
   }
 
-  @Post('email/resend')
+  @Post('phone/resend')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Throttle(STRICT_THROTTLE)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth(BEARER_AUTH)
   @ApiOperation({
-    summary: 'Send a new email verification code',
+    summary: 'Text a new phone verification code',
     description:
       'One code per OTP_RESEND_COOLDOWN_SECONDS and at most ' +
       'OTP_MAX_PER_HOUR per account (the sign-up code ' +
@@ -208,28 +211,28 @@ export class AuthController {
   })
   @ApiNoContentResponse()
   @ApiUnauthorizedResponse({ type: ApiErrorResponseDto })
-  async resendEmailVerification(
+  async resendPhoneVerification(
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
-    await this.auth.resendEmailVerification(user.id);
+    await this.auth.resendPhoneVerification(user.id);
   }
 
   @Post('password/forgot')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Throttle(STRICT_THROTTLE)
   @ApiOperation({
-    summary: 'Email a password reset code',
+    summary: 'Text a password reset code',
     description:
-      'Always 204, whether or not an account uses the email, so the answer ' +
-      'reveals nothing; only an account email receives a code (logged on ' +
-      'the server until an email provider exists). Per address: one code ' +
+      'Always 204, whether or not an account uses the number, so the ' +
+      'answer reveals nothing; only an account phone receives a code. ' +
+      'Per number: one code ' +
       'per OTP_RESEND_COOLDOWN_SECONDS and at most OTP_MAX_PER_HOUR; over ' +
       'the limit, 429 with Retry-After in seconds.',
   })
   @ApiNoContentResponse()
   @ApiUnprocessableEntityResponse({
     type: ApiErrorResponseDto,
-    description: 'VALIDATION_ERROR (not an email address).',
+    description: 'VALIDATION_ERROR (not a Jordanian mobile number).',
   })
   async forgotPassword(@Body() dto: ForgotPasswordDto): Promise<void> {
     await this.auth.forgotPassword(dto);
@@ -260,9 +263,9 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Throttle(STRICT_THROTTLE)
   @ApiOperation({
-    summary: 'Set a new password with the emailed code',
+    summary: 'Set a new password with the texted code',
     description:
-      'Uses the code up, marks the email verified and revokes every ' +
+      'Uses the code up, marks the phone verified and revokes every ' +
       'session, so the user signs in again with the new password. ' +
       'Passwords follow the registration rules.',
   })

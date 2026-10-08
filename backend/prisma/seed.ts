@@ -126,6 +126,8 @@ const SEED_LAWYER_PASSWORD = 'Password123';
 
 interface SeedLawyer {
   email: string;
+  /** Sign-in identifier (seed lawyers use +96279000000N). */
+  phone: string;
   fullName: string;
   barLicenseNumber: string;
   specialties: LawyerSpecialty[];
@@ -139,6 +141,7 @@ interface SeedLawyer {
 const LAWYERS: SeedLawyer[] = [
   {
     email: 'lawyer1@aqd.test',
+    phone: '+962790000001',
     fullName: 'سارة المطيري',
     barLicenseNumber: 'BAR-SEED-0001',
     specialties: [LawyerSpecialty.commercial, LawyerSpecialty.corporate],
@@ -150,6 +153,7 @@ const LAWYERS: SeedLawyer[] = [
   },
   {
     email: 'lawyer2@aqd.test',
+    phone: '+962790000002',
     fullName: 'محمد القحطاني',
     barLicenseNumber: 'BAR-SEED-0002',
     specialties: [LawyerSpecialty.realEstate, LawyerSpecialty.general],
@@ -161,6 +165,7 @@ const LAWYERS: SeedLawyer[] = [
   },
   {
     email: 'lawyer3@aqd.test',
+    phone: '+962790000003',
     fullName: 'نورة الحربي',
     barLicenseNumber: 'BAR-SEED-0003',
     specialties: [LawyerSpecialty.personalStatus, LawyerSpecialty.general],
@@ -172,6 +177,7 @@ const LAWYERS: SeedLawyer[] = [
   },
   {
     email: 'lawyer4@aqd.test',
+    phone: '+962790000004',
     fullName: 'خالد العنزي',
     barLicenseNumber: 'BAR-SEED-0004',
     specialties: [LawyerSpecialty.criminal],
@@ -183,6 +189,7 @@ const LAWYERS: SeedLawyer[] = [
   },
   {
     email: 'lawyer5@aqd.test',
+    phone: '+962790000005',
     fullName: 'ريم الدوسري',
     barLicenseNumber: 'BAR-SEED-0005',
     specialties: [LawyerSpecialty.labor, LawyerSpecialty.intellectualProperty],
@@ -203,13 +210,18 @@ async function seedLawyers(): Promise<void> {
     const user = await prisma.user.upsert({
       where: { email: lawyer.email },
       // Seeded accounts count as verified so they can use every feature.
-      update: { fullName: lawyer.fullName, emailVerifiedAt: new Date() },
+      update: {
+        fullName: lawyer.fullName,
+        phone: lawyer.phone,
+        phoneVerifiedAt: new Date(),
+      },
       create: {
         email: lawyer.email,
         fullName: lawyer.fullName,
         passwordHash,
         role: 'lawyer',
-        emailVerifiedAt: new Date(),
+        phone: lawyer.phone,
+        phoneVerifiedAt: new Date(),
       },
     });
 
@@ -253,7 +265,7 @@ async function seedLawyers(): Promise<void> {
       })),
     });
 
-    console.log(`Seeded lawyer: ${lawyer.fullName} (${lawyer.email})`);
+    console.log(`Seeded lawyer: ${lawyer.fullName} (${lawyer.phone})`);
   }
 }
 

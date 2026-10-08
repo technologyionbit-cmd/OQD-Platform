@@ -71,6 +71,7 @@ export class AuthService {
 
     const email = dto.email.trim().toLowerCase();
     await this.assertEmailAvailable(email);
+    await this.assertPhoneAvailable(dto.phone);
 
     const role = this.roleFor(dto.accountType);
     const passwordHash = await this.passwords.hash(dto.password);
@@ -85,7 +86,7 @@ export class AuthService {
           data: {
             fullName: displayName,
             email,
-            phone: dto.phone.trim(),
+            phone: dto.phone,
             passwordHash,
             role,
             termsAcceptedAt: new Date(),
@@ -145,10 +146,10 @@ export class AuthService {
       })
       .catch((error: unknown) => this.rethrowUniqueViolation(error));
 
-    // Fire-and-forget email verification — never blocks registration
-    // success (docs §2). Failure to "send" (log) must not fail the request.
+    // Phone verification code — never blocks registration success
+    // (docs §2). A failure to store or send it must not fail the request.
     await this.otp
-      .issue(email, 'emailVerification', user.id)
+      .issue(dto.phone, 'phoneVerification', user.id)
       .catch(() => undefined);
 
     const tokens = await this.tokens.issueSession(user.id, user.role, ctx);
@@ -164,7 +165,7 @@ export class AuthService {
     ctx: RequestContext,
   ): Promise<{ user: AuthUserView; tokens: AuthTokens }> {
     const user = await this.prisma.user.findUnique({
-      where: { email: dto.email.trim().toLowerCase() },
+      where: { phone: dto.phone },
     });
 
     // Same bcrypt work whether or not the account exists (timing-safe).
@@ -174,7 +175,7 @@ export class AuthService {
     );
 
     if (!user || !ok) {
-      throw unauthorized('Invalid email or password.');
+      throw unauthorized('Invalid phone number or password.');
     }
 
     if (user.status !== 'active') {
@@ -230,37 +231,26 @@ export class AuthService {
     const updated = await this.prisma.user
       .update({
         where: { id: userId },
-        data: {
-          fullName: dto.fullName.trim(),
-          email,
-          // A new address is unproven until its owner enters the code.
-          ...(emailChanged ? { emailVerifiedAt: null } : {}),
-        },
+        data: { fullName: dto.fullName.trim(), email },
       })
       .catch((error: unknown) => this.rethrowUniqueViolation(error));
-
-    if (emailChanged) {
-      await this.otp
-        .issue(email, 'emailVerification', userId)
-        .catch(() => undefined);
-    }
     return this.toView(updated);
   }
 
   // ---------------------------------------------------------------------------
-  // Email verification
+  // Phone verification
   // ---------------------------------------------------------------------------
 
-  /** Marks the email verified when [code] is the account's latest code.
+  /** Marks the phone verified when [code] is the account's latest code.
    *  Idempotent: an already-verified account just gets its view back. */
-  async verifyEmail(userId: string, code: string): Promise<AuthUserView> {
+  async verifyPhone(userId: string, code: string): Promise<AuthUserView> {
     const user = await this.activeUser(userId);
-    if (user.emailVerifiedAt) return this.toView(user);
+    if (user.phoneVerifiedAt) return this.toView(user);
 
     const result = await this.otp.consume(
-      user.email,
+      this.phoneOf(user),
       code,
-      'emailVerification',
+      'phoneVerification',
       user.id,
     );
     if (!result.valid) {
@@ -269,64 +259,65 @@ export class AuthService {
 
     const verified = await this.prisma.user.update({
       where: { id: user.id },
-      data: { emailVerifiedAt: new Date() },
+      data: { phoneVerifiedAt: new Date() },
     });
     return this.toView(verified);
   }
 
-  /** Sends a new code within the send limits (see {@link assertCanSendCode};
+  /** Texts a new code within the send limits (see {@link assertCanSendCode};
    *  the registration code counts). A no-op for an already verified account. */
-  async resendEmailVerification(userId: string): Promise<void> {
+  async resendPhoneVerification(userId: string): Promise<void> {
     const user = await this.activeUser(userId);
-    if (user.emailVerifiedAt) return;
+    if (user.phoneVerifiedAt) return;
 
-    await this.assertCanSendCode({ userId: user.id }, 'emailVerification');
-    await this.otp.issue(user.email, 'emailVerification', user.id);
+    const phone = this.phoneOf(user);
+    await this.assertCanSendCode({ userId: user.id }, 'phoneVerification');
+    await this.otp.issue(phone, 'phoneVerification', user.id);
   }
 
   // ---------------------------------------------------------------------------
-  // Password reset (emailed code)
+  // Password reset (texted code)
   // ---------------------------------------------------------------------------
 
   /**
-   * Emails a reset code when [email] belongs to an account. Known and
-   * unknown addresses get the same 204, the same work and the same send
+   * Texts a reset code when [phone] belongs to an account. Known and
+   * unknown numbers get the same 204, the same work and the same send
    * limits, so the answer never reveals whether an account exists.
    */
   async forgotPassword(dto: ForgotPasswordDto): Promise<void> {
-    const email = dto.email.trim().toLowerCase();
-    await this.assertCanSendCode({ destination: email }, 'passwordReset');
-    const user = await this.prisma.user.findUnique({ where: { email } });
-    await this.otp.issue(email, 'passwordReset', user?.id ?? null);
+    await this.assertCanSendCode({ destination: dto.phone }, 'passwordReset');
+    const user = await this.prisma.user.findUnique({
+      where: { phone: dto.phone },
+    });
+    await this.otp.issue(dto.phone, 'passwordReset', user?.id ?? null);
   }
 
   /** Checks the code before the app asks for a new password. Does not
    *  use the code up; wrong tries count toward its lock. */
   async verifyOtp(dto: VerifyOtpDto): Promise<void> {
-    const result = await this.otp.verify(
-      dto.email.trim().toLowerCase(),
-      dto.code,
-      'passwordReset',
-    );
+    const result = await this.otp.verify(dto.phone, dto.code, 'passwordReset');
     if (!result.valid) {
       throw this.invalidCode();
     }
   }
 
   /**
-   * Sets the new password, marks the email verified (the code proved the
-   * user reads it) and signs the account out everywhere.
+   * Sets the new password, marks the phone verified (the code proved the
+   * user holds it) and signs the account out everywhere.
    */
   async resetPassword(dto: ResetPasswordDto): Promise<void> {
-    const email = dto.email.trim().toLowerCase();
-    const result = await this.otp.consume(email, dto.code, 'passwordReset');
+    const result = await this.otp.consume(
+      dto.phone,
+      dto.code,
+      'passwordReset',
+    );
     const user =
       result.valid && result.userId
         ? await this.prisma.user.findUnique({ where: { id: result.userId } })
         : null;
-    // The code proves control of this address only while it is still the
-    // account's email; after an email change it resets nothing.
-    if (!user || user.email !== email) {
+    // The code proves control of this number only while it is still the
+    // account's phone.
+    if (!user || user.phone !== dto.phone) {
       throw this.invalidCode();
     }
 
@@ -335,7 +326,7 @@ export class AuthService {
       where: { id: user.id },
       data: {
         passwordHash,
-        ...(user.emailVerifiedAt ? {} : { emailVerifiedAt: new Date() }),
+        ...(user.phoneVerifiedAt ? {} : { phoneVerifiedAt: new Date() }),
       },
     });
     // Security-sensitive change: force re-login everywhere (docs §4).
@@ -343,8 +334,8 @@ export class AuthService {
   }
 
   /**
-   * Send limits for emailed codes: one per cooldown, and a fixed number
-   * per rolling hour for [filter] (an account or an address). Over the
+   * Send limits for texted codes: one per cooldown, and a fixed number
+   * per rolling hour for [filter] (an account or a number). Over the
    * limit it is a 429 whose Retry-After says when the next send fits.
    */
   private async assertCanSendCode(
@@ -435,9 +426,20 @@ export class AuthService {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
+      phone: user.phone,
       role: user.role,
-      emailVerified: user.emailVerifiedAt !== null,
+      phoneVerified: user.phoneVerifiedAt !== null,
     };
+  }
+
+  /** The account's phone. Only accounts whose old number could not be
+   *  normalized (migration phone_sign_in) have none; they cannot sign in
+   *  by phone either, so their session is treated as over. */
+  private phoneOf(user: User): string {
+    if (!user.phone) {
+      throw unauthorized('Session expired. Please sign in again.');
+    }
+    return user.phone;
   }
 
   /** The caller's account, or 401 when it is gone or no longer active. */
@@ -465,6 +467,21 @@ export class AuthService {
     if (existing) {
       throw this.emailTaken();
     }
+  }
+
+  private async assertPhoneAvailable(phone: string): Promise<void> {
+    const existing = await this.prisma.user.findUnique({ where: { phone } });
+    if (existing) {
+      throw this.phoneTaken();
+    }
+  }
+
+  private phoneTaken(): UnprocessableEntityException {
+    return this.fieldError(
+      'phone',
+      'This phone number is already registered.',
+      ApiErrorCode.PHONE_ALREADY_REGISTERED,
+    );
   }
 
   private emailTaken(): UnprocessableEntityException {
@@ -523,6 +540,9 @@ export class AuthService {
       }
       if (target.includes('email')) {
         throw this.emailTaken();
+      }
+      if (target.includes('phone')) {
+        throw this.phoneTaken();
       }
     }
     throw error as Error;

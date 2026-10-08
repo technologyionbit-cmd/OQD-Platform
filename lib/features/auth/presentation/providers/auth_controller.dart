@@ -9,7 +9,7 @@ import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
-import 'package:aqd_ionbit/features/auth/presentation/providers/email_verification_prompt.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/phone_verification_prompt.dart';
 
 /// App-wide session state: `AsyncLoading` while resolving the stored
 /// session on startup, `AsyncData(null)` when unauthenticated,
@@ -43,8 +43,8 @@ class AuthController extends AsyncNotifier<AuthUser?> {
     };
   }
 
-  Future<Result<AuthUser>> login({required String email, required String password}) async {
-    final result = await _repository.login(email: email, password: password);
+  Future<Result<AuthUser>> login({required String phone, required String password}) async {
+    final result = await _repository.login(phone: phone, password: password);
     return result.fold(
       Result.failure,
       (data) {
@@ -61,7 +61,7 @@ class AuthController extends AsyncNotifier<AuthUser?> {
       (data) {
         // Set before the user so the router's first look at the new
         // session already routes to the code screen.
-        if (!data.user.emailVerified) ref.read(emailVerificationPromptProvider.notifier).show();
+        if (!data.user.phoneVerified) ref.read(phoneVerificationPromptProvider.notifier).show();
         state = AsyncData(data.user);
         return Result.success(data.user);
       },
@@ -70,20 +70,20 @@ class AuthController extends AsyncNotifier<AuthUser?> {
 
   /// On success the router leaves the verify screen by itself, because
   /// the user it reads is now verified.
-  Future<Result<AuthUser>> verifyEmail(String code) async {
-    final result = await _repository.verifyEmail(code: code);
+  Future<Result<AuthUser>> verifyPhone(String code) async {
+    final result = await _repository.verifyPhone(code: code);
     result.fold((failure) {}, (user) {
-      ref.read(emailVerificationPromptProvider.notifier).dismiss();
+      ref.read(phoneVerificationPromptProvider.notifier).dismiss();
       state = AsyncData(user);
     });
     return result;
   }
 
-  Future<Result<void>> resendEmailVerification() => _repository.resendEmailVerification();
+  Future<Result<void>> resendPhoneVerification() => _repository.resendPhoneVerification();
 
   Future<void> logout() async {
     await _repository.logout();
-    ref.read(emailVerificationPromptProvider.notifier).dismiss();
+    ref.read(phoneVerificationPromptProvider.notifier).dismiss();
     state = const AsyncData(null);
   }
 
@@ -97,7 +97,7 @@ class AuthController extends AsyncNotifier<AuthUser?> {
   /// token — the session is over, so the stored tokens go too.
   Future<void> _handleSessionExpired() async {
     await _repository.clearLocalSession();
-    ref.read(emailVerificationPromptProvider.notifier).dismiss();
+    ref.read(phoneVerificationPromptProvider.notifier).dismiss();
     state = const AsyncData(null);
   }
 }

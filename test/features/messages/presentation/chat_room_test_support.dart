@@ -29,8 +29,8 @@ export '../../../support/test_doubles.dart' show FixedAuthController;
 /// files (one file = one isolate for `flutter test`) rather than one giant
 /// file — keeps each run's Timer/AnimationController lifecycle isolated per
 /// file instead of accumulating across a long list of `testWidgets`.
-const testClient = AuthUser(id: 'u_client_1', fullName: 'أحمد العتيبي', email: 'client@aqd.test', role: UserRole.client, emailVerified: true);
-const testLawyer = AuthUser(id: 'u_lawyer_1', fullName: 'سارة المطيري', email: 'lawyer@aqd.test', role: UserRole.lawyer, emailVerified: true);
+const testClient = AuthUser(id: 'u_client_1', fullName: 'أحمد العتيبي', email: 'client@aqd.test', phone: '+962791234567', role: UserRole.client, phoneVerified: true);
+const testLawyer = AuthUser(id: 'u_lawyer_1', fullName: 'سارة المطيري', email: 'lawyer@aqd.test', phone: '+962791234567', role: UserRole.lawyer, phoneVerified: true);
 
 /// A single-consultation fake, letting tests control `scheduledAt`/`status`
 /// precisely (e.g. "scheduled right now" so the session is immediately

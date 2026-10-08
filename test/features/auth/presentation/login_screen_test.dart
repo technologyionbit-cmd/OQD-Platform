@@ -43,12 +43,12 @@ void main() {
 
   void loginAnswers(Future<_LoginResult> Function() answer) {
     when(
-      () => repository.login(email: any(named: 'email'), password: any(named: 'password')),
+      () => repository.login(phone: any(named: 'phone'), password: any(named: 'password')),
     ).thenAnswer((_) => answer());
   }
 
-  Future<void> submit(WidgetTester tester, {String email = 'user@aqd.test', String password = 'Password123'}) async {
-    await tester.enterText(find.byType(TextField).at(0), email);
+  Future<void> submit(WidgetTester tester, {String phone = '0791234567', String password = 'Password123'}) async {
+    await tester.enterText(find.byType(TextField).at(0), phone);
     await tester.enterText(find.byType(TextField).at(1), password);
     await tester.tap(find.text('دخول'));
     await tester.pumpAndSettle();
@@ -60,7 +60,25 @@ void main() {
 
     await submit(tester);
 
-    expect(find.text('البريد الإلكتروني أو كلمة المرور غير صحيحة'), findsOneWidget);
+    expect(find.text('رقم الهاتف أو كلمة المرور غير صحيحة'), findsOneWidget);
+  });
+
+  testWidgets('signs in with the phone number, normalized', (tester) async {
+    loginAnswers(() async => const Result.failure(UnauthorizedFailure()));
+    await pumpLogin(tester);
+
+    await submit(tester, phone: ' 079 123 4567 ');
+
+    verify(() => repository.login(phone: '+962791234567', password: 'Password123')).called(1);
+  });
+
+  testWidgets('refuses an email or a non-Jordanian number before sending', (tester) async {
+    await pumpLogin(tester);
+
+    await submit(tester, phone: 'user@aqd.test');
+
+    expect(find.text('أدخل رقم موبايل أردني صحيح، مثل 0791234567'), findsOneWidget);
+    verifyNever(() => repository.login(phone: any(named: 'phone'), password: any(named: 'password')));
   });
 
   testWidgets('too many attempts tells the user how long to wait', (tester) async {
@@ -91,14 +109,14 @@ void main() {
     loginAnswers(() => pending.future);
     await pumpLogin(tester);
 
-    await tester.enterText(find.byType(TextField).at(0), 'user@aqd.test');
+    await tester.enterText(find.byType(TextField).at(0), '0791234567');
     await tester.enterText(find.byType(TextField).at(1), 'Password123');
     await tester.tap(find.text('دخول'));
     await tester.pump();
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pump();
 
-    verify(() => repository.login(email: any(named: 'email'), password: any(named: 'password'))).called(1);
+    verify(() => repository.login(phone: any(named: 'phone'), password: any(named: 'password'))).called(1);
     pending.complete(const Result.failure(UnauthorizedFailure()));
     await tester.pumpAndSettle();
   });

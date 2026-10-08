@@ -19,7 +19,7 @@ import 'package:aqd_ionbit/features/auth/presentation/screens/reset_password_scr
 import 'package:aqd_ionbit/features/auth/presentation/widgets/otp_code_field.dart';
 import '../../../support/test_doubles.dart';
 
-const _email = 'user@aqd.test';
+const _phone = '+962791234567';
 
 void main() {
   late MockAuthRepository repository;
@@ -28,7 +28,7 @@ void main() {
   setUp(() {
     repository = MockAuthRepository();
     when(repository.restoreSession).thenAnswer((_) async => const Result.success(null));
-    when(() => repository.requestPasswordReset(email: any(named: 'email'))).thenAnswer((_) async => const Result.success(null));
+    when(() => repository.requestPasswordReset(phone: any(named: 'phone'))).thenAnswer((_) async => const Result.success(null));
   });
 
   /// Signed-out app on the login screen, tall enough that no step scrolls.
@@ -58,8 +58,8 @@ void main() {
     expect(find.byType(ForgotPasswordScreen), findsOneWidget);
   }
 
-  Future<void> sendEmail(WidgetTester tester, String email) async {
-    await tester.enterText(find.byType(TextField), email);
+  Future<void> sendPhone(WidgetTester tester, String phone) async {
+    await tester.enterText(find.byType(TextField), phone);
     await tester.tap(find.text('إرسال رمز التحقق'));
     await tester.pumpAndSettle();
   }
@@ -73,10 +73,10 @@ void main() {
 
   Future<void> openResetPassword(WidgetTester tester) async {
     when(
-      () => repository.verifyPasswordResetCode(email: _email, code: '123456'),
+      () => repository.verifyPasswordResetCode(phone: _phone, code: '123456'),
     ).thenAnswer((_) async => const Result.success(null));
     await openForgotPassword(tester);
-    await sendEmail(tester, _email);
+    await sendPhone(tester, _phone);
     await enterCode(tester, '123456');
     expect(find.byType(ResetPasswordScreen), findsOneWidget);
   }
@@ -89,34 +89,36 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('asks for an email only and checks it before sending', (tester) async {
+  testWidgets('asks for the phone number only and checks it before sending', (tester) async {
     await openForgotPassword(tester);
-    expect(find.text('رسالة SMS'), findsNothing);
     expect(find.byType(TextField), findsOneWidget);
 
-    await sendEmail(tester, 'not-an-email');
+    await sendPhone(tester, 'user@aqd.test');
+    expect(find.text('أدخل رقم موبايل أردني صحيح، مثل 0791234567'), findsOneWidget);
 
-    expect(find.text('صيغة البريد الإلكتروني غير صحيحة'), findsOneWidget);
-    verifyNever(() => repository.requestPasswordReset(email: any(named: 'email')));
+    await sendPhone(tester, '065000000');
+    expect(find.text('أدخل رقم موبايل أردني صحيح، مثل 0791234567'), findsOneWidget);
+    verifyNever(() => repository.requestPasswordReset(phone: any(named: 'phone')));
   });
 
   testWidgets('goes straight to the code screen once the code is sent', (tester) async {
     await openForgotPassword(tester);
 
-    await sendEmail(tester, '  $_email ');
+    // Typed the local way, sent normalized, shown the local way.
+    await sendPhone(tester, ' 079 123 4567 ');
 
-    verify(() => repository.requestPasswordReset(email: _email)).called(1);
+    verify(() => repository.requestPasswordReset(phone: _phone)).called(1);
     expect(find.byType(OtpVerificationScreen), findsOneWidget);
-    expect(find.text('أرسلنا رمزًا مكونًا من 6 أرقام إلى $_email'), findsOneWidget);
+    expect(find.text('أرسلنا رمزًا مكونًا من 6 أرقام إلى 0791234567'), findsOneWidget);
   });
 
   testWidgets('too many requests says how long to wait and stays on the form', (tester) async {
-    when(() => repository.requestPasswordReset(email: any(named: 'email'))).thenAnswer(
+    when(() => repository.requestPasswordReset(phone: any(named: 'phone'))).thenAnswer(
       (_) async => const Result.failure(RateLimitedFailure(retryAfter: Duration(seconds: 40))),
     );
     await openForgotPassword(tester);
 
-    await sendEmail(tester, _email);
+    await sendPhone(tester, _phone);
 
     expect(find.text('محاولات كثيرة، حاول مجددًا بعد دقيقة'), findsOneWidget);
     expect(find.byType(ForgotPasswordScreen), findsOneWidget);
@@ -124,9 +126,9 @@ void main() {
 
   testWidgets('a wrong or locked code shows a localized error, never server text', (tester) async {
     await openForgotPassword(tester);
-    await sendEmail(tester, _email);
+    await sendPhone(tester, _phone);
 
-    when(() => repository.verifyPasswordResetCode(email: _email, code: '111111')).thenAnswer(
+    when(() => repository.verifyPasswordResetCode(phone: _phone, code: '111111')).thenAnswer(
       (_) async => const Result.failure(
         ValidationFailure(message: 'Invalid or expired code.', code: ApiErrorCodes.invalidVerificationCode),
       ),
@@ -135,7 +137,7 @@ void main() {
     expect(find.text('رمز التحقق غير صحيح'), findsOneWidget);
     expect(find.text('Invalid or expired code.'), findsNothing);
 
-    when(() => repository.verifyPasswordResetCode(email: _email, code: '222222')).thenAnswer(
+    when(() => repository.verifyPasswordResetCode(phone: _phone, code: '222222')).thenAnswer(
       (_) async => const Result.failure(ValidationFailure(code: ApiErrorCodes.verificationCodeLocked)),
     );
     await enterCode(tester, '222222');
@@ -145,11 +147,11 @@ void main() {
 
   testWidgets('resending waits out the cooldown, then honours Retry-After', (tester) async {
     await openForgotPassword(tester);
-    await sendEmail(tester, _email);
+    await sendPhone(tester, _phone);
     expect(find.text('إعادة الإرسال بعد 01:00'), findsOneWidget);
 
     await tester.pump(const Duration(seconds: 61));
-    when(() => repository.requestPasswordReset(email: any(named: 'email'))).thenAnswer(
+    when(() => repository.requestPasswordReset(phone: any(named: 'phone'))).thenAnswer(
       (_) async => const Result.failure(RateLimitedFailure(retryAfter: Duration(seconds: 90))),
     );
     await tester.tap(find.text('إعادة الإرسال'));
@@ -163,7 +165,7 @@ void main() {
   testWidgets('a right code leads to a new password, then back to login', (tester) async {
     await openResetPassword(tester);
     when(
-      () => repository.resetPassword(email: _email, code: '123456', newPassword: 'NewPass123'),
+      () => repository.resetPassword(phone: _phone, code: '123456', newPassword: 'NewPass123'),
     ).thenAnswer((_) async => const Result.success(null));
 
     await submitPasswords(tester, 'NewPass123');
@@ -185,7 +187,7 @@ void main() {
 
     verifyNever(
       () => repository.resetPassword(
-        email: any(named: 'email'),
+        phone: any(named: 'phone'),
         code: any(named: 'code'),
         newPassword: any(named: 'newPassword'),
       ),
@@ -196,7 +198,7 @@ void main() {
     await openResetPassword(tester);
     when(
       () => repository.resetPassword(
-        email: any(named: 'email'),
+        phone: any(named: 'phone'),
         code: any(named: 'code'),
         newPassword: any(named: 'newPassword'),
       ),

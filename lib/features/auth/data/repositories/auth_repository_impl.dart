@@ -31,9 +31,9 @@ class AuthRepositoryImpl implements AuthRepository {
   final ApiErrorMapper _errorMapper;
 
   @override
-  Future<Result<({AuthUser user, AuthTokens tokens})>> login({required String email, required String password}) {
+  Future<Result<({AuthUser user, AuthTokens tokens})>> login({required String phone, required String password}) {
     return _errorMapper.capture(() async {
-      final result = await _remote.login(email: email, password: password);
+      final result = await _remote.login(phone: phone, password: password);
       await _tokenManager.save(result.tokens);
       return result;
     });
@@ -119,26 +119,26 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<AuthUser>> verifyEmail({required String code}) {
-    return _errorMapper.capture(() => _remote.verifyEmail(code: code));
+  Future<Result<AuthUser>> verifyPhone({required String code}) {
+    return _errorMapper.capture(() => _remote.verifyPhone(code: code));
   }
 
   @override
-  Future<Result<void>> resendEmailVerification() => _errorMapper.capture(_remote.resendEmailVerification);
+  Future<Result<void>> resendPhoneVerification() => _errorMapper.capture(_remote.resendPhoneVerification);
 
   @override
-  Future<Result<void>> requestPasswordReset({required String email}) {
-    return _errorMapper.capture(() => _remote.requestPasswordReset(email: email));
+  Future<Result<void>> requestPasswordReset({required String phone}) {
+    return _errorMapper.capture(() => _remote.requestPasswordReset(phone: phone));
   }
 
   @override
-  Future<Result<void>> verifyPasswordResetCode({required String email, required String code}) {
-    return _errorMapper.capture(() => _remote.verifyPasswordResetCode(email: email, code: code));
+  Future<Result<void>> verifyPasswordResetCode({required String phone, required String code}) {
+    return _errorMapper.capture(() => _remote.verifyPasswordResetCode(phone: phone, code: code));
   }
 
   @override
-  Future<Result<void>> resetPassword({required String email, required String code, required String newPassword}) {
-    return _errorMapper.capture(() => _remote.resetPassword(email: email, code: code, newPassword: newPassword));
+  Future<Result<void>> resetPassword({required String phone, required String code, required String newPassword}) {
+    return _errorMapper.capture(() => _remote.resetPassword(phone: phone, code: code, newPassword: newPassword));
   }
 
   @override

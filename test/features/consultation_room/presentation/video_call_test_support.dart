@@ -26,7 +26,7 @@ import 'consultation_waiting_screen_test_support.dart' show consultationDetailsP
 /// defines `testClient`/`testLawyer` (no existing consultation-room test
 /// exercises the company role), so this is defined locally rather than
 /// widening that shared fixture file for a single feature's tests.
-const testCompany = AuthUser(id: 'u_company_1', fullName: 'شركة الرياض القانونية', email: 'company@aqd.test', role: UserRole.company, emailVerified: true);
+const testCompany = AuthUser(id: 'u_company_1', fullName: 'شركة الرياض القانونية', email: 'company@aqd.test', phone: '+962791234567', role: UserRole.company, phoneVerified: true);
 
 /// A video consultation fixture pinned to one of `ConsultationsMockDataSource`'s
 /// seeded IDs (`cons_seed_8`/`_9`/`_11` — reliable / never-connects /

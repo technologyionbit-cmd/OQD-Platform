@@ -14,9 +14,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthUser {
 
- String get id; String get fullName; String get email; UserRole get role;/// False until the user enters the code emailed at sign-up. The server
-/// refuses sensitive actions (booking, reviews) until then.
- bool get emailVerified;
+ String get id; String get fullName; String get email;/// Signs the account in and receives every code, as +9627XXXXXXXX.
+/// Null only for old accounts whose number could not be normalized.
+ String? get phone; UserRole get role;/// False until the user enters the code texted at sign-up. The server
+/// refuses sensitive actions (booking, reviews, signing) until then.
+ bool get phoneVerified;
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -27,16 +29,16 @@ $AuthUserCopyWith<AuthUser> get copyWith => _$AuthUserCopyWithImpl<AuthUser>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthUser&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.role, role) || other.role == role)&&(identical(other.emailVerified, emailVerified) || other.emailVerified == emailVerified));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthUser&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.role, role) || other.role == role)&&(identical(other.phoneVerified, phoneVerified) || other.phoneVerified == phoneVerified));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,fullName,email,role,emailVerified);
+int get hashCode => Object.hash(runtimeType,id,fullName,email,phone,role,phoneVerified);
 
 @override
 String toString() {
-  return 'AuthUser(id: $id, fullName: $fullName, email: $email, role: $role, emailVerified: $emailVerified)';
+  return 'AuthUser(id: $id, fullName: $fullName, email: $email, phone: $phone, role: $role, phoneVerified: $phoneVerified)';
 }
 
 
@@ -47,7 +49,7 @@ abstract mixin class $AuthUserCopyWith<$Res>  {
   factory $AuthUserCopyWith(AuthUser value, $Res Function(AuthUser) _then) = _$AuthUserCopyWithImpl;
 @useResult
 $Res call({
- String id, String fullName, String email, UserRole role, bool emailVerified
+ String id, String fullName, String email, String? phone, UserRole role, bool phoneVerified
 });
 
 
@@ -64,13 +66,14 @@ class _$AuthUserCopyWithImpl<$Res>
 
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fullName = null,Object? email = null,Object? role = null,Object? emailVerified = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? fullName = null,Object? email = null,Object? phone = freezed,Object? role = null,Object? phoneVerified = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
-as UserRole,emailVerified: null == emailVerified ? _self.emailVerified : emailVerified // ignore: cast_nullable_to_non_nullable
+as String,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as UserRole,phoneVerified: null == phoneVerified ? _self.phoneVerified : phoneVerified // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -156,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fullName,  String email,  UserRole role,  bool emailVerified)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String fullName,  String email,  String? phone,  UserRole role,  bool phoneVerified)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthUser() when $default != null:
-return $default(_that.id,_that.fullName,_that.email,_that.role,_that.emailVerified);case _:
+return $default(_that.id,_that.fullName,_that.email,_that.phone,_that.role,_that.phoneVerified);case _:
   return orElse();
 
 }
@@ -177,10 +180,10 @@ return $default(_that.id,_that.fullName,_that.email,_that.role,_that.emailVerifi
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fullName,  String email,  UserRole role,  bool emailVerified)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String fullName,  String email,  String? phone,  UserRole role,  bool phoneVerified)  $default,) {final _that = this;
 switch (_that) {
 case _AuthUser():
-return $default(_that.id,_that.fullName,_that.email,_that.role,_that.emailVerified);case _:
+return $default(_that.id,_that.fullName,_that.email,_that.phone,_that.role,_that.phoneVerified);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +200,10 @@ return $default(_that.id,_that.fullName,_that.email,_that.role,_that.emailVerifi
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fullName,  String email,  UserRole role,  bool emailVerified)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String fullName,  String email,  String? phone,  UserRole role,  bool phoneVerified)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthUser() when $default != null:
-return $default(_that.id,_that.fullName,_that.email,_that.role,_that.emailVerified);case _:
+return $default(_that.id,_that.fullName,_that.email,_that.phone,_that.role,_that.phoneVerified);case _:
   return null;
 
 }
@@ -212,16 +215,19 @@ return $default(_that.id,_that.fullName,_that.email,_that.role,_that.emailVerifi
 
 
 class _AuthUser implements AuthUser {
-  const _AuthUser({required this.id, required this.fullName, required this.email, required this.role, required this.emailVerified});
+  const _AuthUser({required this.id, required this.fullName, required this.email, required this.phone, required this.role, required this.phoneVerified});
   
 
 @override final  String id;
 @override final  String fullName;
 @override final  String email;
+/// Signs the account in and receives every code, as +9627XXXXXXXX.
+/// Null only for old accounts whose number could not be normalized.
+@override final  String? phone;
 @override final  UserRole role;
-/// False until the user enters the code emailed at sign-up. The server
-/// refuses sensitive actions (booking, reviews) until then.
-@override final  bool emailVerified;
+/// False until the user enters the code texted at sign-up. The server
+/// refuses sensitive actions (booking, reviews, signing) until then.
+@override final  bool phoneVerified;
 
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +239,16 @@ _$AuthUserCopyWith<_AuthUser> get copyWith => __$AuthUserCopyWithImpl<_AuthUser>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthUser&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.role, role) || other.role == role)&&(identical(other.emailVerified, emailVerified) || other.emailVerified == emailVerified));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthUser&&(identical(other.id, id) || other.id == id)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.role, role) || other.role == role)&&(identical(other.phoneVerified, phoneVerified) || other.phoneVerified == phoneVerified));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,fullName,email,role,emailVerified);
+int get hashCode => Object.hash(runtimeType,id,fullName,email,phone,role,phoneVerified);
 
 @override
 String toString() {
-  return 'AuthUser(id: $id, fullName: $fullName, email: $email, role: $role, emailVerified: $emailVerified)';
+  return 'AuthUser(id: $id, fullName: $fullName, email: $email, phone: $phone, role: $role, phoneVerified: $phoneVerified)';
 }
 
 
@@ -253,7 +259,7 @@ abstract mixin class _$AuthUserCopyWith<$Res> implements $AuthUserCopyWith<$Res>
   factory _$AuthUserCopyWith(_AuthUser value, $Res Function(_AuthUser) _then) = __$AuthUserCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String fullName, String email, UserRole role, bool emailVerified
+ String id, String fullName, String email, String? phone, UserRole role, bool phoneVerified
 });
 
 
@@ -270,13 +276,14 @@ class __$AuthUserCopyWithImpl<$Res>
 
 /// Create a copy of AuthUser
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fullName = null,Object? email = null,Object? role = null,Object? emailVerified = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? fullName = null,Object? email = null,Object? phone = freezed,Object? role = null,Object? phoneVerified = null,}) {
   return _then(_AuthUser(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,fullName: null == fullName ? _self.fullName : fullName // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
-as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
-as UserRole,emailVerified: null == emailVerified ? _self.emailVerified : emailVerified // ignore: cast_nullable_to_non_nullable
+as String,phone: freezed == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String?,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as UserRole,phoneVerified: null == phoneVerified ? _self.phoneVerified : phoneVerified // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }

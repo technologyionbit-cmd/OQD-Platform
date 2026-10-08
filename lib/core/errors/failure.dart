@@ -82,11 +82,12 @@ abstract final class ApiErrorCodes {
   static const accountInactive = 'ACCOUNT_INACTIVE';
   static const tooManyRequests = 'TOO_MANY_REQUESTS';
   static const emailAlreadyRegistered = 'EMAIL_ALREADY_REGISTERED';
+  static const phoneAlreadyRegistered = 'PHONE_ALREADY_REGISTERED';
   static const commercialRegistrationTaken = 'COMMERCIAL_REGISTRATION_TAKEN';
   static const barLicenseTaken = 'BAR_LICENSE_TAKEN';
   static const termsVersionOutdated = 'TERMS_VERSION_OUTDATED';
   static const invalidVerificationCode = 'INVALID_VERIFICATION_CODE';
   static const verificationCodeLocked = 'VERIFICATION_CODE_LOCKED';
-  static const emailNotVerified = 'EMAIL_NOT_VERIFIED';
+  static const phoneNotVerified = 'PHONE_NOT_VERIFIED';
   static const contractStatusConflict = 'CONTRACT_STATUS_CONFLICT';
 }

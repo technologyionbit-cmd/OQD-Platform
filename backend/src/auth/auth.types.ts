@@ -5,10 +5,13 @@ export interface AuthUserView {
   id: string;
   fullName: string;
   email: string;
+  /** +9627XXXXXXXX — signs the account in and receives every code. Null
+   *  only for old accounts whose number could not be normalized. */
+  phone: string | null;
   role: UserRole;
-  /** False until the user enters the code sent to [email]. Sensitive
-   *  actions answer 403 EMAIL_NOT_VERIFIED until then. */
-  emailVerified: boolean;
+  /** False until the user enters the code texted to [phone]. Sensitive
+   *  actions answer 403 PHONE_NOT_VERIFIED until then. */
+  phoneVerified: boolean;
 }
 
 /** Access + refresh pair returned by login/register/refresh. */

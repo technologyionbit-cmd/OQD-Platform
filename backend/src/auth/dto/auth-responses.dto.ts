@@ -17,15 +17,18 @@ export class AuthUserDto implements AuthUserView {
   @ApiProperty({ format: 'email' })
   email!: string;
 
+  @ApiProperty({ example: '+962791234567', nullable: true, type: String })
+  phone!: string | null;
+
   @ApiProperty({ enum: UserRole, enumName: 'UserRole' })
   role!: UserRole;
 
   @ApiProperty({
     description:
-      'False until the emailed code is entered (POST /auth/email/verify). ' +
-      'Sensitive actions answer 403 EMAIL_NOT_VERIFIED until then.',
+      'False until the texted code is entered (POST /auth/phone/verify). ' +
+      'Sensitive actions answer 403 PHONE_NOT_VERIFIED until then.',
   })
-  emailVerified!: boolean;
+  phoneVerified!: boolean;
 }
 
 export class AuthTokensDto implements AuthTokens {

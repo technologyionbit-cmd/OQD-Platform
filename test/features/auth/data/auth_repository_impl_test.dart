@@ -15,7 +15,7 @@ import '../../../support/test_doubles.dart';
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 
 void main() {
-  const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', role: UserRole.client, emailVerified: true);
+  const user = AuthUser(id: 'u1', fullName: 'Test User', email: 'test@aqd.test', phone: '+962791234567', role: UserRole.client, phoneVerified: true);
   const tokens = AuthTokens(accessToken: 'access', refreshToken: 'refresh');
 
   late MockAuthRemoteDataSource remote;
@@ -35,11 +35,11 @@ void main() {
   group('login', () {
     test('returns success and persists the returned tokens', () async {
       when(
-        () => remote.login(email: any(named: 'email'), password: any(named: 'password')),
+        () => remote.login(phone: any(named: 'phone'), password: any(named: 'password')),
       ).thenAnswer((_) async => (user: user, tokens: tokens));
       when(() => tokenManager.save(tokens)).thenAnswer((_) async {});
 
-      final result = await repository.login(email: 'test@aqd.test', password: 'Password123');
+      final result = await repository.login(phone: '+962791234567', password: 'Password123');
 
       expect(result.isSuccess, isTrue);
       expect(result.valueOrNull?.user, user);
@@ -48,10 +48,10 @@ void main() {
 
     test('maps a thrown Failure to Result.failure and never touches TokenManager', () async {
       when(
-        () => remote.login(email: any(named: 'email'), password: any(named: 'password')),
+        () => remote.login(phone: any(named: 'phone'), password: any(named: 'password')),
       ).thenThrow(const UnauthorizedFailure());
 
-      final result = await repository.login(email: 'test@aqd.test', password: 'wrong');
+      final result = await repository.login(phone: '+962791234567', password: 'wrong');
 
       expect(result.isFailure, isTrue);
       verifyNever(() => tokenManager.save(any()));

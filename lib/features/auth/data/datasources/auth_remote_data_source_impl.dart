@@ -22,11 +22,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   static final _publicOptions = Options(extra: {DioExtraKeys.skipAuth: true});
 
   @override
-  Future<({AuthUser user, AuthTokens tokens})> login({required String email, required String password}) {
+  Future<({AuthUser user, AuthTokens tokens})> login({required String phone, required String password}) {
     return _errorMapper.guard(() async {
       final res = await _dio.post<Map<String, dynamic>>(
         '/auth/login',
-        data: {'email': email, 'password': password},
+        data: {'phone': phone, 'password': password},
         options: _publicOptions,
       );
       return AuthWire.session(res.data);
@@ -84,38 +84,38 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthUser> verifyEmail({required String code}) {
+  Future<AuthUser> verifyPhone({required String code}) {
     return _errorMapper.guard(() async {
-      final res = await _dio.post<Map<String, dynamic>>('/auth/email/verify', data: {'code': code});
+      final res = await _dio.post<Map<String, dynamic>>('/auth/phone/verify', data: {'code': code});
       return AuthWire.user(AuthWire.data(res.data)['user'] as Map<String, dynamic>);
     });
   }
 
   @override
-  Future<void> resendEmailVerification() {
-    return _errorMapper.guard(() => _dio.post<void>('/auth/email/resend'));
+  Future<void> resendPhoneVerification() {
+    return _errorMapper.guard(() => _dio.post<void>('/auth/phone/resend'));
   }
 
   @override
-  Future<void> requestPasswordReset({required String email}) {
+  Future<void> requestPasswordReset({required String phone}) {
     return _errorMapper.guard(() async {
-      await _dio.post<void>('/auth/password/forgot', data: {'email': email}, options: _publicOptions);
+      await _dio.post<void>('/auth/password/forgot', data: {'phone': phone}, options: _publicOptions);
     });
   }
 
   @override
-  Future<void> verifyPasswordResetCode({required String email, required String code}) {
+  Future<void> verifyPasswordResetCode({required String phone, required String code}) {
     return _errorMapper.guard(() async {
-      await _dio.post<void>('/auth/password/verify-otp', data: {'email': email, 'code': code}, options: _publicOptions);
+      await _dio.post<void>('/auth/password/verify-otp', data: {'phone': phone, 'code': code}, options: _publicOptions);
     });
   }
 
   @override
-  Future<void> resetPassword({required String email, required String code, required String newPassword}) {
+  Future<void> resetPassword({required String phone, required String code, required String newPassword}) {
     return _errorMapper.guard(() async {
       await _dio.post<void>(
         '/auth/password/reset',
-        data: {'email': email, 'code': code, 'newPassword': newPassword},
+        data: {'phone': phone, 'code': code, 'newPassword': newPassword},
         options: _publicOptions,
       );
     });

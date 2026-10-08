@@ -15,8 +15,8 @@ import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.da
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contracts_controller.dart';
 import '../../../support/test_doubles.dart';
 
-const _alice = AuthUser(id: 'u_alice', fullName: 'Alice', email: 'alice@aqd.test', role: UserRole.client, emailVerified: true);
-const _bob = AuthUser(id: 'u_bob', fullName: 'Bob', email: 'bob@aqd.test', role: UserRole.client, emailVerified: true);
+const _alice = AuthUser(id: 'u_alice', fullName: 'Alice', email: 'alice@aqd.test', phone: '+962791234567', role: UserRole.client, phoneVerified: true);
+const _bob = AuthUser(id: 'u_bob', fullName: 'Bob', email: 'bob@aqd.test', phone: '+962781234567', role: UserRole.client, phoneVerified: true);
 const _tokens = AuthTokens(accessToken: 'access', refreshToken: 'refresh');
 
 Contract _contractOf(String owner) => Contract(
@@ -39,7 +39,7 @@ void main() {
     when(auth.restoreSession).thenAnswer((_) async => const Result.success(null));
     when(auth.logout).thenAnswer((_) async {});
     for (final user in [_alice, _bob]) {
-      when(() => auth.login(email: user.email, password: any(named: 'password'))).thenAnswer((_) async => Result.success((user: user, tokens: _tokens)));
+      when(() => auth.login(phone: user.phone!, password: any(named: 'password'))).thenAnswer((_) async => Result.success((user: user, tokens: _tokens)));
     }
 
     final container = ProviderContainer(
@@ -55,14 +55,14 @@ void main() {
     final session = container.read(authControllerProvider.notifier);
 
     when(contracts.getContracts).thenAnswer((_) async => Result.success([_contractOf('alice')]));
-    await session.login(email: _alice.email, password: 'Password123');
+    await session.login(phone: _alice.phone!, password: 'Password123');
     expect(await container.read(contractsControllerProvider.future), [_contractOf('alice')]);
 
     await session.logout();
     expect(await container.read(contractsControllerProvider.future), isEmpty);
 
     when(contracts.getContracts).thenAnswer((_) async => Result.success([_contractOf('bob')]));
-    await session.login(email: _bob.email, password: 'Password123');
+    await session.login(phone: _bob.phone!, password: 'Password123');
     expect(await container.read(contractsControllerProvider.future), [_contractOf('bob')]);
   });
 }

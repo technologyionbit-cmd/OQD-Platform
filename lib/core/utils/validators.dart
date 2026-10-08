@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:aqd_ionbit/core/utils/jordan_mobile.dart';
+
 /// Presentation-layer validation only — this makes forms responsive and
 /// friendly, it is NOT a security boundary. The backend re-validates and
 /// remains authoritative; see `errorInvalidCredentials` / [ValidationFailure]
@@ -45,7 +47,12 @@ class Validators {
 
   static bool isPasswordWithinByteLimit(String? value) => value != null && utf8.encode(value).length <= passwordMaxBytes;
 
+  /// Any phone number (e.g. a contract party's). Account numbers use
+  /// [isValidJordanMobile].
   static bool isValidPhone(String? value) => value != null && _phoneRegExp.hasMatch(value.trim().replaceAll(' ', ''));
+
+  /// The account phone: a Jordanian mobile in any common spelling.
+  static bool isValidJordanMobile(String? value) => value != null && JordanMobile.normalize(value) != null;
 
   static bool isValidCardNumber(String? value) => value != null && _cardNumberRegExp.hasMatch(value.trim().replaceAll(' ', ''));
 

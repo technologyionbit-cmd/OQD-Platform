@@ -2,7 +2,12 @@ import { UnprocessableEntityException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHash } from 'node:crypto';
 import { PrismaService } from '../../prisma/prisma.service';
-import { OtpService } from './otp.service';
+import { sendNgtSms } from './ngt-sms.client';
+import { OtpService, smsText } from './otp.service';
+
+jest.mock('./ngt-sms.client', () => ({
+  sendNgtSms: jest.fn(() => Promise.resolve({ ok: true, code: 'I01' })),
+}));
 
 interface Row {
   id: string;
@@ -118,41 +123,91 @@ function applyUpdate(row: Row, data: RowUpdate): void {
   if (data.consumedAt) row.consumedAt = data.consumedAt;
 }
 
-function makeService(fake: FakePrisma): OtpService {
+const SMS = {
+  baseUrl: 'https://sms.test/send',
+  loginName: 'aqd',
+  loginPassword: 'secret',
+  senderId: 'Aqd',
+};
+
+function makeService(
+  fake: FakePrisma,
+  { sms, isProduction = false }: { sms?: typeof SMS; isProduction?: boolean } = {},
+): OtpService {
   const config = {
     get: (ns: string) =>
-      ns === 'auth'
-        ? { otpTtlMinutes: 10, otpMaxAttempts: 3 }
-        : { isProduction: false },
+      ({
+        auth: { otpTtlMinutes: 10, otpMaxAttempts: 3 },
+        app: { isProduction },
+        sms,
+      })[ns],
   } as unknown as ConfigService;
   return new OtpService(fake as unknown as PrismaService, config);
 }
 
+const PHONE = '+962791234567';
+const OTHER_PHONE = '+962781234567';
+const UNKNOWN_PHONE = '+962771234567';
+
 describe('OtpService', () => {
-  it('infers the channel from the destination shape', () => {
-    const service = makeService(new FakePrisma());
-    expect(service.channelFor('user@example.com')).toBe('email');
-    expect(service.channelFor('+962790000000')).toBe('sms');
+  beforeEach(() => jest.mocked(sendNgtSms).mockClear());
+
+  it('texts the code through the gateway when it is configured', async () => {
+    const service = makeService(new FakePrisma(), { sms: SMS });
+    await service.issue(PHONE, 'phoneVerification', 'u1');
+    const code = service.peekDevCode(PHONE)!;
+
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(sendNgtSms).toHaveBeenCalledWith(SMS, PHONE, smsText(code));
+  });
+
+  it('never texts a number that has no account', async () => {
+    const service = makeService(new FakePrisma(), { sms: SMS });
+    await service.issue(UNKNOWN_PHONE, 'passwordReset', null);
+
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(sendNgtSms).not.toHaveBeenCalled();
+  });
+
+  it('does not fail the request when the gateway fails', async () => {
+    jest.mocked(sendNgtSms).mockRejectedValueOnce(new Error('timeout'));
+    const service = makeService(new FakePrisma(), { sms: SMS });
+
+    await expect(
+      service.issue(PHONE, 'phoneVerification', 'u1'),
+    ).resolves.toBeUndefined();
+  });
+
+  it('keeps no readable code in production', async () => {
+    const service = makeService(new FakePrisma(), { sms: SMS, isProduction: true });
+    await service.issue(PHONE, 'phoneVerification', 'u1');
+
+    expect(service.peekDevCode(PHONE)).toBeUndefined();
+  });
+
+  it('fits the message in one SMS segment', () => {
+    expect(smsText('123456').length).toBeLessThanOrEqual(70);
+    expect(smsText('123456')).toContain('123456');
   });
 
   it('issues a 6-digit code, then verifies and consumes it', async () => {
     const fake = new FakePrisma();
     const service = makeService(fake);
 
-    await service.issue('user@example.com', 'passwordReset', 'u1');
-    const code = service.peekDevCode('user@example.com')!;
+    await service.issue(PHONE, 'passwordReset', 'u1');
+    const code = service.peekDevCode(PHONE)!;
     expect(code).toMatch(/^\d{6}$/);
     expect(fake.rows[0].codeHash).toBe(
       createHash('sha256').update(code).digest('hex'),
     );
 
-    expect(await service.verify('user@example.com', code, 'passwordReset')).toEqual({
+    expect(await service.verify(PHONE, code, 'passwordReset')).toEqual({
       valid: true,
       userId: 'u1',
     });
 
     const consumed = await service.consume(
-      'user@example.com',
+      PHONE,
       code,
       'passwordReset',
     );
@@ -161,25 +216,25 @@ describe('OtpService', () => {
 
     // consumed — no longer usable
     expect(
-      (await service.verify('user@example.com', code, 'passwordReset')).valid,
+      (await service.verify(PHONE, code, 'passwordReset')).valid,
     ).toBe(false);
   });
 
   it('locks out after the configured number of failed attempts', async () => {
     const fake = new FakePrisma();
     const service = makeService(fake);
-    await service.issue('user@example.com', 'passwordReset', 'u1');
+    await service.issue(PHONE, 'passwordReset', 'u1');
 
     for (let i = 0; i < 3; i++) {
       expect(
-        (await service.verify('user@example.com', '000000', 'passwordReset'))
+        (await service.verify(PHONE, '000000', 'passwordReset'))
           .valid,
       ).toBe(false);
     }
 
-    const code = service.peekDevCode('user@example.com')!;
+    const code = service.peekDevCode(PHONE)!;
     const locked = await service
-      .verify('user@example.com', code, 'passwordReset')
+      .verify(PHONE, code, 'passwordReset')
       .catch((e: unknown) => e);
     expect(locked).toBeInstanceOf(UnprocessableEntityException);
     expect((locked as UnprocessableEntityException).getResponse()).toMatchObject(
@@ -190,15 +245,15 @@ describe('OtpService', () => {
   it('with a userId, ignores a code issued to another account', async () => {
     const fake = new FakePrisma();
     const service = makeService(fake);
-    await service.issue('user@example.com', 'emailVerification', 'u1');
-    const code = service.peekDevCode('user@example.com')!;
+    await service.issue(PHONE, 'phoneVerification', 'u1');
+    const code = service.peekDevCode(PHONE)!;
 
     expect(
-      (await service.verify('user@example.com', code, 'emailVerification', 'u2'))
+      (await service.verify(PHONE, code, 'phoneVerification', 'u2'))
         .valid,
     ).toBe(false);
     expect(
-      (await service.consume('user@example.com', code, 'emailVerification', 'u1'))
+      (await service.consume(PHONE, code, 'phoneVerification', 'u1'))
         .valid,
     ).toBe(true);
   });
@@ -207,14 +262,14 @@ describe('OtpService', () => {
     const fake = new FakePrisma();
     const service = makeService(fake);
     const since = new Date(Date.now() - 1000);
-    await service.issue('a@example.com', 'emailVerification', 'u1');
-    await service.issue('a@example.com', 'passwordReset', 'u1');
-    await service.issue('a@example.com', 'emailVerification', 'u1');
-    await service.issue('b@example.com', 'emailVerification', 'u2');
+    await service.issue(PHONE, 'phoneVerification', 'u1');
+    await service.issue(PHONE, 'passwordReset', 'u1');
+    await service.issue(PHONE, 'phoneVerification', 'u1');
+    await service.issue(OTHER_PHONE, 'phoneVerification', 'u2');
 
     const times = await service.issuedSince(
       { userId: 'u1' },
-      'emailVerification',
+      'phoneVerification',
       since,
     );
 
@@ -222,16 +277,16 @@ describe('OtpService', () => {
     expect(times[0].getTime()).toBeLessThan(times[1].getTime());
   });
 
-  it('lists issue times for an address, with or without an account', async () => {
+  it('lists issue times for a number, with or without an account', async () => {
     const fake = new FakePrisma();
     const service = makeService(fake);
     const since = new Date(Date.now() - 1000);
-    await service.issue('nobody@example.com', 'passwordReset', null);
-    await service.issue('nobody@example.com', 'passwordReset', null);
-    await service.issue('user@example.com', 'passwordReset', 'u1');
+    await service.issue(UNKNOWN_PHONE, 'passwordReset', null);
+    await service.issue(UNKNOWN_PHONE, 'passwordReset', null);
+    await service.issue(PHONE, 'passwordReset', 'u1');
 
     const times = await service.issuedSince(
-      { destination: 'nobody@example.com' },
+      { destination: UNKNOWN_PHONE },
       'passwordReset',
       since,
     );
@@ -242,18 +297,18 @@ describe('OtpService', () => {
   it('does not count a right code as a try', async () => {
     const fake = new FakePrisma();
     const service = makeService(fake);
-    await service.issue('user@example.com', 'passwordReset', 'u1');
-    const code = service.peekDevCode('user@example.com')!;
+    await service.issue(PHONE, 'passwordReset', 'u1');
+    const code = service.peekDevCode(PHONE)!;
 
     // Two wrong tries, then the code screen and the reset step both check
     // the right code — with 3 tries allowed, none of that locks it.
-    await service.verify('user@example.com', '000000', 'passwordReset');
-    await service.verify('user@example.com', '000001', 'passwordReset');
+    await service.verify(PHONE, '000000', 'passwordReset');
+    await service.verify(PHONE, '000001', 'passwordReset');
     expect(
-      (await service.verify('user@example.com', code, 'passwordReset')).valid,
+      (await service.verify(PHONE, code, 'passwordReset')).valid,
     ).toBe(true);
     expect(
-      (await service.consume('user@example.com', code, 'passwordReset')).valid,
+      (await service.consume(PHONE, code, 'passwordReset')).valid,
     ).toBe(true);
     expect(fake.rows[0].attemptCount).toBe(2);
   });
@@ -261,12 +316,12 @@ describe('OtpService', () => {
   it('lets only one of two parallel requests consume a code', async () => {
     const fake = new FakePrisma();
     const service = makeService(fake);
-    await service.issue('user@example.com', 'passwordReset', 'u1');
-    const code = service.peekDevCode('user@example.com')!;
+    await service.issue(PHONE, 'passwordReset', 'u1');
+    const code = service.peekDevCode(PHONE)!;
 
     const results = await Promise.all([
-      service.consume('user@example.com', code, 'passwordReset'),
-      service.consume('user@example.com', code, 'passwordReset'),
+      service.consume(PHONE, code, 'passwordReset'),
+      service.consume(PHONE, code, 'passwordReset'),
     ]);
 
     expect(results.filter((r) => r.valid)).toHaveLength(1);
@@ -275,14 +330,14 @@ describe('OtpService', () => {
   it('never gives parallel guesses more than the allowed tries', async () => {
     const fake = new FakePrisma();
     const service = makeService(fake);
-    await service.issue('user@example.com', 'passwordReset', 'u1');
-    const code = Number(service.peekDevCode('user@example.com'));
+    await service.issue(PHONE, 'passwordReset', 'u1');
+    const code = Number(service.peekDevCode(PHONE));
     const wrong = (i: number) =>
       String((code + 1 + i) % 1_000_000).padStart(6, '0');
 
     const outcomes = await Promise.allSettled(
       Array.from({ length: 10 }, (_, i) =>
-        service.verify('user@example.com', wrong(i), 'passwordReset'),
+        service.verify(PHONE, wrong(i), 'passwordReset'),
       ),
     );
 
@@ -293,12 +348,12 @@ describe('OtpService', () => {
   it('treats an expired code as invalid', async () => {
     const fake = new FakePrisma();
     const service = makeService(fake);
-    await service.issue('user@example.com', 'passwordReset', 'u1');
-    const code = service.peekDevCode('user@example.com')!;
+    await service.issue(PHONE, 'passwordReset', 'u1');
+    const code = service.peekDevCode(PHONE)!;
     fake.rows[0].expiresAt = new Date(Date.now() - 1000);
 
     expect(
-      (await service.verify('user@example.com', code, 'passwordReset')).valid,
+      (await service.verify(PHONE, code, 'passwordReset')).valid,
     ).toBe(false);
   });
 });

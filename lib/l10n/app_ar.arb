@@ -38,6 +38,7 @@
   "authEmailOrPhoneLabel": "البريد الإلكتروني أو رقم الهاتف",
   "authPasswordLabel": "كلمة المرور",
   "authPhoneLabel": "رقم الهاتف",
+  "authPhoneHint": "07XXXXXXXX",
   "authLoginSubmit": "دخول",
   "authForgotPassword": "نسيت كلمة المرور؟",
   "authNoAccount": "ليس لديك حساب؟",
@@ -68,21 +69,21 @@
   "authPrivacyPolicy": "سياسة الخصوصية",
   "authTermsCheckboxPrefix": "أوافق على ",
   "authPasswordRulesHint": "8 أحرف على الأقل، وتحتوي على حرف ورقم",
-  "authVerifyEmailTitle": "تأكيد البريد الإلكتروني",
-  "authVerifyEmailSubtitle": "أرسلنا رمزًا مكونًا من 6 أرقام إلى {email}",
-  "@authVerifyEmailSubtitle": {
+  "authVerifyPhoneTitle": "تأكيد رقم الهاتف",
+  "authVerifyPhoneSubtitle": "أرسلنا رسالة نصية فيها رمز من 6 أرقام إلى {phone}",
+  "@authVerifyPhoneSubtitle": {
     "placeholders": {
-      "email": {"type": "String"}
+      "phone": {"type": "String"}
     }
   },
-  "authVerifyEmailLater": "لاحقًا",
-  "authVerifyEmailResent": "تم إرسال رمز جديد",
-  "emailVerificationBannerMessage": "بريدك الإلكتروني غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وإضافة التقييمات",
-  "emailVerificationBannerAction": "تأكيد الآن",
+  "authVerifyPhoneLater": "لاحقًا",
+  "authCodeResent": "تم إرسال رمز جديد",
+  "phoneVerificationBannerMessage": "رقم هاتفك غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وتوقيع العقود وإضافة التقييمات",
+  "phoneVerificationBannerAction": "تأكيد الآن",
 
   "authForgotPasswordTitle": "نسيت كلمة المرور؟",
-  "authForgotPasswordSubtitle": "أدخل البريد الإلكتروني لحسابك وسنرسل لك رمز تحقق",
-  "authEmailInfo": "إذا كان البريد مسجلًا لدينا فسيصلك رمز من 6 أرقام خلال دقائق. إن لم تجده فتحقق من مجلد الرسائل غير المرغوب فيها",
+  "authForgotPasswordSubtitle": "أدخل رقم الهاتف المسجَّل في حسابك وسنرسل لك رمز تحقق برسالة نصية",
+  "authPhoneInfo": "إذا كان الرقم مسجلًا لدينا فسيصلك رمز من 6 أرقام برسالة نصية خلال دقائق",
   "authSendCode": "إرسال رمز التحقق",
   "authRememberPassword": "تذكرت كلمة المرور؟",
   "authResend": "إعادة الإرسال",
@@ -132,7 +133,7 @@
 
   "errorGeneric": "حدث خطأ غير متوقع",
   "errorNetwork": "تعذّر الاتصال بالشبكة، تحقق من الاتصال بالإنترنت",
-  "errorInvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+  "errorInvalidCredentials": "رقم الهاتف أو كلمة المرور غير صحيحة",
   "errorServer": "حدث خطأ في الخادم، حاول لاحقًا",
   "errorTimeout": "انتهت مهلة الاتصال",
   "errorTooManyAttempts": "محاولات كثيرة، يرجى المحاولة لاحقًا",
@@ -144,8 +145,9 @@
     }
   },
   "errorAccountInactive": "هذا الحساب غير مفعّل، يرجى التواصل مع الدعم",
-  "errorEmailNotVerified": "أكّد بريدك الإلكتروني أولًا لإتمام هذا الإجراء",
+  "errorPhoneNotVerified": "أكّد رقم هاتفك أولًا لإتمام هذا الإجراء",
   "errorEmailAlreadyRegistered": "هذا البريد الإلكتروني مسجَّل مسبقًا",
+  "errorPhoneAlreadyRegistered": "رقم الهاتف هذا مسجَّل في حساب آخر",
   "errorCommercialRegistrationTaken": "رقم السجل التجاري مستخدم في حساب آخر",
   "errorBarLicenseTaken": "رقم إجازة المحاماة مستخدم في حساب آخر",
   "errorTermsVersionOutdated": "تم تحديث شروط الخدمة، حدّث التطبيق ثم حاول مجددًا",
@@ -157,6 +159,7 @@
   "validationInvalidEmail": "صيغة البريد الإلكتروني غير صحيحة",
   "validationPasswordTooShort": "كلمة المرور يجب ألا تقل عن 8 أحرف",
   "validationInvalidPhone": "رقم الهاتف غير صحيح",
+  "validationInvalidJordanMobile": "أدخل رقم موبايل أردني صحيح، مثل 0791234567",
   "validationInvalidValue": "القيمة المدخلة غير صحيحة",
   "validationPasswordNeedsLetterAndDigit": "كلمة المرور يجب أن تحتوي على حرف ورقم على الأقل",
   "validationPasswordTooLong": "كلمة المرور طويلة جدًا",

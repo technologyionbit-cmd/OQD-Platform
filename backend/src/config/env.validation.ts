@@ -1,5 +1,13 @@
 import * as Joi from 'joi';
 
+function smsRequiredInProduction() {
+  return Joi.string().when('NODE_ENV', {
+    is: 'production',
+    then: Joi.required(),
+    otherwise: Joi.allow('').default(''),
+  });
+}
+
 /**
  * Validated at process startup via ConfigModule.forRoot({ validationSchema }).
  * Only variables actually consumed in the current phase are listed —
@@ -33,14 +41,15 @@ export const envValidationSchema = Joi.object({
   OTP_TTL_MINUTES: Joi.number().integer().min(1).default(10),
   OTP_MAX_ATTEMPTS: Joi.number().integer().min(1).default(5),
 
-  // NGT SMSPRO gateway (OTP over SMS). Leave the password empty to fall back
-  // to logging codes in the server log (dev only).
+  // NGT SMSPRO gateway: every code (phone verification, password reset) is
+  // texted. Required in production, where nothing else can deliver a code;
+  // elsewhere an empty password logs codes to the server log instead.
   NGT_SMS_BASE_URL: Joi.string()
     .uri()
     .default('https://sendsms.ngt.jo/http/send_sms_http.php'),
-  NGT_SMS_LOGIN_NAME: Joi.string().allow('').default(''),
-  NGT_SMS_LOGIN_PASSWORD: Joi.string().allow('').default(''),
-  NGT_SMS_SENDER_ID: Joi.string().allow('').default(''),
+  NGT_SMS_LOGIN_NAME: smsRequiredInProduction(),
+  NGT_SMS_LOGIN_PASSWORD: smsRequiredInProduction(),
+  NGT_SMS_SENDER_ID: smsRequiredInProduction(),
   LOGIN_MAX_ATTEMPTS: Joi.number().integer().min(1).default(10),
   LOGIN_ATTEMPT_WINDOW_MINUTES: Joi.number().integer().min(1).default(15),
   OTP_RESEND_COOLDOWN_SECONDS: Joi.number()

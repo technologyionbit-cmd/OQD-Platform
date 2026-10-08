@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import type { Server } from 'node:http';
 import request from 'supertest';
 import { createE2EApp } from './support/e2e-app';
-import { apiError, ok } from './support/e2e-helpers';
+import { apiError, ok, storedPhone, testPhone } from './support/e2e-helpers';
 import { OtpService } from '../src/auth/services/otp.service';
 import { DEFAULT_TERMS_VERSION } from '../src/config/configuration';
 
@@ -17,8 +17,9 @@ interface UserView {
   id: string;
   fullName: string;
   email: string;
+  phone: string;
   role: string;
-  emailVerified: boolean;
+  phoneVerified: boolean;
 }
 interface Tokens {
   accessToken: string;
@@ -39,7 +40,7 @@ describe('Auth (e2e)', () => {
   const individual = {
     accountType: 'individual',
     fullName: 'Ahmad Client',
-    phone: '0791234567',
+    phone: testPhone(),
     email: `ahmad.${tag}@test.com`,
     password: 'Password123',
     ...terms,
@@ -48,7 +49,7 @@ describe('Auth (e2e)', () => {
     accountType: 'company',
     companyName: 'Rowad Legal',
     commercialRegistrationNumber: `CR-${tag}`,
-    phone: '0791111111',
+    phone: testPhone(),
     email: `company.${tag}@test.com`,
     password: 'Password123',
     ...terms,
@@ -58,7 +59,7 @@ describe('Auth (e2e)', () => {
     fullName: 'Sara Lawyer',
     barLicenseNumber: `BAR-${tag}`,
     mainSpecialty: 'commercial',
-    phone: '0792222222',
+    phone: testPhone(),
     email: `lawyer.${tag}@test.com`,
     password: 'Password123',
     ...terms,
@@ -84,8 +85,8 @@ describe('Auth (e2e)', () => {
     await app.close();
   });
 
-  const login = (email: string, password: string) =>
-    request(http).post('/v1/auth/login').send({ email, password });
+  const login = (phone: string, password: string) =>
+    request(http).post('/v1/auth/login').send({ phone, password });
 
   describe('registration', () => {
     it('registers an individual and returns user + tokens', async () => {
@@ -97,9 +98,10 @@ describe('Auth (e2e)', () => {
       const data = ok<{ user: UserView; tokens: Tokens }>(res);
       expect(data.user).toMatchObject({
         email: individual.email,
+        phone: storedPhone(individual.phone),
         role: 'client',
         fullName: individual.fullName,
-        emailVerified: false,
+        phoneVerified: false,
       });
 
       const stored = await prisma.user.findUnique({
@@ -109,6 +111,12 @@ describe('Auth (e2e)', () => {
       expect(stored?.termsAcceptedAt).toBeInstanceOf(Date);
       expect(typeof data.tokens.accessToken).toBe('string');
       expect(typeof data.tokens.refreshToken).toBe('string');
+    });
+
+    it('texts the sign-up code to the normalized number', () => {
+      expect(
+        app.get(OtpService).peekDevCode(storedPhone(individual.phone)),
+      ).toMatch(/^\d{6}$/);
     });
 
     it('registers a company and auto-creates the organization + owner member', async () => {
@@ -151,16 +159,49 @@ describe('Auth (e2e)', () => {
     it('rejects a duplicate email with EMAIL_ALREADY_REGISTERED on the email field', async () => {
       const res = await request(http)
         .post('/v1/auth/register')
-        .send({ ...individual, email: individual.email.toUpperCase() });
+        .send({
+          ...individual,
+          phone: testPhone(),
+          email: individual.email.toUpperCase(),
+        });
       expect(res.status).toBe(422);
       expect(apiError(res).code).toBe('EMAIL_ALREADY_REGISTERED');
       expect(apiError(res).errors?.email).toBeDefined();
     });
 
+    it('rejects a number already in use, in any spelling, with PHONE_ALREADY_REGISTERED', async () => {
+      const res = await request(http)
+        .post('/v1/auth/register')
+        .send({
+          ...individual,
+          email: `samephone.${tag}@test.com`,
+          phone: storedPhone(individual.phone),
+        });
+      expect(res.status).toBe(422);
+      expect(apiError(res).code).toBe('PHONE_ALREADY_REGISTERED');
+      expect(apiError(res).errors?.phone).toBeDefined();
+    });
+
+    it('rejects a number that is not a Jordanian mobile', async () => {
+      const res = await request(http)
+        .post('/v1/auth/register')
+        .send({
+          ...individual,
+          email: `badphone.${tag}@test.com`,
+          phone: '+966501234567',
+        });
+      expect(res.status).toBe(422);
+      expect(apiError(res).errors?.phone).toBeDefined();
+    });
+
     it('rejects a taken commercial registration number with its own code', async () => {
       const res = await request(http)
         .post('/v1/auth/register')
-        .send({ ...company, email: `company2.${tag}@test.com` });
+        .send({
+          ...company,
+          phone: testPhone(),
+          email: `company2.${tag}@test.com`,
+        });
       expect(res.status).toBe(422);
       expect(apiError(res).code).toBe('COMMERCIAL_REGISTRATION_TAKEN');
       expect(apiError(res).errors?.commercialRegistrationNumber).toBeDefined();
@@ -169,7 +210,11 @@ describe('Auth (e2e)', () => {
     it('rejects a taken bar license number with its own code', async () => {
       const res = await request(http)
         .post('/v1/auth/register')
-        .send({ ...lawyer, email: `lawyer2.${tag}@test.com` });
+        .send({
+          ...lawyer,
+          phone: testPhone(),
+          email: `lawyer2.${tag}@test.com`,
+        });
       expect(res.status).toBe(422);
       expect(apiError(res).code).toBe('BAR_LICENSE_TAKEN');
       expect(apiError(res).errors?.barLicenseNumber).toBeDefined();
@@ -226,41 +271,55 @@ describe('Auth (e2e)', () => {
   });
 
   describe('login + session lifecycle', () => {
-    it('logs in with valid credentials', async () => {
-      const res = await login(individual.email, individual.password);
+    it('logs in with the phone number in any spelling', async () => {
+      const res = await login(individual.phone, individual.password);
       expect(res.status).toBe(200);
       expect(ok<{ user: UserView }>(res).user.email).toBe(individual.email);
+
+      const international = await login(
+        storedPhone(individual.phone),
+        individual.password,
+      );
+      expect(international.status).toBe(200);
+    });
+
+    it('no longer signs in with the email', async () => {
+      const res = await request(http)
+        .post('/v1/auth/login')
+        .send({ email: individual.email, password: individual.password });
+      expect(res.status).toBe(422);
     });
 
     it('returns a generic 401 for a bad password', async () => {
-      const res = await login(individual.email, 'WrongPass123');
+      const res = await login(individual.phone, 'WrongPass123');
       expect(res.status).toBe(401);
       expect(apiError(res).code).toBe('UNAUTHORIZED');
     });
 
-    it('answers an unknown email exactly like a wrong password', async () => {
-      const unknown = await login(`nobody.${tag}@test.com`, 'WrongPass123');
-      const wrongPassword = await login(individual.email, 'WrongPass123');
+    it('answers an unknown number exactly like a wrong password', async () => {
+      const unknown = await login(testPhone(), 'WrongPass123');
+      const wrongPassword = await login(individual.phone, 'WrongPass123');
 
       expect(unknown.status).toBe(401);
       expect(unknown.body).toEqual(wrongPassword.body);
     });
 
-    it('limits attempts per email regardless of IP, with Retry-After', async () => {
-      // An unknown email on purpose: the limit must behave identically for
+    it('limits attempts per number regardless of IP, with Retry-After', async () => {
+      // An unknown number on purpose: the limit must behave identically for
       // accounts that don't exist, or it would reveal which ones do.
-      const target = `bruteforce.${tag}@test.com`;
+      const target = testPhone();
       for (let i = 0; i < 10; i++) {
         expect((await login(target, `Guess${i}pass`)).status).toBe(401);
       }
 
-      const blocked = await login(target, 'Guess10pass');
+      // Another spelling of the same number shares the counter.
+      const blocked = await login(storedPhone(target), 'Guess10pass');
 
       expect(blocked.status).toBe(429);
       expect(apiError(blocked).code).toBe('TOO_MANY_REQUESTS');
       expect(Number(blocked.headers['retry-after'])).toBeGreaterThan(0);
       // Other accounts are unaffected.
-      expect((await login(individual.email, individual.password)).status).toBe(
+      expect((await login(individual.phone, individual.password)).status).toBe(
         200,
       );
     });
@@ -271,12 +330,12 @@ describe('Auth (e2e)', () => {
         data: { status: 'suspended' },
       });
       try {
-        const res = await login(company.email, company.password);
+        const res = await login(company.phone, company.password);
         expect(res.status).toBe(403);
         expect(apiError(res).code).toBe('ACCOUNT_INACTIVE');
 
         // Without the right password it stays an indistinguishable 401.
-        const guess = await login(company.email, 'WrongPass123');
+        const guess = await login(company.phone, 'WrongPass123');
         expect(guess.status).toBe(401);
       } finally {
         await prisma.user.update({
@@ -287,7 +346,7 @@ describe('Auth (e2e)', () => {
     });
 
     it('refreshes, rotates the refresh token, and detects reuse', async () => {
-      const session = await login(individual.email, individual.password);
+      const session = await login(individual.phone, individual.password);
       const oldRefresh = ok<{ tokens: Tokens }>(session).tokens.refreshToken;
 
       const refreshed = await request(http)
@@ -334,7 +393,7 @@ describe('Auth (e2e)', () => {
       const anon = await request(http).get('/v1/auth/me');
       expect(anon.status).toBe(401);
 
-      const session = await login(individual.email, individual.password);
+      const session = await login(individual.phone, individual.password);
       const me = await request(http)
         .get('/v1/auth/me')
         .set(
@@ -346,8 +405,8 @@ describe('Auth (e2e)', () => {
     });
 
     it('lists active sessions and revokes the others', async () => {
-      const first = await login(lawyer.email, lawyer.password);
-      await login(lawyer.email, lawyer.password);
+      const first = await login(lawyer.phone, lawyer.password);
+      await login(lawyer.phone, lawyer.password);
       const access = ok<{ tokens: Tokens }>(first).tokens.accessToken;
 
       const list = await request(http)
@@ -369,37 +428,37 @@ describe('Auth (e2e)', () => {
     });
   });
 
-  describe('password reset (emailed code)', () => {
-    const forgot = (email: string) =>
-      request(http).post('/v1/auth/password/forgot').send({ email });
+  describe('password reset (texted code)', () => {
+    const forgot = (phone: string) =>
+      request(http).post('/v1/auth/password/forgot').send({ phone });
 
-    it('runs forgot -> verify -> reset, verifies the email and ends old sessions', async () => {
-      const session = await login(company.email, company.password);
+    it('runs forgot -> verify -> reset, verifies the phone and ends old sessions', async () => {
+      const session = await login(company.phone, company.password);
       const staleAccess = ok<{ tokens: Tokens }>(session).tokens.accessToken;
-      expect(ok<{ user: UserView }>(session).user.emailVerified).toBe(false);
+      expect(ok<{ user: UserView }>(session).user.phoneVerified).toBe(false);
 
-      // Addresses are matched case-insensitively.
-      const sent = await forgot(company.email.toUpperCase());
+      // Any spelling of the number reaches the same account.
+      const sent = await forgot(storedPhone(company.phone));
       expect(sent.status).toBe(204);
 
-      const code = app.get(OtpService).peekDevCode(company.email)!;
+      const code = app.get(OtpService).peekDevCode(storedPhone(company.phone))!;
       expect(code).toMatch(/^\d{6}$/);
       const wrong = code === '000000' ? '111111' : '000000';
 
       const badVerify = await request(http)
         .post('/v1/auth/password/verify-otp')
-        .send({ email: company.email, code: wrong });
+        .send({ phone: company.phone, code: wrong });
       expect(badVerify.status).toBe(422);
       expect(apiError(badVerify).code).toBe('INVALID_VERIFICATION_CODE');
 
       const goodVerify = await request(http)
         .post('/v1/auth/password/verify-otp')
-        .send({ email: company.email, code });
+        .send({ phone: company.phone, code });
       expect(goodVerify.status).toBe(204);
 
       const reset = await request(http)
         .post('/v1/auth/password/reset')
-        .send({ email: company.email, code, newPassword: 'Rotated123' });
+        .send({ phone: company.phone, code, newPassword: 'Rotated123' });
       expect(reset.status).toBe(204);
       company.password = 'Rotated123';
 
@@ -408,21 +467,21 @@ describe('Auth (e2e)', () => {
         .set('authorization', `Bearer ${staleAccess}`);
       expect(stale.status).toBe(401);
 
-      const fresh = await login(company.email, 'Rotated123');
+      const fresh = await login(company.phone, 'Rotated123');
       expect(fresh.status).toBe(200);
-      expect(ok<{ user: UserView }>(fresh).user.emailVerified).toBe(true);
+      expect(ok<{ user: UserView }>(fresh).user.phoneVerified).toBe(true);
 
       // The code is used up.
       const reused = await request(http)
         .post('/v1/auth/password/reset')
-        .send({ email: company.email, code, newPassword: 'Rotated456' });
+        .send({ phone: company.phone, code, newPassword: 'Rotated456' });
       expect(reused.status).toBe(422);
       expect(apiError(reused).code).toBe('INVALID_VERIFICATION_CODE');
     });
 
     it('rejects a reset with a wrong code (422 INVALID_VERIFICATION_CODE)', async () => {
       const res = await request(http).post('/v1/auth/password/reset').send({
-        email: company.email,
+        phone: company.phone,
         code: '000000',
         newPassword: 'Rotated999',
       });
@@ -430,53 +489,60 @@ describe('Auth (e2e)', () => {
       expect(apiError(res).code).toBe('INVALID_VERIFICATION_CODE');
     });
 
-    it('answers an unknown address with 204 and sends it nothing usable', async () => {
-      const email = `nobody.${tag}@test.com`;
-      expect((await forgot(email)).status).toBe(204);
+    it('answers an unknown number with 204 and sends it nothing usable', async () => {
+      const phone = testPhone();
+      expect((await forgot(phone)).status).toBe(204);
 
-      // Even the stored code resets nothing: no account owns the address.
-      const code = app.get(OtpService).peekDevCode(email)!;
+      // Even the stored code resets nothing: no account owns the number.
+      const code = app.get(OtpService).peekDevCode(storedPhone(phone))!;
       const res = await request(http)
         .post('/v1/auth/password/reset')
-        .send({ email, code, newPassword: 'Rotated123' });
+        .send({ phone, code, newPassword: 'Rotated123' });
       expect(res.status).toBe(422);
       expect(apiError(res).code).toBe('INVALID_VERIFICATION_CODE');
     });
 
-    it('limits sends per address the same way for unknown addresses', async () => {
-      const email = `nobody.limit.${tag}@test.com`;
-      expect((await forgot(email)).status).toBe(204);
+    it('limits sends per number the same way for unknown numbers', async () => {
+      const phone = testPhone();
+      expect((await forgot(phone)).status).toBe(204);
 
-      const again = await forgot(email);
+      const again = await forgot(storedPhone(phone));
       expect(again.status).toBe(429);
       expect(Number(again.headers['retry-after'])).toBeGreaterThan(0);
     });
 
-    it('refuses anything but an email address', async () => {
-      const res = await forgot('+962790000000');
+    it('refuses anything but a Jordanian mobile number', async () => {
+      const res = await request(http)
+        .post('/v1/auth/password/forgot')
+        .send({ email: individual.email });
       expect(res.status).toBe(422);
       expect(apiError(res).code).toBe('VALIDATION_ERROR');
-      expect(apiError(res).errors?.email).toBeDefined();
+
+      const landline = await forgot('065000000');
+      expect(landline.status).toBe(422);
+      expect(apiError(landline).errors?.phone).toBeDefined();
     });
   });
 
-  describe('email verification', () => {
+  describe('phone verification', () => {
     const verifier = {
       ...individual,
       fullName: 'Verify Me',
+      phone: testPhone(),
       email: `verifier.${tag}@test.com`,
     };
+    const verifierPhone = storedPhone(verifier.phone);
     let access = '';
     const auth = () => ({ authorization: `Bearer ${access}` });
     const someId = '00000000-0000-4000-8000-000000000000';
 
-    /** Moves every code of this account back in time, as if the cooldown
-     *  had passed, without the spec having to wait. */
-    const ageCodes = async (email: string, seconds: number) => {
+    /** Moves every code for [phone] back in time, as if the cooldown had
+     *  passed, without the spec having to wait. */
+    const ageCodes = async (phone: string, seconds: number) => {
       await prisma.$executeRaw`
         UPDATE verification_codes
         SET created_at = created_at - make_interval(secs => ${seconds})
-        WHERE destination = ${email}`;
+        WHERE destination = ${phone}`;
     };
 
     beforeAll(async () => {
@@ -484,20 +550,20 @@ describe('Auth (e2e)', () => {
       access = ok<{ tokens: Tokens }>(res).tokens.accessToken;
     });
 
-    it('blocks sensitive actions with 403 EMAIL_NOT_VERIFIED until verified', async () => {
+    it('blocks sensitive actions with 403 PHONE_NOT_VERIFIED until verified', async () => {
       const book = await request(http)
         .post('/v1/consultations')
         .set(auth())
         .send({});
       expect(book.status).toBe(403);
-      expect(apiError(book).code).toBe('EMAIL_NOT_VERIFIED');
+      expect(apiError(book).code).toBe('PHONE_NOT_VERIFIED');
 
       const review = await request(http)
         .post(`/v1/consultations/${someId}/reviews`)
         .set(auth())
         .send({});
       expect(review.status).toBe(403);
-      expect(apiError(review).code).toBe('EMAIL_NOT_VERIFIED');
+      expect(apiError(review).code).toBe('PHONE_NOT_VERIFIED');
 
       // Everything else keeps working.
       const list = await request(http).get('/v1/consultations').set(auth());
@@ -506,16 +572,24 @@ describe('Auth (e2e)', () => {
 
     it('requires a session for verify and resend', async () => {
       const verify = await request(http)
-        .post('/v1/auth/email/verify')
+        .post('/v1/auth/phone/verify')
         .send({ code: '123456' });
       expect(verify.status).toBe(401);
 
-      const resend = await request(http).post('/v1/auth/email/resend');
+      const resend = await request(http).post('/v1/auth/phone/resend');
       expect(resend.status).toBe(401);
     });
 
+    it('no longer serves the email verification endpoints', async () => {
+      const res = await request(http)
+        .post('/v1/auth/email/verify')
+        .set(auth())
+        .send({ code: '123456' });
+      expect(res.status).toBe(404);
+    });
+
     it('refuses a resend inside the cooldown with 429 + Retry-After', async () => {
-      const res = await request(http).post('/v1/auth/email/resend').set(auth());
+      const res = await request(http).post('/v1/auth/phone/resend').set(auth());
       expect(res.status).toBe(429);
       expect(apiError(res).code).toBe('TOO_MANY_REQUESTS');
       const retryAfter = Number(res.headers['retry-after']);
@@ -524,11 +598,11 @@ describe('Auth (e2e)', () => {
     });
 
     it('rejects a wrong code with INVALID_VERIFICATION_CODE', async () => {
-      const signUpCode = app.get(OtpService).peekDevCode(verifier.email);
+      const signUpCode = app.get(OtpService).peekDevCode(verifierPhone);
       const wrong = signUpCode === '000000' ? '111111' : '000000';
 
       const res = await request(http)
-        .post('/v1/auth/email/verify')
+        .post('/v1/auth/phone/verify')
         .set(auth())
         .send({ code: wrong });
       expect(res.status).toBe(422);
@@ -538,16 +612,16 @@ describe('Auth (e2e)', () => {
 
     it('resends after the cooldown and retires the previous code', async () => {
       const otp = app.get(OtpService);
-      const oldCode = otp.peekDevCode(verifier.email)!;
-      await ageCodes(verifier.email, 61);
+      const oldCode = otp.peekDevCode(verifierPhone)!;
+      await ageCodes(verifierPhone, 61);
 
-      const res = await request(http).post('/v1/auth/email/resend').set(auth());
+      const res = await request(http).post('/v1/auth/phone/resend').set(auth());
       expect(res.status).toBe(204);
 
-      const newCode = otp.peekDevCode(verifier.email)!;
+      const newCode = otp.peekDevCode(verifierPhone)!;
       if (newCode !== oldCode) {
         const stale = await request(http)
-          .post('/v1/auth/email/verify')
+          .post('/v1/auth/phone/verify')
           .set(auth())
           .send({ code: oldCode });
         expect(apiError(stale).code).toBe('INVALID_VERIFICATION_CODE');
@@ -555,17 +629,17 @@ describe('Auth (e2e)', () => {
     });
 
     it('verifies with the latest code and unlocks sensitive actions', async () => {
-      const code = app.get(OtpService).peekDevCode(verifier.email)!;
+      const code = app.get(OtpService).peekDevCode(verifierPhone)!;
 
       const res = await request(http)
-        .post('/v1/auth/email/verify')
+        .post('/v1/auth/phone/verify')
         .set(auth())
         .send({ code });
       expect(res.status).toBe(200);
-      expect(ok<{ user: UserView }>(res).user.emailVerified).toBe(true);
+      expect(ok<{ user: UserView }>(res).user.phoneVerified).toBe(true);
 
       const me = await request(http).get('/v1/auth/me').set(auth());
-      expect(ok<{ user: UserView }>(me).user.emailVerified).toBe(true);
+      expect(ok<{ user: UserView }>(me).user.phoneVerified).toBe(true);
 
       // Past the gate: the unknown consultation is now a plain 404.
       const review = await request(http)
@@ -577,27 +651,29 @@ describe('Auth (e2e)', () => {
 
     it('treats verify and resend as no-ops once verified', async () => {
       const again = await request(http)
-        .post('/v1/auth/email/verify')
+        .post('/v1/auth/phone/verify')
         .set(auth())
         .send({ code: '000000' });
       expect(again.status).toBe(200);
-      expect(ok<{ user: UserView }>(again).user.emailVerified).toBe(true);
+      expect(ok<{ user: UserView }>(again).user.phoneVerified).toBe(true);
 
       const resend = await request(http)
-        .post('/v1/auth/email/resend')
+        .post('/v1/auth/phone/resend')
         .set(auth());
       expect(resend.status).toBe(204);
     });
 
-    it('marks a changed email unverified again', async () => {
+    it('changes the email without any code and keeps the phone verified', async () => {
       const newEmail = `verifier.changed.${tag}@test.com`;
       const res = await request(http)
         .patch('/v1/auth/me')
         .set(auth())
         .send({ fullName: verifier.fullName, email: newEmail });
       expect(res.status).toBe(200);
-      expect(ok<{ user: UserView }>(res).user.emailVerified).toBe(false);
-      expect(app.get(OtpService).peekDevCode(newEmail)).toMatch(/^\d{6}$/);
+      expect(ok<{ user: UserView }>(res).user).toMatchObject({
+        email: newEmail,
+        phoneVerified: true,
+      });
     });
 
     it('refuses a profile email that another account uses', async () => {
@@ -610,7 +686,12 @@ describe('Auth (e2e)', () => {
     });
 
     it('caps codes per account per hour', async () => {
-      const capped = { ...individual, email: `capped.${tag}@test.com` };
+      const capped = {
+        ...individual,
+        phone: testPhone(),
+        email: `capped.${tag}@test.com`,
+      };
+      const cappedPhone = storedPhone(capped.phone);
       const reg = await request(http).post('/v1/auth/register').send(capped);
       const token = ok<{ tokens: Tokens }>(reg).tokens.accessToken;
       const user = ok<{ user: UserView }>(reg).user;
@@ -620,12 +701,12 @@ describe('Auth (e2e)', () => {
       for (let i = 0; i < 4; i++) {
         await app
           .get(OtpService)
-          .issue(capped.email, 'emailVerification', user.id);
+          .issue(cappedPhone, 'phoneVerification', user.id);
       }
-      await ageCodes(capped.email, 120);
+      await ageCodes(cappedPhone, 120);
 
       const res = await request(http)
-        .post('/v1/auth/email/resend')
+        .post('/v1/auth/phone/resend')
         .set('authorization', `Bearer ${token}`);
       expect(res.status).toBe(429);
       const retryAfter = Number(res.headers['retry-after']);
@@ -636,7 +717,7 @@ describe('Auth (e2e)', () => {
 
   describe('change password', () => {
     it('re-verifies the current password and keeps the caller signed in', async () => {
-      const session = await login(individual.email, individual.password);
+      const session = await login(individual.phone, individual.password);
       const access = ok<{ tokens: Tokens }>(session).tokens.accessToken;
 
       const wrong = await request(http)
@@ -659,7 +740,7 @@ describe('Auth (e2e)', () => {
         .set('authorization', `Bearer ${access}`);
       expect(stillMe.status).toBe(200);
 
-      const oldPw = await login(individual.email, individual.password);
+      const oldPw = await login(individual.phone, individual.password);
       expect(oldPw.status).toBe(401);
 
       individual.password = 'Changed123';

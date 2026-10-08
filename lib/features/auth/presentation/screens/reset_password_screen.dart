@@ -20,9 +20,9 @@ import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_success_state
 /// previous screen checked. Success signs the account out everywhere, so
 /// the user continues from the login screen.
 class ResetPasswordScreen extends ConsumerStatefulWidget {
-  const ResetPasswordScreen({super.key, required this.email, required this.code});
+  const ResetPasswordScreen({super.key, required this.phone, required this.code});
 
-  final String email;
+  final String phone;
   final String code;
 
   @override
@@ -65,7 +65,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
     final result = await ref
         .read(authRepositoryProvider)
-        .resetPassword(email: widget.email, code: widget.code, newPassword: _passwordController.text);
+        .resetPassword(phone: widget.phone, code: widget.code, newPassword: _passwordController.text);
     if (!mounted) return;
 
     setState(() {

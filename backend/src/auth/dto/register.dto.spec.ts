@@ -2,6 +2,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { ChangePasswordDto } from './credentials.dto';
 import { ResetPasswordDto } from './password-reset.dto';
+import { normalizeJordanMobile } from './phone.rules';
 import { RegisterDto } from './register.dto';
 
 const valid = {
@@ -53,6 +54,22 @@ describe('RegisterDto', () => {
     expect(await failedFields({ ...valid, password })).toEqual(['password']);
   });
 
+  it.each(['0791234567', '079 123 4567', '+962791234567', '00962791234567', '791234567'])(
+    'accepts the phone spelling %p and stores it as +962791234567',
+    async (phone) => {
+      const dto = plainToInstance(RegisterDto, { ...valid, phone });
+      expect((await validate(dto)).map((e) => e.property)).toEqual([]);
+      expect(dto.phone).toBe('+962791234567');
+    },
+  );
+
+  it.each(['0761234567', '079123456', '+966501234567', '07912345678', 'abc0791234567'])(
+    'rejects the phone %p (not a Jordanian mobile)',
+    async (phone) => {
+      expect(await failedFields({ ...valid, phone })).toEqual(['phone']);
+    },
+  );
+
   it.each(['short1', 'lettersonly', '12345678'])(
     'rejects the weak password %p',
     async (password) => {
@@ -77,11 +94,25 @@ describe('password byte limit on change and reset', () => {
   it('applies to ResetPasswordDto.newPassword', async () => {
     const errors = await validate(
       plainToInstance(ResetPasswordDto, {
-        email: 'a@test.com',
+        phone: '0791234567',
         code: '123456',
         newPassword: tooLong,
       }),
     );
     expect(errors.map((e) => e.property)).toEqual(['newPassword']);
+  });
+});
+
+describe('normalizeJordanMobile', () => {
+  it.each([
+    ['0781234567', '+962781234567'],
+    ['(077) 123-4567', '+962771234567'],
+    ['962791234567', '+962791234567'],
+  ])('%p -> %p', (raw, normalized) => {
+    expect(normalizeJordanMobile(raw)).toBe(normalized);
+  });
+
+  it.each(['', '0791234567x', '+1 202 555 0100'])('%p -> null', (raw) => {
+    expect(normalizeJordanMobile(raw)).toBeNull();
   });
 });

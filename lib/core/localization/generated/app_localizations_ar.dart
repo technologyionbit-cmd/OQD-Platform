@@ -81,6 +81,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authPhoneLabel => 'رقم الهاتف';
 
   @override
+  String get authPhoneHint => '07XXXXXXXX';
+
+  @override
   String get authLoginSubmit => 'دخول';
 
   @override
@@ -155,36 +158,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authPasswordRulesHint => '8 أحرف على الأقل، وتحتوي على حرف ورقم';
 
   @override
-  String get authVerifyEmailTitle => 'تأكيد البريد الإلكتروني';
+  String get authVerifyPhoneTitle => 'تأكيد رقم الهاتف';
 
   @override
-  String authVerifyEmailSubtitle(String email) {
-    return 'أرسلنا رمزًا مكونًا من 6 أرقام إلى $email';
+  String authVerifyPhoneSubtitle(String phone) {
+    return 'أرسلنا رسالة نصية فيها رمز من 6 أرقام إلى $phone';
   }
 
   @override
-  String get authVerifyEmailLater => 'لاحقًا';
+  String get authVerifyPhoneLater => 'لاحقًا';
 
   @override
-  String get authVerifyEmailResent => 'تم إرسال رمز جديد';
+  String get authCodeResent => 'تم إرسال رمز جديد';
 
   @override
-  String get emailVerificationBannerMessage =>
-      'بريدك الإلكتروني غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وإضافة التقييمات';
+  String get phoneVerificationBannerMessage =>
+      'رقم هاتفك غير مؤكَّد. أكّده لتتمكن من حجز الاستشارات وتوقيع العقود وإضافة التقييمات';
 
   @override
-  String get emailVerificationBannerAction => 'تأكيد الآن';
+  String get phoneVerificationBannerAction => 'تأكيد الآن';
 
   @override
   String get authForgotPasswordTitle => 'نسيت كلمة المرور؟';
 
   @override
   String get authForgotPasswordSubtitle =>
-      'أدخل البريد الإلكتروني لحسابك وسنرسل لك رمز تحقق';
+      'أدخل رقم الهاتف المسجَّل في حسابك وسنرسل لك رمز تحقق برسالة نصية';
 
   @override
-  String get authEmailInfo =>
-      'إذا كان البريد مسجلًا لدينا فسيصلك رمز من 6 أرقام خلال دقائق. إن لم تجده فتحقق من مجلد الرسائل غير المرغوب فيها';
+  String get authPhoneInfo =>
+      'إذا كان الرقم مسجلًا لدينا فسيصلك رمز من 6 أرقام برسالة نصية خلال دقائق';
 
   @override
   String get authSendCode => 'إرسال رمز التحقق';
@@ -282,8 +285,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get errorNetwork => 'تعذّر الاتصال بالشبكة، تحقق من الاتصال بالإنترنت';
 
   @override
-  String get errorInvalidCredentials =>
-      'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+  String get errorInvalidCredentials => 'رقم الهاتف أو كلمة المرور غير صحيحة';
 
   @override
   String get errorServer => 'حدث خطأ في الخادم، حاول لاحقًا';
@@ -312,12 +314,14 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذا الحساب غير مفعّل، يرجى التواصل مع الدعم';
 
   @override
-  String get errorEmailNotVerified =>
-      'أكّد بريدك الإلكتروني أولًا لإتمام هذا الإجراء';
+  String get errorPhoneNotVerified => 'أكّد رقم هاتفك أولًا لإتمام هذا الإجراء';
 
   @override
   String get errorEmailAlreadyRegistered =>
       'هذا البريد الإلكتروني مسجَّل مسبقًا';
+
+  @override
+  String get errorPhoneAlreadyRegistered => 'رقم الهاتف هذا مسجَّل في حساب آخر';
 
   @override
   String get errorCommercialRegistrationTaken =>
@@ -352,6 +356,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get validationInvalidPhone => 'رقم الهاتف غير صحيح';
+
+  @override
+  String get validationInvalidJordanMobile =>
+      'أدخل رقم موبايل أردني صحيح، مثل 0791234567';
 
   @override
   String get validationInvalidValue => 'القيمة المدخلة غير صحيحة';

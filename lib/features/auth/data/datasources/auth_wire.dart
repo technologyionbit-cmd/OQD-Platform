@@ -53,8 +53,9 @@ class AuthWire {
       id: userJson['id'] as String,
       fullName: userJson['fullName'] as String,
       email: userJson['email'] as String,
+      phone: userJson['phone'] as String?,
       role: UserRoleWire.fromWire(userJson['role'] as String),
-      emailVerified: userJson['emailVerified'] as bool,
+      phoneVerified: userJson['phoneVerified'] as bool,
     );
   }
 

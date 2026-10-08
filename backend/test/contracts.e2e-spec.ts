@@ -141,16 +141,16 @@ describe('Contracts (e2e)', () => {
     expect(late.status).toBe(409);
     expect(apiError(late).code).toBe('CONTRACT_STATUS_CONFLICT');
 
-    // Signing needs a verified email.
+    // Signing needs a verified phone number.
     const unverified = await request(http)
       .post(`/v1/contracts/${contract.id}/sign`)
       .set(bearer(accounts.owner));
     expect(unverified.status).toBe(403);
-    expect(apiError(unverified).code).toBe('EMAIL_NOT_VERIFIED');
+    expect(apiError(unverified).code).toBe('PHONE_NOT_VERIFIED');
 
     await prisma.user.update({
       where: { email: `contracts.owner.${tag}@test.com` },
-      data: { emailVerifiedAt: new Date() },
+      data: { phoneVerifiedAt: new Date() },
     });
     const signed = await request(http)
       .post(`/v1/contracts/${contract.id}/sign`)

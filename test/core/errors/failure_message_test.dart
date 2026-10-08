@@ -30,13 +30,14 @@ void main() {
     expect(const ForbiddenFailure(code: ApiErrorCodes.accountInactive).localizedMessage(en), en.errorAccountInactive);
   });
 
-  test('an unverified email is explained on any gated action', () {
-    expect(const ForbiddenFailure(message: 'Verify your email', code: ApiErrorCodes.emailNotVerified).localizedMessage(ar), ar.errorEmailNotVerified);
+  test('an unverified phone is explained on any gated action', () {
+    expect(const ForbiddenFailure(message: 'Verify your phone number to continue.', code: ApiErrorCodes.phoneNotVerified).localizedMessage(ar), ar.errorPhoneNotVerified);
   });
 
   test('registration and verification codes each get their own message', () {
     final cases = {
       ApiErrorCodes.emailAlreadyRegistered: ar.errorEmailAlreadyRegistered,
+      ApiErrorCodes.phoneAlreadyRegistered: ar.errorPhoneAlreadyRegistered,
       ApiErrorCodes.commercialRegistrationTaken: ar.errorCommercialRegistrationTaken,
       ApiErrorCodes.barLicenseTaken: ar.errorBarLicenseTaken,
       ApiErrorCodes.termsVersionOutdated: ar.errorTermsVersionOutdated,

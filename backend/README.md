@@ -97,14 +97,16 @@ Returns `200` with `status: "ok"` when PostgreSQL is reachable, `503` otherwise.
 | Method & path | Auth | Purpose |
 |---|---|---|
 | `POST /register` | — | Register (`accountType`: `individual` \| `company` \| `lawyer`) → `{ user, tokens }` |
-| `POST /login` | — | `{ email, password }` → `{ user, tokens }` |
+| `POST /login` | — | `{ phone, password }` → `{ user, tokens }` (Jordanian mobile, any spelling) |
 | `POST /refresh` | — | `{ refreshToken }` → `{ tokens }` (rotates; reuse ⇒ family revoked) |
 | `POST /logout` | — | `{ refreshToken }` → 204 |
 | `GET /me` | Bearer | Current user |
 | `PATCH /me` | Bearer | `{ fullName, email }` → updated user |
-| `POST /password/forgot` | — | `{ email }` → 204 (always; anti-enumeration), 429 over the per-address send limit |
-| `POST /password/verify-otp` | — | `{ email, code }` → 204, or 422 `INVALID_VERIFICATION_CODE` / `VERIFICATION_CODE_LOCKED` |
-| `POST /password/reset` | — | `{ email, code, newPassword }` → 204 (marks the email verified, revokes all sessions) |
+| `POST /phone/verify` | Bearer | `{ code }` → user with `phoneVerified: true`, or 422 `INVALID_VERIFICATION_CODE` / `VERIFICATION_CODE_LOCKED` |
+| `POST /phone/resend` | Bearer | → 204, 429 over the per-account send limit |
+| `POST /password/forgot` | — | `{ phone }` → 204 (always; anti-enumeration), 429 over the per-number send limit |
+| `POST /password/verify-otp` | — | `{ phone, code }` → 204, or 422 `INVALID_VERIFICATION_CODE` / `VERIFICATION_CODE_LOCKED` |
+| `POST /password/reset` | — | `{ phone, code, newPassword }` → 204 (marks the phone verified, revokes all sessions) |
 | `POST /password/change` | Bearer | `{ currentPassword, newPassword }` → 204 (revokes other sessions) |
 | `GET /sessions` | Bearer | Active sessions with a `current` flag |
 | `DELETE /sessions/:id` | Bearer | Revoke one session |
@@ -112,8 +114,9 @@ Returns `200` with `status: "ok"` when PostgreSQL is reachable, `503` otherwise.
 
 - Access token: JWT, `JWT_ACCESS_TTL` (default 15m), carries `sub`/`role`/`sid`.
 - Refresh token: opaque, 30 days, only its SHA-256 hash is stored.
-- No email/SMS provider is wired — OTP codes are written to the server log
-  (dev only). Swapping in a provider is confined to `OtpService.deliver`.
+- Every code is texted through NGT SMSPRO (`NGT_SMS_*`, required in
+  production). Without `NGT_SMS_LOGIN_PASSWORD` (dev only) the code is
+  written to the server log instead. Delivery is confined to `OtpService.deliver`.
 
 ## Tests
 

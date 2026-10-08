@@ -6,16 +6,14 @@ import {
   IsIn,
   IsNotEmpty,
   IsString,
-  Matches,
   MaxLength,
   ValidateIf,
 } from 'class-validator';
 import { StrongPassword } from './password.rules';
+import { JordanMobile } from './phone.rules';
 
 export const ACCOUNT_TYPES = ['individual', 'company', 'lawyer'] as const;
 export type AccountType = (typeof ACCOUNT_TYPES)[number];
-
-const PHONE_RE = /^\+?[0-9]{8,15}$/;
 
 /**
  * The three registration shapes the frontend's `RegisterRequest` union
@@ -35,7 +33,8 @@ export class RegisterDto {
   @StrongPassword()
   password!: string;
 
-  @Matches(PHONE_RE, { message: 'Enter a valid phone number.' })
+  /** Signs the account in and receives every code. */
+  @JordanMobile()
   phone!: string;
 
   /** Must be `true`: the user ticked the terms/privacy checkbox. */

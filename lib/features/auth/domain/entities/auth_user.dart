@@ -25,10 +25,14 @@ abstract class AuthUser with _$AuthUser {
     required String id,
     required String fullName,
     required String email,
+
+    /// Signs the account in and receives every code, as +9627XXXXXXXX.
+    /// Null only for old accounts whose number could not be normalized.
+    required String? phone,
     required UserRole role,
 
-    /// False until the user enters the code emailed at sign-up. The server
-    /// refuses sensitive actions (booking, reviews) until then.
-    required bool emailVerified,
+    /// False until the user enters the code texted at sign-up. The server
+    /// refuses sensitive actions (booking, reviews, signing) until then.
+    required bool phoneVerified,
   }) = _AuthUser;
 }

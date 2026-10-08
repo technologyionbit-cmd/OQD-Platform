@@ -2,33 +2,32 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ApiErrorCode } from '../../common/errors/api-error-codes';
 import { ConfigService } from '@nestjs/config';
 import { createHash, randomInt, timingSafeEqual } from 'node:crypto';
-import type { VerificationChannel, VerificationPurpose } from '@prisma/client';
+import type { VerificationPurpose } from '@prisma/client';
 import { validationFailed } from '../../common/errors/api-exceptions';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { AuthConfig, SmsConfig } from '../../config/configuration';
 import { sendNgtSms } from './ngt-sms.client';
-
-const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export interface OtpVerification {
   valid: boolean;
   userId: string | null;
 }
 
-/** Which codes a send limit counts: an account's, or an address's. */
+/** Which codes a send limit counts: an account's, or a number's. */
 export type OtpIssueFilter = { userId: string } | { destination: string };
 
 /**
- * One-time codes for password reset and email/phone verification.
+ * One-time codes for phone verification and password reset, texted to a
+ * normalized phone number (+9627XXXXXXXX).
  *
  * Codes are 6 numeric digits (mirrors the frontend's OtpCodeField), stored
  * only as a SHA-256 hash in `verification_codes`, expire after
  * `OTP_TTL_MINUTES`, and lock out after `OTP_MAX_ATTEMPTS` failed tries.
  *
- * SMS codes go out through NGT SMSPRO when `NGT_SMS_LOGIN_PASSWORD` is set.
- * Otherwise (and for email, which has no provider yet) the code is written
- * to the server log — non-production only. Delivery is confined to
- * {@link deliver}.
+ * Codes go out through NGT SMSPRO when `NGT_SMS_LOGIN_PASSWORD` is set
+ * (required in production, see env.validation.ts). Without it the code is
+ * written to the server log instead — never in production. Delivery is
+ * confined to {@link deliver}.
  */
 @Injectable()
 export class OtpService {
@@ -39,8 +38,8 @@ export class OtpService {
   private readonly sms: SmsConfig | undefined;
 
   /** Dev/test only — last code issued per destination, so local manual
-   *  testing and e2e specs can complete the reset flow without an email
-   *  provider. Never populated in production, never exposed over HTTP. */
+   *  testing and e2e specs can complete the flows without an SMS gateway.
+   *  Never populated in production, never exposed over HTTP. */
   private readonly devCodes = new Map<string, string>();
 
   constructor(
@@ -58,18 +57,14 @@ export class OtpService {
 
   /** Dev/test helper — see {@link devCodes}. Returns undefined in production. */
   peekDevCode(destination: string): string | undefined {
-    return this.isProduction ? undefined : this.devCodes.get(destination.trim());
-  }
-
-  channelFor(destination: string): VerificationChannel {
-    return EMAIL_RE.test(destination.trim()) ? 'email' : 'sms';
+    return this.isProduction ? undefined : this.devCodes.get(destination);
   }
 
   /**
-   * Issue a code and send it. A code for no account ([userId] null) is
+   * Issue a code and text it. A code for no account ([userId] null) is
    * stored but never sent: the row keeps the request's cost and the send
-   * limits the same for unknown addresses, so neither reveals whether an
-   * account exists, and nobody can use the app to mail strangers.
+   * limits the same for unknown numbers, so neither reveals whether an
+   * account exists, and nobody can use the app to text strangers.
    */
   async issue(
     destination: string,
@@ -82,15 +77,15 @@ export class OtpService {
     await this.prisma.verificationCode.create({
       data: {
         userId,
-        destination: destination.trim(),
-        channel: this.channelFor(destination),
+        destination,
+        channel: 'sms',
         codeHash: this.hash(code),
         purpose,
         expiresAt: new Date(Date.now() + this.ttlMinutes * 60 * 1000),
       },
     });
     if (!this.isProduction) {
-      this.devCodes.set(destination.trim(), code);
+      this.devCodes.set(destination, code);
     }
     if (userId !== null) {
       void this.deliver(destination, code, purpose);
@@ -187,7 +182,7 @@ export class OtpService {
   ) {
     return this.prisma.verificationCode.findFirst({
       where: {
-        destination: destination.trim(),
+        destination,
         purpose,
         ...(userId === undefined ? {} : { userId }),
         consumedAt: null,
@@ -208,27 +203,23 @@ export class OtpService {
     );
   }
 
-  /** Runs in the background (not awaited by the caller): awaiting a provider
-   *  would make forgot-password slower for real accounts than unknown ones.
-   *  Never throws. */
+  /** Runs in the background (not awaited by the caller): awaiting the
+   *  gateway would make forgot-password slower for real accounts than
+   *  unknown ones. Never throws. */
   private async deliver(
     destination: string,
     code: string,
     purpose: VerificationPurpose,
   ): Promise<void> {
-    if (this.sms && this.channelFor(destination) === 'sms') {
+    if (this.sms) {
       try {
-        const result = await sendNgtSms(
-          this.sms,
-          destination,
-          `Your verification code is ${code}`,
-        );
+        const result = await sendNgtSms(this.sms, destination, smsText(code));
         if (!result.ok) {
           this.logger.error(`SMS send failed: ${result.code}`);
         }
       } catch (err) {
-        // Never surface provider failures — the endpoint must not reveal
-        // anything about the destination. Never log the message (has the code).
+        // Never surface gateway failures — the endpoint must not reveal
+        // anything about the number. Never log the message (has the code).
         this.logger.error(`SMS send error: ${(err as Error).message}`);
       }
       return;
@@ -239,4 +230,9 @@ export class OtpService {
       `[dev] ${purpose} code for ${destination}: ${code} (expires in ${this.ttlMinutes}m)`,
     );
   }
+}
+
+/** The texted message: one SMS segment (under 70 characters), Arabic first. */
+export function smsText(code: string): string {
+  return `رمز التحقق في عقد: ${code}\nAqd verification code: ${code}`;
 }

@@ -64,7 +64,6 @@ enum VerificationChannel {
 
 enum VerificationPurpose {
   passwordReset
-  emailVerification
   phoneVerification
 }
 
@@ -197,8 +196,10 @@ model User {
   id               String     @id @default(uuid()) @db.Uuid
   fullName         String     @map("full_name")
   email            String     @unique @db.Citext
-  emailVerifiedAt  DateTime?  @map("email_verified_at") @db.Timestamptz
-  phone            String?
+  /// Sign-in identifier and where every code is texted: E.164 Jordanian
+  /// mobile (+9627XXXXXXXX). Null only for accounts whose stored number
+  /// could not be normalized when phone sign-in was introduced.
+  phone            String?    @unique
   phoneVerifiedAt  DateTime?  @map("phone_verified_at") @db.Timestamptz
   passwordHash     String     @map("password_hash")
   role             UserRole

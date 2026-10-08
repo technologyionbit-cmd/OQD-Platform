@@ -18,9 +18,8 @@ Frontend source: `AuthUser` (`lib/features/auth/domain/entities/auth_user.dart`)
 | id | uuid | PK | |
 | fullName | text | no | |
 | email | citext | no | unique constraint |
-| emailVerifiedAt | timestamptz | yes | **NEW** — frontend has OTP UI (`OtpVerificationScreen`) but no persisted verification flag |
-| phone | text | yes | captured at registration for individual/company/lawyer, never modeled on `AuthUser` today — **NEW** field to actually store it |
-| phoneVerifiedAt | timestamptz | yes | **NEW** |
+| phone | text | yes | unique; sign-in identifier and where every code is texted, stored as `+9627XXXXXXXX`. Null only for old accounts whose number could not be normalized (migration `phone_sign_in`) |
+| phoneVerifiedAt | timestamptz | yes | set by the texted code (sign-up or password reset); sensitive actions need it |
 | passwordHash | text | no | never sent to client; bcrypt/argon2 |
 | role | enum `UserRole` | no | `client, lawyer, company` — see note below |
 | status | enum `UserStatus` | no | **NEW**: `active, suspended, banned, pendingDeletion` — no such concept exists client-side today |
@@ -65,7 +64,7 @@ Frontend source: `AuthUser` (`lib/features/auth/domain/entities/auth_user.dart`)
 | destination | text | no | email or phone the code was sent to |
 | channel | enum | no | **NEW**, `email, sms` — frontend infers this from destination shape only; backend should be explicit |
 | codeHash | text | no | short numeric code, hashed |
-| purpose | enum | no | `passwordReset, emailVerification, phoneVerification` |
+| purpose | enum | no | `passwordReset, phoneVerification` |
 | expiresAt | timestamptz | no | short TTL (10 min) |
 | consumedAt | timestamptz | yes | |
 | attemptCount | int | no, default 0 | rate-limit brute force |

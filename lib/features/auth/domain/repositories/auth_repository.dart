@@ -9,7 +9,7 @@ import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 /// Contract the presentation layer programs against. Implemented by
 /// `AuthRepositoryImpl`, which is backed by the real NestJS auth API.
 abstract interface class AuthRepository {
-  Future<Result<({AuthUser user, AuthTokens tokens})>> login({required String email, required String password});
+  Future<Result<({AuthUser user, AuthTokens tokens})>> login({required String phone, required String password});
 
   Future<Result<({AuthUser user, AuthTokens tokens})>> register(RegisterRequest request);
 
@@ -32,19 +32,19 @@ abstract interface class AuthRepository {
 
   Future<void> logout();
 
-  Future<Result<AuthUser>> verifyEmail({required String code});
+  Future<Result<AuthUser>> verifyPhone({required String code});
 
-  Future<Result<void>> resendEmailVerification();
+  Future<Result<void>> resendPhoneVerification();
 
-  /// Emails a reset code. Succeeds the same whether or not [email] has an
+  /// Texts a reset code. Succeeds the same whether or not [phone] has an
   /// account; a [RateLimitedFailure] means too many codes were requested.
-  Future<Result<void>> requestPasswordReset({required String email});
+  Future<Result<void>> requestPasswordReset({required String phone});
 
   /// Checks [code] without using it up. A wrong or expired code is a
   /// [ValidationFailure] with code `INVALID_VERIFICATION_CODE`.
-  Future<Result<void>> verifyPasswordResetCode({required String email, required String code});
+  Future<Result<void>> verifyPasswordResetCode({required String phone, required String code});
 
-  Future<Result<void>> resetPassword({required String email, required String code, required String newPassword});
+  Future<Result<void>> resetPassword({required String phone, required String code, required String newPassword});
 
   Future<Result<void>> changePassword({required String currentPassword, required String newPassword});
 

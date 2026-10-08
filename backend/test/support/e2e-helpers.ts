@@ -1,4 +1,5 @@
 import type { PrismaClient } from '@prisma/client';
+import { randomInt } from 'node:crypto';
 import type { Server } from 'node:http';
 import request from 'supertest';
 import { DEFAULT_TERMS_VERSION } from '../../src/config/configuration';
@@ -17,9 +18,19 @@ export const ok = <T>(res: request.Response): T =>
 export const apiError = (res: request.Response): ApiErrorBody =>
   (res.body as { error: ApiErrorBody }).error;
 
+/** A fresh Jordanian mobile number in the local spelling the app sends
+ *  (07XXXXXXXX), so sign-ups never collide on the unique phone column. */
+export function testPhone(): string {
+  return `079${randomInt(0, 10_000_000).toString().padStart(7, '0')}`;
+}
+
+/** How the API stores and returns [testPhone]: +9627XXXXXXXX. */
+export const storedPhone = (local: string): string => `+962${local.slice(1)}`;
+
 export interface TestAccount {
   id: string;
   email: string;
+  phone: string;
   fullName: string;
   token: string;
 }
@@ -43,12 +54,13 @@ export function accountRegistrar(http: Server, prefix: string, tag: number) {
     signup: Record<string, string>,
   ): Promise<TestAccount> => {
     const email = `${prefix}.${key}.${tag}@test.com`;
+    const phone = testPhone();
     const fullName = `${prefix} ${key}`;
     const res = await request(http)
       .post('/v1/auth/register')
       .send({
         fullName,
-        phone: '0791234567',
+        phone,
         email,
         password: 'Password123',
         acceptTerms: true,
@@ -62,6 +74,7 @@ export function accountRegistrar(http: Server, prefix: string, tag: number) {
     return {
       id: body.user.id,
       email,
+      phone: storedPhone(phone),
       fullName,
       token: body.tokens.accessToken,
     };

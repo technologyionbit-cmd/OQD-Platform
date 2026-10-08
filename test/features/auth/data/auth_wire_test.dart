@@ -69,27 +69,27 @@ void main() {
     test('session() reads user + tokens out of the data envelope', () {
       final result = AuthWire.session({
         'data': {
-          'user': {'id': 'u1', 'fullName': 'Ahmad', 'email': 'a@test.com', 'role': 'lawyer', 'emailVerified': false},
+          'user': {'id': 'u1', 'fullName': 'Ahmad', 'email': 'a@test.com', 'role': 'lawyer', 'phoneVerified': false},
           'tokens': {'accessToken': 'access', 'refreshToken': 'refresh'},
         },
       });
       expect(result.user.role, UserRole.lawyer);
       expect(result.user.id, 'u1');
-      expect(result.user.emailVerified, isFalse);
+      expect(result.user.phoneVerified, isFalse);
       expect(result.tokens.accessToken, 'access');
       expect(result.tokens.refreshToken, 'refresh');
     });
 
     test('user() throws on an unknown role rather than defaulting', () {
       expect(
-        () => AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'admin', 'emailVerified': false}),
+        () => AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'admin', 'phoneVerified': false}),
         throwsArgumentError,
       );
     });
 
-    test('user() reads emailVerified and fails loudly when it is missing', () {
-      final verified = AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'client', 'emailVerified': true});
-      expect(verified.emailVerified, isTrue);
+    test('user() reads phoneVerified and fails loudly when it is missing', () {
+      final verified = AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'client', 'phoneVerified': true});
+      expect(verified.phoneVerified, isTrue);
 
       expect(
         () => AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'client'}),

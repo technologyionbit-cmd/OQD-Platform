@@ -9,6 +9,7 @@ import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
+import 'package:aqd_ionbit/core/utils/jordan_mobile.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
@@ -17,7 +18,7 @@ import 'package:aqd_ionbit/core/widgets/language_switch_button.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
 
-/// Email + password only. The account's role (returned by the backend)
+/// Phone number + password only. The account's role (returned by the backend)
 /// decides which shell the router lands on — there is no role selector,
 /// so a lawyer signing in goes to the lawyer app, a client to the client
 /// app, automatically.
@@ -29,17 +30,17 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  String? _emailError;
+  String? _phoneError;
   String? _passwordError;
   String? _formError;
   bool _isSubmitting = false;
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -50,25 +51,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final l10n = AppLocalizations.of(context)!;
     FocusScope.of(context).unfocus();
 
-    final emailError =
-        !Validators.isRequired(_emailController.text)
+    final phone = JordanMobile.normalize(_phoneController.text);
+    final phoneError =
+        !Validators.isRequired(_phoneController.text)
             ? l10n.validationRequired
-            : !Validators.isValidEmail(_emailController.text)
-            ? l10n.validationInvalidEmail
+            : phone == null
+            ? l10n.validationInvalidJordanMobile
             : null;
     final passwordError = !Validators.isRequired(_passwordController.text) ? l10n.validationRequired : null;
 
     setState(() {
-      _emailError = emailError;
+      _phoneError = phoneError;
       _passwordError = passwordError;
       _formError = null;
     });
-    if (emailError != null || passwordError != null) return;
+    if (phone == null || passwordError != null) return;
 
     setState(() => _isSubmitting = true);
     final result = await ref
         .read(authControllerProvider.notifier)
-        .login(email: _emailController.text.trim(), password: _passwordController.text);
+        .login(phone: phone, password: _passwordController.text);
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
@@ -125,12 +127,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     AppTextField(
-                      controller: _emailController,
-                      label: l10n.authEmailLabel,
-                      errorText: _emailError,
-                      keyboardType: TextInputType.emailAddress,
+                      controller: _phoneController,
+                      label: l10n.authPhoneLabel,
+                      hintText: l10n.authPhoneHint,
+                      errorText: _phoneError,
+                      keyboardType: TextInputType.phone,
                       textInputAction: TextInputAction.next,
-                      autofillHints: const [AutofillHints.email],
+                      autofillHints: const [AutofillHints.telephoneNumber],
                     ),
                     const SizedBox(height: AppSpacing.md),
                     AppTextField(

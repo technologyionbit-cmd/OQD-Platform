@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/widgets/app_shell.dart';
-import 'package:aqd_ionbit/features/auth/presentation/widgets/email_verification_banner.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/phone_verification_banner.dart';
 import 'package:aqd_ionbit/features/company/presentation/screens/company_home_screen.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/screens/contracts_list_screen.dart';
 import 'package:aqd_ionbit/features/documents/presentation/screens/documents_screen.dart';
@@ -23,7 +23,7 @@ StatefulShellRoute companyShellRoute() {
       final l10n = AppLocalizations.of(context)!;
       return AppShell(
         navigationShell: navigationShell,
-        banner: const EmailVerificationBanner(),
+        banner: const PhoneVerificationBanner(),
         destinations: [
           NavigationDestination(icon: const Icon(Icons.home_outlined), selectedIcon: const Icon(Icons.home), label: l10n.navHome),
           NavigationDestination(

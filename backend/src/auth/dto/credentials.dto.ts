@@ -1,14 +1,14 @@
 import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { StrongPassword } from './password.rules';
+import { JordanMobile } from './phone.rules';
 
 /** Issued tokens are 64 chars (48 random bytes, base64url); anything far
  *  longer is not ours and is rejected before it is hashed or queried. */
 const REFRESH_TOKEN_MAX_LENGTH = 256;
 
 export class LoginDto {
-  @IsEmail()
-  @MaxLength(254)
-  email!: string;
+  @JordanMobile()
+  phone!: string;
 
   @IsString()
   @IsNotEmpty()

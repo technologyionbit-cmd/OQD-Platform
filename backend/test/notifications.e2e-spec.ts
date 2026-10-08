@@ -58,7 +58,7 @@ describe('Notifications (e2e)', () => {
     accounts.lawyer = await register('lawyer', lawyerSignup(`BAR-N-${tag}`));
     await prisma.user.update({
       where: { id: accounts.client.id },
-      data: { emailVerifiedAt: new Date() },
+      data: { phoneVerifiedAt: new Date() },
     });
     lawyerProfileId = (
       await prisma.lawyerProfile.findUniqueOrThrow({
