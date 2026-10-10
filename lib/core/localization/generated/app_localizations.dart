@@ -3482,6 +3482,24 @@ abstract class AppLocalizations {
   /// **'المساعدة والدعم'**
   String get accountMenuHelp;
 
+  /// No description provided for @accountMenuComingSoon.
+  ///
+  /// In ar, this message translates to:
+  /// **'قريباً'**
+  String get accountMenuComingSoon;
+
+  /// No description provided for @accountPhoneVerified.
+  ///
+  /// In ar, this message translates to:
+  /// **'موثّق'**
+  String get accountPhoneVerified;
+
+  /// No description provided for @accountPhoneUnverified.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير موثّق'**
+  String get accountPhoneUnverified;
+
   /// No description provided for @paymentMethodsTitle.
   ///
   /// In ar, this message translates to:

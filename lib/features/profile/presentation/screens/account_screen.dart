@@ -9,22 +9,21 @@ import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_gradients.dart';
 import 'package:aqd_ionbit/core/theme/app_radii.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
+import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
+import 'package:aqd_ionbit/core/utils/jordan_mobile.dart';
 import 'package:aqd_ionbit/core/widgets/app_card.dart';
 import 'package:aqd_ionbit/core/widgets/confirmation_dialog.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
-import 'package:aqd_ionbit/features/billing/domain/entities/subscription_tier.dart';
-import 'package:aqd_ionbit/features/billing/presentation/providers/subscription_controller.dart';
 import 'package:aqd_ionbit/features/consultations/presentation/providers/consultations_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contracts_controller.dart';
-import 'package:aqd_ionbit/features/documents/presentation/providers/documents_controller.dart';
 
-/// Shared across all three roles — identity header (avatar, plan badge,
-/// activity stats), then the full reference menu (subscriptions, payment
-/// methods, saved signature, documents, bookings, invoices, notifications,
-/// language, security, help), then logout. Every row that isn't
-/// role-specific business logic routes to a real screen with working mock
-/// state — none of it is decorative.
+/// Shared across all three roles — identity header (name, phone and its
+/// verification state, email), activity stats, then the menu and logout.
+/// Rows whose feature still runs on mock data (subscriptions, payment
+/// methods, saved signature, documents, invoices) are shown disabled with
+/// a "coming soon" tag until their backend lands, so no account ever sees
+/// demo cards, demo documents or a plan it never paid for.
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
 
@@ -56,34 +55,17 @@ class AccountScreen extends ConsumerWidget {
     UserRole.company => RoutePaths.companyBase,
   };
 
-  String _documentsRouteFor(UserRole role) => switch (role) {
-    UserRole.client => RoutePaths.clientDocuments,
-    UserRole.lawyer => RoutePaths.lawyerDocuments,
-    UserRole.company => RoutePaths.companyDocuments,
-  };
-
   String _bookingsRouteFor(UserRole role) => switch (role) {
     UserRole.client => RoutePaths.clientConsultations,
     UserRole.lawyer => RoutePaths.lawyerConsultations,
     UserRole.company => RoutePaths.companyConsultations,
   };
 
-  String _planBadgeLabel(SubscriptionTier? tier, AppLocalizations l10n) {
-    return switch (tier) {
-      null => l10n.subscriptionNoPlan,
-      SubscriptionTier.basic => l10n.subscriptionTierBasic,
-      SubscriptionTier.pro => l10n.subscriptionTierPro,
-      SubscriptionTier.enterprise => l10n.subscriptionTierEnterprise,
-    };
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final user = ref.watch(authControllerProvider).value;
     final locale = ref.watch(localeControllerProvider);
-    final subscription = ref.watch(subscriptionControllerProvider);
-    final documentsCount = ref.watch(documentsControllerProvider).value?.length ?? 0;
     final consultationsCount = ref.watch(consultationsControllerProvider).value?.length ?? 0;
     final contractsCount = ref.watch(contractsControllerProvider).value?.length ?? 0;
     final base = user != null ? _roleBase(user.role) : RoutePaths.clientBase;
@@ -93,7 +75,7 @@ class AccountScreen extends ConsumerWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            if (user != null) _ProfileHeader(name: user.fullName, email: user.email, planLabel: _planBadgeLabel(subscription.tier, l10n)),
+            if (user != null) _ProfileHeader(name: user.fullName, phone: user.phone, phoneVerified: user.phoneVerified, email: user.email),
             Padding(
               padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, 0),
               child: Transform.translate(
@@ -105,8 +87,6 @@ class AccountScreen extends ConsumerWidget {
                       AppCard(
                         child: Row(
                           children: [
-                            Expanded(child: _StatItem(value: '$documentsCount', label: l10n.accountStatDocuments)),
-                            const _StatDivider(),
                             Expanded(child: _StatItem(value: '$consultationsCount', label: l10n.accountStatConsultations)),
                             const _StatDivider(),
                             Expanded(child: _StatItem(value: '$contractsCount', label: l10n.accountStatContracts)),
@@ -144,36 +124,20 @@ class AccountScreen extends ConsumerWidget {
                       child: Column(
                         children: [
                           _MenuRow(
-                            icon: Icons.workspace_premium_outlined,
-                            label: l10n.accountMenuSubscriptions,
-                            onTap: () => context.push(RoutePaths.subscriptionPlansFor(base)),
-                          ),
-                          const Divider(height: 1),
-                          _MenuRow(
-                            icon: Icons.credit_card_outlined,
-                            label: l10n.accountMenuPaymentMethods,
-                            onTap: () => context.push(RoutePaths.paymentMethodsFor(base)),
-                          ),
-                          const Divider(height: 1),
-                          _MenuRow(
-                            icon: Icons.draw_outlined,
-                            label: l10n.accountMenuSavedSignature,
-                            onTap: () => context.push(RoutePaths.savedSignatureFor(base)),
-                          ),
-                          const Divider(height: 1),
-                          _MenuRow(icon: Icons.folder_outlined, label: l10n.navDocuments, onTap: () => context.go(_documentsRouteFor(user?.role ?? UserRole.client))),
-                          const Divider(height: 1),
-                          _MenuRow(
                             icon: Icons.event_note_outlined,
                             label: l10n.accountMenuBookings,
                             onTap: () => context.push(_bookingsRouteFor(user?.role ?? UserRole.client)),
                           ),
                           const Divider(height: 1),
-                          _MenuRow(
-                            icon: Icons.receipt_long_outlined,
-                            label: l10n.accountMenuInvoices,
-                            onTap: () => context.push(RoutePaths.invoicesFor(base)),
-                          ),
+                          _MenuRow(icon: Icons.workspace_premium_outlined, label: l10n.accountMenuSubscriptions),
+                          const Divider(height: 1),
+                          _MenuRow(icon: Icons.credit_card_outlined, label: l10n.accountMenuPaymentMethods),
+                          const Divider(height: 1),
+                          _MenuRow(icon: Icons.draw_outlined, label: l10n.accountMenuSavedSignature),
+                          const Divider(height: 1),
+                          _MenuRow(icon: Icons.folder_outlined, label: l10n.navDocuments),
+                          const Divider(height: 1),
+                          _MenuRow(icon: Icons.receipt_long_outlined, label: l10n.accountMenuInvoices),
                         ],
                       ),
                     ),
@@ -237,14 +201,18 @@ class AccountScreen extends ConsumerWidget {
 }
 
 class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({required this.name, required this.email, required this.planLabel});
+  const _ProfileHeader({required this.name, required this.phone, required this.phoneVerified, required this.email});
 
   final String name;
+  final String? phone;
+  final bool phoneVerified;
   final String email;
-  final String planLabel;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final textTheme = Theme.of(context).textTheme;
+    final phone = this.phone;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, AppSpacing.xxxl),
@@ -259,22 +227,53 @@ class _ProfileHeader extends StatelessWidget {
             child: const Icon(Icons.person, color: AppColors.onPrimary, size: 40),
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(name, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.w700)),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(email, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onPrimary.withValues(alpha: 0.7))),
-          const SizedBox(height: AppSpacing.sm),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
-            decoration: BoxDecoration(color: AppColors.secondary.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(AppRadii.pill)),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+          Text(name, style: textTheme.titleLarge?.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.w700)),
+          if (phone != null) ...[
+            const SizedBox(height: AppSpacing.xxs),
+            // Wrap, not Row: on narrow screens or large text the chip drops
+            // under the number instead of overflowing.
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xxs,
               children: [
-                const Icon(Icons.star, color: AppColors.secondary, size: 14),
-                const SizedBox(width: AppSpacing.xxs),
-                Text(planLabel, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.secondary, fontWeight: FontWeight.w700)),
+                // Digits stay left-to-right inside the Arabic layout.
+                Text(
+                  JordanMobile.display(phone),
+                  textDirection: TextDirection.ltr,
+                  style: textTheme.bodyMedium?.copyWith(color: AppColors.onPrimary),
+                ),
+                _PhoneStatusChip(verified: phoneVerified, label: phoneVerified ? l10n.accountPhoneVerified : l10n.accountPhoneUnverified),
               ],
             ),
-          ),
+          ],
+          const SizedBox(height: AppSpacing.xxs),
+          Text(email, style: textTheme.bodySmall?.copyWith(color: AppColors.onPrimary.withValues(alpha: 0.7))),
+        ],
+      ),
+    );
+  }
+}
+
+class _PhoneStatusChip extends StatelessWidget {
+  const _PhoneStatusChip({required this.verified, required this.label});
+
+  final bool verified;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = verified ? context.statusColors.success : context.statusColors.warning;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2),
+      decoration: BoxDecoration(color: colors.background, borderRadius: BorderRadius.circular(AppRadii.pill)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(verified ? Icons.verified_outlined : Icons.error_outline, size: 14, color: colors.foreground),
+          const SizedBox(width: AppSpacing.xxs),
+          Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: colors.foreground, fontWeight: FontWeight.w700)),
         ],
       ),
     );
@@ -308,15 +307,31 @@ class _StatDivider extends StatelessWidget {
   }
 }
 
+/// A menu entry. Without [onTap] the row is disabled and tagged
+/// "coming soon" — its feature has no backend yet.
 class _MenuRow extends StatelessWidget {
-  const _MenuRow({required this.icon, required this.label, required this.onTap});
+  const _MenuRow({required this.icon, required this.label, this.onTap});
 
   final IconData icon;
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(leading: Icon(icon), title: Text(label), trailing: const Icon(Icons.chevron_right), onTap: onTap);
+    final onTap = this.onTap;
+    if (onTap != null) {
+      return ListTile(leading: Icon(icon), title: Text(label), trailing: const Icon(Icons.chevron_right), onTap: onTap);
+    }
+    final l10n = AppLocalizations.of(context)!;
+    return ListTile(
+      enabled: false,
+      leading: Icon(icon),
+      title: Text(label),
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2),
+        decoration: BoxDecoration(color: AppColors.surfaceVariant, borderRadius: BorderRadius.circular(AppRadii.pill)),
+        child: Text(l10n.accountMenuComingSoon, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.textSecondary)),
+      ),
+    );
   }
 }

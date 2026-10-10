@@ -763,6 +763,9 @@
   "accountMenuInvoices": "الفواتير",
   "accountMenuSecurity": "الأمان والخصوصية",
   "accountMenuHelp": "المساعدة والدعم",
+  "accountMenuComingSoon": "قريباً",
+  "accountPhoneVerified": "موثّق",
+  "accountPhoneUnverified": "غير موثّق",
 
   "paymentMethodsTitle": "طرق الدفع",
   "paymentMethodsEmptyTitle": "لا توجد طرق دفع محفوظة",

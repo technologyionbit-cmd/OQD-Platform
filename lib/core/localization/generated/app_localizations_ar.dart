@@ -1874,6 +1874,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get accountMenuHelp => 'المساعدة والدعم';
 
   @override
+  String get accountMenuComingSoon => 'قريباً';
+
+  @override
+  String get accountPhoneVerified => 'موثّق';
+
+  @override
+  String get accountPhoneUnverified => 'غير موثّق';
+
+  @override
   String get paymentMethodsTitle => 'طرق الدفع';
 
   @override

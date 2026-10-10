@@ -1903,6 +1903,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accountMenuHelp => 'Help & Support';
 
   @override
+  String get accountMenuComingSoon => 'Coming soon';
+
+  @override
+  String get accountPhoneVerified => 'Verified';
+
+  @override
+  String get accountPhoneUnverified => 'Not verified';
+
+  @override
   String get paymentMethodsTitle => 'Payment Methods';
 
   @override

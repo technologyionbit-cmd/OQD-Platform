@@ -644,6 +644,9 @@
   "accountMenuInvoices": "Invoices",
   "accountMenuSecurity": "Security & Privacy",
   "accountMenuHelp": "Help & Support",
+  "accountMenuComingSoon": "Coming soon",
+  "accountPhoneVerified": "Verified",
+  "accountPhoneUnverified": "Not verified",
 
   "paymentMethodsTitle": "Payment Methods",
   "paymentMethodsEmptyTitle": "No saved payment methods",
