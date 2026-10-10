@@ -22,13 +22,13 @@
 |---|---|---|
 | 0.1 | دمج `feature/sms-otp` على `main` ورفعه | Done |
 | 0.2 | إصلاح `backend/package-lock.json` مشان `npm ci` يشتغل على السيرفر (`@emnapi/core` و `@emnapi/runtime`) | Done |
-| 0.3 | إصلاح الفحص الفاشل `lawyer_schedule_screen_test` ("an unbooked slot can still be removed") | In progress |
+| 0.3 | إصلاح الفحص الفاشل `lawyer_schedule_screen_test` ("an unbooked slot can still be removed") | Done |
 
 ### المرحلة 1 — الحساب والأمان
 
 | # | الخطوة | Status |
 |---|---|---|
-| 1.1 | صفحة الحساب (`account_screen`) | Not started |
+| 1.1 | صفحة الحساب (`account_screen`) | In progress |
 | 1.2 | تعديل البروفايل: تغيير الإيميل يطلب كلمة السر | Not started |
 | 1.3 | تغيير رقم الهاتف عن طريق OTP على الرقم الجديد | Not started |
 | 1.4 | الأمان والخصوصية: تغيير كلمة السر والجلسات النشطة | Not started |
