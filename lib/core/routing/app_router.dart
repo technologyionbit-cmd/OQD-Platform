@@ -31,7 +31,13 @@ import 'package:aqd_ionbit/features/onboarding/presentation/providers/onboarding
 final routerProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = ValueNotifier(0);
   void refresh() => refreshNotifier.value++;
-  ref.listen(authControllerProvider, (_, _) => refresh());
+  // Only what [_redirect] reads. A profile edit (new name or email) must
+  // not refresh: that re-applies the location from before the editing
+  // screen closed, which opened it again.
+  ref.listen(
+    authControllerProvider.select((auth) => (auth.isLoading, auth.hasError, auth.value?.id, auth.value?.role, auth.value?.phoneVerified)),
+    (_, _) => refresh(),
+  );
   ref.listen(onboardingControllerProvider, (_, _) => refresh());
   ref.listen(phoneVerificationPromptProvider, (_, _) => refresh());
   ref.onDispose(refreshNotifier.dispose);
