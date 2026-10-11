@@ -1,4 +1,5 @@
 import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { COMPANY_NAME_MAX_LENGTH, DisplayName } from './name.rules';
 import { StrongPassword } from './password.rules';
 import { JordanMobile } from './phone.rules';
 
@@ -31,14 +32,21 @@ export class LogoutDto {
 }
 
 export class UpdateProfileDto {
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(120)
+  /** Company accounts keep their company name here, hence the company
+   *  limit; the service holds people to the shorter person-name limit. */
+  @DisplayName(COMPANY_NAME_MAX_LENGTH)
   fullName!: string;
 
   @IsEmail()
   @MaxLength(254)
   email!: string;
+
+  /** Required for every save, so an unlocked device alone cannot change
+   *  who the account belongs to. */
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(128)
+  currentPassword!: string;
 }
 
 export class ChangePasswordDto {

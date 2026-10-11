@@ -1655,6 +1655,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileUpdatedMessage => 'تم تحديث الملف الشخصي';
 
   @override
+  String get editProfilePasswordHelper => 'مطلوبة لتأكيد هويتك';
+
+  @override
+  String get editProfileLawyerRenameWarning =>
+      'تغيير اسمك سيعيد حسابك إلى المراجعة، ولن يظهر في قائمة المحامين حتى تتم الموافقة عليه من جديد.';
+
+  @override
+  String get errorCurrentPasswordIncorrect => 'كلمة المرور الحالية غير صحيحة';
+
+  @override
   String get unsavedChangesTitle => 'تجاهل التغييرات؟';
 
   @override

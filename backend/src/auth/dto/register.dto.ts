@@ -9,6 +9,11 @@ import {
   MaxLength,
   ValidateIf,
 } from 'class-validator';
+import {
+  COMPANY_NAME_MAX_LENGTH,
+  DisplayName,
+  PERSON_NAME_MAX_LENGTH,
+} from './name.rules';
 import { StrongPassword } from './password.rules';
 import { JordanMobile } from './phone.rules';
 
@@ -50,16 +55,12 @@ export class RegisterDto {
 
   // individual + lawyer
   @ValidateIf((o: RegisterDto) => o.accountType !== 'company')
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(120)
+  @DisplayName(PERSON_NAME_MAX_LENGTH)
   fullName?: string;
 
   // company
   @ValidateIf((o: RegisterDto) => o.accountType === 'company')
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(160)
+  @DisplayName(COMPANY_NAME_MAX_LENGTH)
   companyName?: string;
 
   @ValidateIf((o: RegisterDto) => o.accountType === 'company')

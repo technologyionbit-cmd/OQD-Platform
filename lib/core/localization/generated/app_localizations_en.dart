@@ -1681,6 +1681,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileUpdatedMessage => 'Profile updated';
 
   @override
+  String get editProfilePasswordHelper => 'Required to confirm it\'s you';
+
+  @override
+  String get editProfileLawyerRenameWarning =>
+      'Changing your name sends your account back to review. You won\'t appear in the lawyer list until it is approved again.';
+
+  @override
+  String get errorCurrentPasswordIncorrect => 'Current password is incorrect';
+
+  @override
   String get unsavedChangesTitle => 'Discard changes?';
 
   @override

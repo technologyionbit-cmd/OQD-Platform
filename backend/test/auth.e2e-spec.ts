@@ -665,10 +665,11 @@ describe('Auth (e2e)', () => {
 
     it('changes the email without any code and keeps the phone verified', async () => {
       const newEmail = `verifier.changed.${tag}@test.com`;
-      const res = await request(http)
-        .patch('/v1/auth/me')
-        .set(auth())
-        .send({ fullName: verifier.fullName, email: newEmail });
+      const res = await request(http).patch('/v1/auth/me').set(auth()).send({
+        fullName: verifier.fullName,
+        email: newEmail,
+        currentPassword: verifier.password,
+      });
       expect(res.status).toBe(200);
       expect(ok<{ user: UserView }>(res).user).toMatchObject({
         email: newEmail,
@@ -677,10 +678,11 @@ describe('Auth (e2e)', () => {
     });
 
     it('refuses a profile email that another account uses', async () => {
-      const res = await request(http)
-        .patch('/v1/auth/me')
-        .set(auth())
-        .send({ fullName: verifier.fullName, email: lawyer.email });
+      const res = await request(http).patch('/v1/auth/me').set(auth()).send({
+        fullName: verifier.fullName,
+        email: lawyer.email,
+        currentPassword: verifier.password,
+      });
       expect(res.status).toBe(422);
       expect(apiError(res).code).toBe('EMAIL_ALREADY_REGISTERED');
     });

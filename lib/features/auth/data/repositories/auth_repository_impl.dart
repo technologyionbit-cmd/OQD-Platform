@@ -101,8 +101,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Result<AuthUser>> updateProfile({required String fullName, required String email}) {
-    return _errorMapper.capture(() => _remote.updateProfile(fullName: fullName, email: email));
+  Future<Result<AuthUser>> updateProfile({required String fullName, required String email, required String currentPassword}) {
+    return _errorMapper.capture(() => _remote.updateProfile(fullName: fullName, email: email, currentPassword: currentPassword));
   }
 
   @override

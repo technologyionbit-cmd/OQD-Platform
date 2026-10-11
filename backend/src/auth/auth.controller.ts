@@ -153,13 +153,17 @@ export class AuthController {
   }
 
   @Patch('me')
+  @Throttle(STRICT_THROTTLE)
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth(BEARER_AUTH)
   @ApiOperation({
     summary: 'Update name and email',
     description:
-      'The email is contact information only (no code, no sign-in). ' +
-      '422 EMAIL_ALREADY_REGISTERED when another account uses it.',
+      'Every save needs the current password (422 VALIDATION_ERROR on ' +
+      'currentPassword when wrong). The email is contact information only ' +
+      '(no code, no sign-in); 422 EMAIL_ALREADY_REGISTERED when another ' +
+      'account uses it. A verified lawyer who changes their name goes back ' +
+      'to pending review and leaves the marketplace until approved again.',
   })
   @ApiOkResponse({ type: UserResponseDto })
   async updateProfile(

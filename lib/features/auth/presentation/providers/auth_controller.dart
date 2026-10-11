@@ -87,8 +87,8 @@ class AuthController extends AsyncNotifier<AuthUser?> {
     state = const AsyncData(null);
   }
 
-  Future<Result<AuthUser>> updateProfile({required String fullName, required String email}) async {
-    final result = await _repository.updateProfile(fullName: fullName, email: email);
+  Future<Result<AuthUser>> updateProfile({required String fullName, required String email, required String currentPassword}) async {
+    final result = await _repository.updateProfile(fullName: fullName, email: email, currentPassword: currentPassword);
     result.fold((failure) {}, (user) => state = AsyncData(user));
     return result;
   }

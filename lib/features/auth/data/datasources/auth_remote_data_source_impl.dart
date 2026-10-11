@@ -66,11 +66,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthUser> updateProfile({required String fullName, required String email}) {
+  Future<AuthUser> updateProfile({required String fullName, required String email, required String currentPassword}) {
     return _errorMapper.guard(() async {
       final res = await _dio.patch<Map<String, dynamic>>(
         '/auth/me',
-        data: {'fullName': fullName, 'email': email},
+        data: {'fullName': fullName, 'email': email, 'currentPassword': currentPassword},
       );
       return AuthWire.user(AuthWire.data(res.data)['user'] as Map<String, dynamic>);
     });

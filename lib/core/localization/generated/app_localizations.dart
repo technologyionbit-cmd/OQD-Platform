@@ -3074,6 +3074,24 @@ abstract class AppLocalizations {
   /// **'تم تحديث الملف الشخصي'**
   String get profileUpdatedMessage;
 
+  /// No description provided for @editProfilePasswordHelper.
+  ///
+  /// In ar, this message translates to:
+  /// **'مطلوبة لتأكيد هويتك'**
+  String get editProfilePasswordHelper;
+
+  /// No description provided for @editProfileLawyerRenameWarning.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير اسمك سيعيد حسابك إلى المراجعة، ولن يظهر في قائمة المحامين حتى تتم الموافقة عليه من جديد.'**
+  String get editProfileLawyerRenameWarning;
+
+  /// No description provided for @errorCurrentPasswordIncorrect.
+  ///
+  /// In ar, this message translates to:
+  /// **'كلمة المرور الحالية غير صحيحة'**
+  String get errorCurrentPasswordIncorrect;
+
   /// No description provided for @unsavedChangesTitle.
   ///
   /// In ar, this message translates to:

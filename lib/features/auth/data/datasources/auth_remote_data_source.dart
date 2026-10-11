@@ -21,7 +21,7 @@ abstract interface class AuthRemoteDataSource {
 
   Future<AuthUser> currentUser();
 
-  Future<AuthUser> updateProfile({required String fullName, required String email});
+  Future<AuthUser> updateProfile({required String fullName, required String email, required String currentPassword});
 
   Future<void> logout(String refreshToken);
 

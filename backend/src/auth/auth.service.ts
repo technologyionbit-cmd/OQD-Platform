@@ -7,15 +7,15 @@ import type {
   UserRole,
   VerificationPurpose,
 } from '@prisma/client';
-import { forbidden, notFound, unauthorized } from '../common/errors/api-exceptions';
+import {
+  forbidden,
+  notFound,
+  unauthorized,
+} from '../common/errors/api-exceptions';
 import { RateLimitedException } from '../common/errors/rate-limited.exception';
 import type { AuthConfig } from '../config/configuration';
 import { PrismaService } from '../prisma/prisma.service';
-import type {
-  AuthTokens,
-  AuthUserView,
-  RequestContext,
-} from './auth.types';
+import type { AuthTokens, AuthUserView, RequestContext } from './auth.types';
 import type {
   ChangePasswordDto,
   LoginDto,
@@ -28,6 +28,7 @@ import type {
   ResetPasswordDto,
   VerifyOtpDto,
 } from './dto/password-reset.dto';
+import { PERSON_NAME_MAX_LENGTH } from './dto/name.rules';
 import type { AccountType, RegisterDto } from './dto/register.dto';
 import { PasswordService } from './services/password.service';
 import { OtpService, type OtpIssueFilter } from './services/otp.service';
@@ -179,7 +180,10 @@ export class AuthService {
     }
 
     if (user.status !== 'active') {
-      throw forbidden('This account is not active.', ApiErrorCode.ACCOUNT_INACTIVE);
+      throw forbidden(
+        'This account is not active.',
+        ApiErrorCode.ACCOUNT_INACTIVE,
+      );
     }
 
     const tokens = await this.tokens.issueSession(user.id, user.role, ctx);
@@ -215,26 +219,62 @@ export class AuthService {
     userId: string,
     dto: UpdateProfileDto,
   ): Promise<AuthUserView> {
-    const email = dto.email.trim().toLowerCase();
-    const current = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-    if (!current) {
-      throw notFound('Account not found.');
-    }
+    const current = await this.activeUser(userId);
+    await this.assertCurrentPassword(current, dto.currentPassword);
 
-    const emailChanged = current.email.toLowerCase() !== email;
-    if (emailChanged) {
+    const fullName = dto.fullName.trim();
+    if (
+      current.role !== 'company' &&
+      fullName.length > PERSON_NAME_MAX_LENGTH
+    ) {
+      throw this.fieldError(
+        'fullName',
+        `Name must be at most ${PERSON_NAME_MAX_LENGTH} characters.`,
+      );
+    }
+    const email = dto.email.trim().toLowerCase();
+    if (current.email.toLowerCase() !== email) {
       await this.assertEmailAvailable(email);
     }
 
-    const updated = await this.prisma.user
-      .update({
-        where: { id: userId },
-        data: { fullName: dto.fullName.trim(), email },
+    const updated = await this.prisma
+      .$transaction(async (tx) => {
+        const user = await tx.user.update({
+          where: { id: userId },
+          data: { fullName, email },
+        });
+        if (fullName !== current.fullName) {
+          await this.syncDisplayName(tx, userId, fullName);
+        }
+        return user;
       })
       .catch((error: unknown) => this.rethrowUniqueViolation(error));
     return this.toView(updated);
+  }
+
+  /** Copies a new display name to the rows that keep their own copy. A
+   *  verified lawyer goes back to review: the badge vouched for the old
+   *  name, and the admin checks the new one against the same documents. */
+  private async syncDisplayName(
+    tx: Prisma.TransactionClient,
+    userId: string,
+    fullName: string,
+  ): Promise<void> {
+    await tx.lawyerProfile.updateMany({
+      where: { userId, verificationStatus: 'verified' },
+      data: {
+        verificationStatus: 'pending',
+        verificationSubmittedAt: new Date(),
+      },
+    });
+    await tx.lawyerProfile.updateMany({
+      where: { userId },
+      data: { fullName },
+    });
+    await tx.organizationMember.updateMany({
+      where: { userId },
+      data: { fullName },
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -306,11 +346,7 @@ export class AuthService {
    * user holds it) and signs the account out everywhere.
    */
   async resetPassword(dto: ResetPasswordDto): Promise<void> {
-    const result = await this.otp.consume(
-      dto.phone,
-      dto.code,
-      'passwordReset',
-    );
+    const result = await this.otp.consume(dto.phone, dto.code, 'passwordReset');
     const user =
       result.valid && result.userId
         ? await this.prisma.user.findUnique({ where: { id: result.userId } })
@@ -378,16 +414,7 @@ export class AuthService {
       throw unauthorized('Session expired. Please sign in again.');
     }
 
-    const ok = await this.passwords.verify(
-      dto.currentPassword,
-      user.passwordHash,
-    );
-    if (!ok) {
-      throw this.fieldError(
-        'currentPassword',
-        'Current password is incorrect.',
-      );
-    }
+    await this.assertCurrentPassword(user, dto.currentPassword);
 
     const passwordHash = await this.passwords.hash(dto.newPassword);
     await this.prisma.user.update({
@@ -443,6 +470,20 @@ export class AuthService {
   }
 
   /** The caller's account, or 401 when it is gone or no longer active. */
+  /** 422 on `currentPassword` unless [password] is the account's own. */
+  private async assertCurrentPassword(
+    user: User,
+    password: string,
+  ): Promise<void> {
+    const ok = await this.passwords.verify(password, user.passwordHash);
+    if (!ok) {
+      throw this.fieldError(
+        'currentPassword',
+        'Current password is incorrect.',
+      );
+    }
+  }
+
   private async activeUser(userId: string): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user || user.status !== 'active') {
