@@ -29,8 +29,10 @@ class TermsConsentField extends StatefulWidget {
 
 class _TermsConsentFieldState extends State<TermsConsentField> {
   // Recognizers own gesture state, so they live (and die) with this State.
-  late final _termsTap = TapGestureRecognizer()..onTap = () => widget.onOpenTerms();
-  late final _privacyTap = TapGestureRecognizer()..onTap = () => widget.onOpenPrivacy();
+  late final _termsTap =
+      TapGestureRecognizer()..onTap = () => widget.onOpenTerms();
+  late final _privacyTap =
+      TapGestureRecognizer()..onTap = () => widget.onOpenPrivacy();
 
   @override
   void dispose() {
@@ -43,7 +45,11 @@ class _TermsConsentFieldState extends State<TermsConsentField> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    const linkStyle = TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600, decoration: TextDecoration.underline);
+    const linkStyle = TextStyle(
+      color: AppColors.primary,
+      fontWeight: FontWeight.w600,
+      decoration: TextDecoration.underline,
+    );
     final errorText = widget.errorText;
 
     return Column(
@@ -64,9 +70,17 @@ class _TermsConsentFieldState extends State<TermsConsentField> {
                     style: theme.textTheme.bodySmall,
                     children: [
                       TextSpan(text: l10n.authTermsCheckboxPrefix),
-                      TextSpan(text: l10n.authTermsOfService, style: linkStyle, recognizer: _termsTap),
+                      TextSpan(
+                        text: l10n.authTermsOfService,
+                        style: linkStyle,
+                        recognizer: _termsTap,
+                      ),
                       TextSpan(text: l10n.authTermsAgreementJoiner),
-                      TextSpan(text: l10n.authPrivacyPolicy, style: linkStyle, recognizer: _privacyTap),
+                      TextSpan(
+                        text: l10n.authPrivacyPolicy,
+                        style: linkStyle,
+                        recognizer: _privacyTap,
+                      ),
                     ],
                   ),
                 ),
@@ -79,7 +93,12 @@ class _TermsConsentFieldState extends State<TermsConsentField> {
             liveRegion: true,
             child: Padding(
               padding: const EdgeInsetsDirectional.only(start: 12),
-              child: Text(errorText, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error)),
+              child: Text(
+                errorText,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
             ),
           ),
       ],

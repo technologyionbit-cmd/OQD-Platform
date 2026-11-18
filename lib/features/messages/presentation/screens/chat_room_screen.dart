@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:aqd_ionbit/core/config/feature_flags.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
@@ -214,7 +215,9 @@ class _ChatRoomBodyState extends ConsumerState<_ChatRoomBody> {
       (failure) => _showSendFailedSnackbar(l10n, () => _submitText(l10n, text, senderId, role)),
       (message) {
         _scrollToBottom();
-        if (role == UserRole.client) _scheduleMockLawyerReply(l10n, message.text);
+        // The scripted lawyer reply is a demo stand-in for a real lawyer's
+        // message; it must never appear in a release build.
+        if (role == UserRole.client && ref.read(previewFeaturesProvider)) _scheduleMockLawyerReply(l10n, message.text);
       },
     );
   }

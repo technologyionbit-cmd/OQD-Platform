@@ -30,6 +30,12 @@ void main() {
     expect(const ForbiddenFailure(code: ApiErrorCodes.accountInactive).localizedMessage(en), en.errorAccountInactive);
   });
 
+  test('an account type the app cannot serve (admin) gets its own message', () {
+    expect(const ForbiddenFailure(code: ApiErrorCodes.unsupportedRole).localizedMessage(en), en.errorUnsupportedRole);
+    expect(const ForbiddenFailure(code: ApiErrorCodes.unsupportedRole).localizedMessage(ar), ar.errorUnsupportedRole);
+    expect(en.errorUnsupportedRole, isNot(en.errorGeneric));
+  });
+
   test('an unverified phone is explained on any gated action', () {
     expect(const ForbiddenFailure(message: 'Verify your phone number to continue.', code: ApiErrorCodes.phoneNotVerified).localizedMessage(ar), ar.errorPhoneNotVerified);
   });

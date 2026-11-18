@@ -160,6 +160,15 @@ class AppLocalizationsEn extends AppLocalizations {
       'At least 8 characters, with a letter and a number';
 
   @override
+  String get authPasswordStrengthWeak => 'Weak';
+
+  @override
+  String get authPasswordStrengthGood => 'Good';
+
+  @override
+  String get authPasswordStrengthStrong => 'Strong';
+
+  @override
   String get authVerifyPhoneTitle => 'Verify your phone number';
 
   @override
@@ -311,6 +320,10 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get errorUnsupportedRole =>
+      'This account type cannot be used in the app. Please use the admin console.';
 
   @override
   String get errorAccountInactive =>
@@ -2306,4 +2319,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get govProcedureStatusInProgress => 'In progress — awaiting documents';
+
+  @override
+  String get clientHomeGuestTitle => 'Sign in to unlock every service';
+
+  @override
+  String get clientHomeGuestSubtitle =>
+      'Book a lawyer, create contracts, and track your consultations and documents in one place.';
+
+  @override
+  String get loginRequiredTitle => 'Sign in required';
+
+  @override
+  String get loginRequiredMessage =>
+      'Sign in or create an account to use this service.';
+
+  @override
+  String get loginRequiredLater => 'Not now';
+
+  @override
+  String get authBiometricLogin => 'Sign in with fingerprint';
+
+  @override
+  String get authBiometricReason => 'Verify your identity to sign in';
+
+  @override
+  String get authBiometricEnableToggle =>
+      'Enable fingerprint sign-in on this device';
+
+  @override
+  String get authBiometricNotSetUp =>
+      'Fingerprint sign-in is not set up yet. Sign in with your password and enable the option to use it here.';
+
+  @override
+  String get authBiometricUnavailable =>
+      'Fingerprint is unavailable or not enrolled on this device.';
+
+  @override
+  String get authBiometricFailed =>
+      'Fingerprint was not verified. Please try again.';
+
+  @override
+  String get authBiometricRetry => 'Try again';
+
+  @override
+  String get authBiometricExpired =>
+      'The saved sign-in details are no longer valid. Please sign in with your password again.';
+
+  @override
+  String get authWelcomeTitle => 'Welcome';
+
+  @override
+  String get commonShow => 'Show';
+
+  @override
+  String get commonHide => 'Hide';
+
+  @override
+  String get authCreateAccountShort => 'Create account';
 }

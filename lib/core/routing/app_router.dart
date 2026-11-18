@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:aqd_ionbit/core/config/feature_flags.dart';
 import 'package:aqd_ionbit/core/routing/routes/auth_routes.dart';
 import 'package:aqd_ionbit/core/routing/routes/client_contract_routes.dart';
 import 'package:aqd_ionbit/core/routing/routes/client_extra_routes.dart';
@@ -12,6 +13,7 @@ import 'package:aqd_ionbit/core/routing/routes/lawyer_extra_routes.dart';
 import 'package:aqd_ionbit/core/routing/routes/lawyer_routes.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/splash_screen.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
+import 'package:aqd_ionbit/core/routing/splash_hold.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/phone_verification_prompt.dart';
@@ -33,6 +35,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   void refresh() => refreshNotifier.value++;
   ref.listen(authControllerProvider, (_, _) => refresh());
   ref.listen(onboardingControllerProvider, (_, _) => refresh());
+  ref.listen(splashHoldProvider, (_, _) => refresh());
   ref.listen(phoneVerificationPromptProvider, (_, _) => refresh());
   ref.onDispose(refreshNotifier.dispose);
 
@@ -47,9 +50,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ...clientExtraRoutes(),
       ...lawyerExtraRoutes(),
       ...companyExtraRoutes(),
-      clientShellRoute(),
+      clientShellRoute(showPreviewTabs: ref.read(previewFeaturesProvider)),
       lawyerShellRoute(),
-      companyShellRoute(),
+      companyShellRoute(showPreviewTabs: ref.read(previewFeaturesProvider)),
     ],
   );
 });
@@ -77,6 +80,11 @@ String? _redirect(Ref ref, GoRouterState state) {
   final user = authState.value;
   final location = state.matchedLocation;
 
+  // Cold start: keep the splash up for its minimum time.
+  if (ref.read(splashHoldProvider)) {
+    return location == RoutePaths.splash ? null : RoutePaths.splash;
+  }
+
   // An error here means the stored session couldn't be verified (server
   // unreachable) — the splash screen owns the retry, so stay on it rather
   // than treating the user as signed out.
@@ -84,14 +92,21 @@ String? _redirect(Ref ref, GoRouterState state) {
     return location == RoutePaths.splash ? null : RoutePaths.splash;
   }
 
+  // Screens that run on made-up data (AI, documents, team, billing, the
+  // local-only chat) do not exist in release builds: a stale link or typed
+  // URL lands on the user's home instead of an invented screen.
+  if (!ref.read(previewFeaturesProvider) && isPreviewOnlyRoute(location)) {
+    return user == null ? RoutePaths.clientHome : _homeRouteFor(user.role);
+  }
+
   // Signed out: onboarding until it's been seen, then only the public auth
-  // screens — landing on login by default (including straight out of
-  // onboarding, which is how onboarding "navigates" when it completes).
+  // screens. There is no guest mode — everything else (including splash and
+  // onboarding once seen) lands on the welcome page with login / register.
   if (user == null) {
     if (!ref.read(onboardingControllerProvider)) {
       return location == RoutePaths.onboarding ? null : RoutePaths.onboarding;
     }
-    return publicAuthRoutes.contains(location) ? null : RoutePaths.login;
+    return publicAuthRoutes.contains(location) ? null : RoutePaths.welcome;
   }
 
   // Signed in with an unverified phone: the code screen while the prompt
@@ -106,11 +121,27 @@ String? _redirect(Ref ref, GoRouterState state) {
   // and confined to their own role's route subtree — a client hitting
   // `/lawyer/dashboard` (typed URL, stale deep link, whatever) lands back
   // on their own home rather than a lawyer-only screen.
-  final isEntryOrPublicRoute = location == RoutePaths.splash || location == RoutePaths.onboarding || publicAuthRoutes.contains(location);
+  final isEntryOrPublicRoute =
+      location == RoutePaths.loginRequired || location == RoutePaths.splash || location == RoutePaths.onboarding || publicAuthRoutes.contains(location);
   final isOnOwnRoleRoute = location.startsWith(_roleBase(user.role));
 
   if (isEntryOrPublicRoute || !isOnOwnRoleRoute) {
+    // Just signed in from a guest-triggered login: resume where they were.
+    final from = state.uri.queryParameters['from'];
+    if (publicAuthRoutes.contains(location) && from != null && from.startsWith(_roleBase(user.role))) {
+      return from;
+    }
     return _homeRouteFor(user.role);
   }
   return null;
 }
+
+final _previewOnlyRoutes = RegExp(
+  r'^/(client|lawyer|company)/('
+  r'ai(/.*)?|documents|subscription|account/(payment-methods|signature|invoices)|consultations/[^/]+/chat'
+  r')$|^/company/team(/.*)?$',
+);
+
+/// Routes backed by mock/local-only data, reachable only while
+/// `FeatureFlags.previewFeatures` is on (FE-01b).
+bool isPreviewOnlyRoute(String location) => _previewOnlyRoutes.hasMatch(location);

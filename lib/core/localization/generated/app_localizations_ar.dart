@@ -158,6 +158,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authPasswordRulesHint => '8 أحرف على الأقل، وتحتوي على حرف ورقم';
 
   @override
+  String get authPasswordStrengthWeak => 'ضعيفة';
+
+  @override
+  String get authPasswordStrengthGood => 'جيدة';
+
+  @override
+  String get authPasswordStrengthStrong => 'قوية';
+
+  @override
   String get authVerifyPhoneTitle => 'تأكيد رقم الهاتف';
 
   @override
@@ -308,6 +317,10 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get errorUnsupportedRole =>
+      'هذا الحساب مخصص للإدارة ولا يمكن استخدامه في التطبيق.';
 
   @override
   String get errorAccountInactive =>
@@ -2269,4 +2282,60 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get govProcedureStatusInProgress => 'قيد الإجراء — بانتظار المستندات';
+
+  @override
+  String get clientHomeGuestTitle => 'سجّل دخولك للاستفادة من كل الخدمات';
+
+  @override
+  String get clientHomeGuestSubtitle =>
+      'احجز محامياً، أنشئ عقودك، وتابع استشاراتك ومستنداتك من مكان واحد.';
+
+  @override
+  String get loginRequiredTitle => 'تسجيل الدخول مطلوب';
+
+  @override
+  String get loginRequiredMessage =>
+      'سجّل دخولك أو أنشئ حساباً للاستفادة من هذه الخدمة.';
+
+  @override
+  String get loginRequiredLater => 'لاحقاً';
+
+  @override
+  String get authBiometricLogin => 'الدخول بالبصمة';
+
+  @override
+  String get authBiometricReason => 'تحقق من هويتك لتسجيل الدخول';
+
+  @override
+  String get authBiometricEnableToggle => 'تفعيل الدخول بالبصمة على هذا الجهاز';
+
+  @override
+  String get authBiometricNotSetUp =>
+      'لم يتم تفعيل الدخول بالبصمة بعد. سجّل دخولك بكلمة المرور وفعّل الخيار ليظهر هنا.';
+
+  @override
+  String get authBiometricUnavailable =>
+      'البصمة غير متوفرة أو غير مفعّلة على هذا الجهاز.';
+
+  @override
+  String get authBiometricFailed => 'لم يتم التحقق من البصمة. حاول مرة أخرى.';
+
+  @override
+  String get authBiometricRetry => 'المحاولة مرة أخرى';
+
+  @override
+  String get authBiometricExpired =>
+      'انتهت صلاحية بيانات الدخول المحفوظة. سجّل دخولك بكلمة المرور من جديد.';
+
+  @override
+  String get authWelcomeTitle => 'أهلاً بك';
+
+  @override
+  String get commonShow => 'عرض';
+
+  @override
+  String get commonHide => 'إخفاء';
+
+  @override
+  String get authCreateAccountShort => 'إنشاء حساب';
 }

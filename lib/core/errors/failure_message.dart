@@ -20,6 +20,7 @@ extension FailureMessage on Failure {
     Failure(code: ApiErrorCodes.invalidVerificationCode) => l10n.authOtpInvalidCode,
     Failure(code: ApiErrorCodes.verificationCodeLocked) => l10n.errorVerificationCodeLocked,
     Failure(code: ApiErrorCodes.contractStatusConflict) => l10n.errorContractStatusConflict,
+    Failure(code: ApiErrorCodes.unsupportedRole) => l10n.errorUnsupportedRole,
     ServerFailure() => l10n.errorServer,
     _ => l10n.errorGeneric,
   };

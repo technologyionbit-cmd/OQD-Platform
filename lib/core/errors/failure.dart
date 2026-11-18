@@ -90,4 +90,8 @@ abstract final class ApiErrorCodes {
   static const verificationCodeLocked = 'VERIFICATION_CODE_LOCKED';
   static const phoneNotVerified = 'PHONE_NOT_VERIFIED';
   static const contractStatusConflict = 'CONTRACT_STATUS_CONFLICT';
+
+  /// Client-side only (not sent by the backend): the account's role has no
+  /// screens in this app, e.g. an administrator account.
+  static const unsupportedRole = 'UNSUPPORTED_ROLE';
 }

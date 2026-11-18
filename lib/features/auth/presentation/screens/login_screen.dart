@@ -11,12 +11,13 @@ import 'package:aqd_ionbit/core/theme/app_colors.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/utils/jordan_mobile.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
-import 'package:aqd_ionbit/core/widgets/app_button.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
-import 'package:aqd_ionbit/core/widgets/icon_badge.dart';
-import 'package:aqd_ionbit/core/widgets/language_switch_button.dart';
+import 'package:aqd_ionbit/core/widgets/phone_field.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/sanad_auth_page.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/sanad_button.dart';
+import 'package:aqd_ionbit/core/providers/core_providers.dart';
 
 /// Phone number + password only. The account's role (returned by the backend)
 /// decides which shell the router lands on — there is no role selector,
@@ -37,6 +38,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _passwordError;
   String? _formError;
   bool _isSubmitting = false;
+  bool _biometricAvailable = false;
+  bool _enableBiometric = true;
+
+  @override
+  void initState() {
+    super.initState();
+    ref.read(biometricServiceProvider).isAvailable().then((v) {
+      if (mounted) setState(() => _biometricAvailable = v);
+    });
+  }
 
   @override
   void dispose() {
@@ -58,7 +69,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             : phone == null
             ? l10n.validationInvalidJordanMobile
             : null;
-    final passwordError = !Validators.isRequired(_passwordController.text) ? l10n.validationRequired : null;
+    final passwordError =
+        !Validators.isRequired(_passwordController.text)
+            ? l10n.validationRequired
+            : null;
 
     setState(() {
       _phoneError = phoneError;
@@ -68,9 +82,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (phone == null || passwordError != null) return;
 
     setState(() => _isSubmitting = true);
+    final biometric = ref.read(biometricServiceProvider);
+    final password = _passwordController.text;
+    final saveBiometric = _biometricAvailable && _enableBiometric;
     final result = await ref
         .read(authControllerProvider.notifier)
-        .login(phone: phone, password: _passwordController.text);
+        .login(phone: phone, password: password);
+    // Runs before the mounted check: a successful login makes the router
+    // leave (and dispose) this screen immediately.
+    if (result is Success) {
+      if (saveBiometric) {
+        await biometric.saveCredentials(phone: phone, password: password);
+      } else if (_biometricAvailable) {
+        await biometric.clearCredentials();
+      }
+    }
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
@@ -84,96 +110,98 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   /// A 401 here means wrong credentials, not an expired session.
-  String _messageFor(Failure failure, AppLocalizations l10n) => switch (failure) {
-    UnauthorizedFailure() => l10n.errorInvalidCredentials,
-    _ => failure.localizedMessage(l10n),
-  };
+  String _messageFor(Failure failure, AppLocalizations l10n) =>
+      switch (failure) {
+        UnauthorizedFailure() => l10n.errorInvalidCredentials,
+        _ => failure.localizedMessage(l10n),
+      };
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 420),
-              child: AutofillGroup(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Align(alignment: AlignmentDirectional.centerEnd, child: LanguageSwitchButton()),
-                    const Center(
-                      child: IconBadge(
-                        icon: Icons.gavel_rounded,
-                        backgroundColor: AppColors.navy,
-                        iconColor: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-                    Text(
-                      l10n.authLoginTitle,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: AppSpacing.xxs),
-                    Text(
-                      l10n.authLoginSubtitle,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    AppTextField(
-                      controller: _phoneController,
-                      label: l10n.authPhoneLabel,
-                      hintText: l10n.authPhoneHint,
-                      errorText: _phoneError,
-                      keyboardType: TextInputType.phone,
-                      textInputAction: TextInputAction.next,
-                      autofillHints: const [AutofillHints.telephoneNumber],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    AppTextField(
-                      controller: _passwordController,
-                      label: l10n.authPasswordLabel,
-                      errorText: _passwordError,
-                      obscureText: true,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => _submit(),
-                      autofillHints: const [AutofillHints.password],
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: TextButton(
-                        onPressed: () => context.push(RoutePaths.forgotPassword),
-                        child: Text(l10n.authForgotPassword),
-                      ),
-                    ),
-                    AuthFormError(_formError),
-                    const SizedBox(height: AppSpacing.md),
-                    AppButton(label: l10n.authLoginSubmit, isLoading: _isSubmitting, onPressed: _submit),
-                    const SizedBox(height: AppSpacing.lg),
-                    Center(
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Text(l10n.authNoAccount, style: Theme.of(context).textTheme.bodyMedium),
-                          TextButton(
-                            onPressed: () => context.push(RoutePaths.register),
-                            child: Text(l10n.authCreateAccount),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+    // Sanad-style login page: a centered title bar with a chevron, the two
+    // fields at the top, a text "show" toggle on the password, the blue
+    // button, then a one-line "create account" link.
+    return SanadAuthPage(
+      title: l10n.authLoginTitle,
+      child: AutofillGroup(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            PhoneField(
+              controller: _phoneController,
+              label: l10n.authPhoneLabel,
+              errorText: _phoneError,
+              textInputAction: TextInputAction.next,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            AppTextField(
+              controller: _passwordController,
+              label: l10n.authPasswordLabel,
+              prefixIcon: Icons.lock_rounded,
+              errorText: _passwordError,
+              obscureText: true,
+              textDirection: Directionality.of(context),
+              toggleLabels: (l10n.commonShow, l10n.commonHide),
+              textInputAction: TextInputAction.done,
+              onSubmitted: (_) => _submit(),
+              autofillHints: const [AutofillHints.password],
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextButton(
+                onPressed: () => context.push(RoutePaths.forgotPassword),
+                child: Text(
+                  l10n.authForgotPassword,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
-          ),
+            if (_biometricAvailable)
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                dense: true,
+                value: _enableBiometric,
+                onChanged: (v) => setState(() => _enableBiometric = v ?? false),
+                title: Text(
+                  l10n.authBiometricEnableToggle,
+                  style: textTheme.bodyMedium,
+                ),
+              ),
+            AuthFormError(_formError),
+            const SizedBox(height: AppSpacing.lg),
+            SanadButton(
+              label: l10n.authLoginTitle,
+              isLoading: _isSubmitting,
+              onPressed: _submit,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: AppSpacing.xs,
+              children: [
+                Text(l10n.authNoAccount, style: textTheme.bodyMedium),
+                GestureDetector(
+                  onTap: () => context.push(RoutePaths.register),
+                  child: Text(
+                    l10n.authCreateAccountShort,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: AppColors.primary,
+                      decoration: TextDecoration.underline,
+                      decorationColor: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

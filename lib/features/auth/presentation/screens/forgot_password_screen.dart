@@ -15,7 +15,7 @@ import 'package:aqd_ionbit/core/theme/app_status_colors.dart';
 import 'package:aqd_ionbit/core/utils/jordan_mobile.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
 import 'package:aqd_ionbit/core/widgets/app_button.dart';
-import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
+import 'package:aqd_ionbit/core/widgets/phone_field.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_scaffold.dart';
@@ -27,7 +27,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
@@ -50,11 +51,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     FocusScope.of(context).unfocus();
     final phone = JordanMobile.normalize(_phoneController.text);
 
-    final phoneError = !Validators.isRequired(_phoneController.text)
-        ? l10n.validationRequired
-        : phone == null
-        ? l10n.validationInvalidJordanMobile
-        : null;
+    final phoneError =
+        !Validators.isRequired(_phoneController.text)
+            ? l10n.validationRequired
+            : phone == null
+            ? l10n.validationInvalidJordanMobile
+            : null;
     setState(() {
       _phoneError = phoneError;
       _formError = null;
@@ -62,14 +64,18 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     });
     if (phone == null) return;
 
-    final result = await ref.read(authRepositoryProvider).requestPasswordReset(phone: phone);
+    final result = await ref
+        .read(authRepositoryProvider)
+        .requestPasswordReset(phone: phone);
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
     switch (result) {
       case Success():
         unawaited(context.push(RoutePaths.otpVerification, extra: phone));
-      case ResultFailure(failure: ValidationFailure(code: ApiErrorCodes.validationError)):
+      case ResultFailure(
+        failure: ValidationFailure(code: ApiErrorCodes.validationError),
+      ):
         setState(() => _phoneError = l10n.validationInvalidJordanMobile);
       case ResultFailure(:final failure):
         setState(() => _formError = failure.localizedMessage(l10n));
@@ -88,40 +94,59 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            AppTextField(
+            PhoneField(
               controller: _phoneController,
               label: l10n.authPhoneLabel,
-              hintText: l10n.authPhoneHint,
               errorText: _phoneError,
-              keyboardType: TextInputType.phone,
               textInputAction: TextInputAction.done,
-              autofillHints: const [AutofillHints.telephoneNumber],
               onSubmitted: (_) => _send(),
             ),
             const SizedBox(height: AppSpacing.md),
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
-              decoration: BoxDecoration(color: context.statusColors.info.background, borderRadius: AppRadii.mdRadius),
+              decoration: BoxDecoration(
+                color: context.statusColors.info.background,
+                borderRadius: AppRadii.mdRadius,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.info_outline, size: 18, color: context.statusColors.info.foreground),
+                  Icon(
+                    Icons.info_outline,
+                    size: 18,
+                    color: context.statusColors.info.foreground,
+                  ),
                   const SizedBox(width: AppSpacing.xs),
-                  Expanded(child: Text(l10n.authPhoneInfo, style: Theme.of(context).textTheme.bodySmall)),
+                  Expanded(
+                    child: Text(
+                      l10n.authPhoneInfo,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
                 ],
               ),
             ),
             AuthFormError(_formError),
             const SizedBox(height: AppSpacing.lg),
-            AppButton(label: l10n.authSendCode, isLoading: _isSubmitting, onPressed: _send),
+            AppButton(
+              label: l10n.authSendCode,
+              isLoading: _isSubmitting,
+              onPressed: _send,
+            ),
             const SizedBox(height: AppSpacing.md),
             Center(
               child: Wrap(
                 alignment: WrapAlignment.center,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Text(l10n.authRememberPassword, style: Theme.of(context).textTheme.bodyMedium),
-                  TextButton(onPressed: () => context.go(RoutePaths.login), child: Text(l10n.authLoginTitle)),
+                  Text(
+                    l10n.authRememberPassword,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  TextButton(
+                    onPressed: () => context.go(RoutePaths.login),
+                    child: Text(l10n.authLoginTitle),
+                  ),
                 ],
               ),
             ),

@@ -69,6 +69,9 @@
   "authPrivacyPolicy": "سياسة الخصوصية",
   "authTermsCheckboxPrefix": "أوافق على ",
   "authPasswordRulesHint": "8 أحرف على الأقل، وتحتوي على حرف ورقم",
+  "authPasswordStrengthWeak": "ضعيفة",
+  "authPasswordStrengthGood": "جيدة",
+  "authPasswordStrengthStrong": "قوية",
   "authVerifyPhoneTitle": "تأكيد رقم الهاتف",
   "authVerifyPhoneSubtitle": "أرسلنا رسالة نصية فيها رمز من 6 أرقام إلى {phone}",
   "@authVerifyPhoneSubtitle": {
@@ -144,6 +147,7 @@
       "minutes": { "type": "int" }
     }
   },
+  "errorUnsupportedRole": "هذا الحساب مخصص للإدارة ولا يمكن استخدامه في التطبيق.",
   "errorAccountInactive": "هذا الحساب غير مفعّل، يرجى التواصل مع الدعم",
   "errorPhoneNotVerified": "أكّد رقم هاتفك أولًا لإتمام هذا الإجراء",
   "errorEmailAlreadyRegistered": "هذا البريد الإلكتروني مسجَّل مسبقًا",
@@ -938,5 +942,22 @@
   "govProcedureStepsTitle": "خطوات الإجراء",
   "govStartProcedure": "ابدأ الإجراء الآن",
   "govProcedureStartedMessage": "تم بدء متابعة الإجراء — يمكنك متابعة حالته من هنا",
-  "govProcedureStatusInProgress": "قيد الإجراء — بانتظار المستندات"
+  "govProcedureStatusInProgress": "قيد الإجراء — بانتظار المستندات",
+  "clientHomeGuestTitle": "سجّل دخولك للاستفادة من كل الخدمات",
+  "clientHomeGuestSubtitle": "احجز محامياً، أنشئ عقودك، وتابع استشاراتك ومستنداتك من مكان واحد.",
+  "loginRequiredTitle": "تسجيل الدخول مطلوب",
+  "loginRequiredMessage": "سجّل دخولك أو أنشئ حساباً للاستفادة من هذه الخدمة.",
+  "loginRequiredLater": "لاحقاً",
+  "authBiometricLogin": "الدخول بالبصمة",
+  "authBiometricReason": "تحقق من هويتك لتسجيل الدخول",
+  "authBiometricEnableToggle": "تفعيل الدخول بالبصمة على هذا الجهاز",
+  "authBiometricNotSetUp": "لم يتم تفعيل الدخول بالبصمة بعد. سجّل دخولك بكلمة المرور وفعّل الخيار ليظهر هنا.",
+  "authBiometricUnavailable": "البصمة غير متوفرة أو غير مفعّلة على هذا الجهاز.",
+  "authBiometricFailed": "لم يتم التحقق من البصمة. حاول مرة أخرى.",
+  "authBiometricRetry": "المحاولة مرة أخرى",
+  "authBiometricExpired": "انتهت صلاحية بيانات الدخول المحفوظة. سجّل دخولك بكلمة المرور من جديد.",
+  "authWelcomeTitle": "أهلاً بك",
+  "commonShow": "عرض",
+  "commonHide": "إخفاء",
+  "authCreateAccountShort": "إنشاء حساب"
 }

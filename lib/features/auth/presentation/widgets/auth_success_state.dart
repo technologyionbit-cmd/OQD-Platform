@@ -36,16 +36,25 @@ class AuthSuccessState extends StatelessWidget {
           width: 88,
           height: 88,
           alignment: Alignment.center,
-          decoration: BoxDecoration(color: success.background, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: success.background,
+            shape: BoxShape.circle,
+          ),
           child: Icon(Icons.check_rounded, color: success.foreground, size: 40),
         ),
         const SizedBox(height: AppSpacing.lg),
-        Text(title, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall),
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
         const SizedBox(height: AppSpacing.xs),
         Text(
           message,
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
         ),
         const SizedBox(height: AppSpacing.xl),
         AppButton(label: primaryLabel, onPressed: onPrimary),

@@ -20,13 +20,18 @@ import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_success_state
 /// previous screen checked. Success signs the account out everywhere, so
 /// the user continues from the login screen.
 class ResetPasswordScreen extends ConsumerStatefulWidget {
-  const ResetPasswordScreen({super.key, required this.phone, required this.code});
+  const ResetPasswordScreen({
+    super.key,
+    required this.phone,
+    required this.code,
+  });
 
   final String phone;
   final String code;
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
@@ -53,7 +58,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     FocusScope.of(context).unfocus();
 
     final passwordError = newPasswordError(_passwordController.text, l10n);
-    final confirmError = _confirmController.text == _passwordController.text ? null : l10n.validationPasswordMismatch;
+    final confirmError =
+        _confirmController.text == _passwordController.text
+            ? null
+            : l10n.validationPasswordMismatch;
 
     setState(() {
       _passwordError = passwordError;
@@ -65,7 +73,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
 
     final result = await ref
         .read(authRepositoryProvider)
-        .resetPassword(phone: widget.phone, code: widget.code, newPassword: _passwordController.text);
+        .resetPassword(
+          phone: widget.phone,
+          code: widget.code,
+          newPassword: _passwordController.text,
+        );
     if (!mounted) return;
 
     setState(() {
@@ -83,9 +95,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   void _applyFailure(Failure failure, AppLocalizations l10n) {
     switch (failure) {
       // The code expired, got locked, or was used since the previous screen.
-      case Failure(code: ApiErrorCodes.invalidVerificationCode || ApiErrorCodes.verificationCodeLocked):
+      case Failure(
+        code: ApiErrorCodes.invalidVerificationCode ||
+            ApiErrorCodes.verificationCodeLocked,
+      ):
         _formError = l10n.authResetCodeExpired;
-      case ValidationFailure(code: ApiErrorCodes.validationError, :final fieldErrors) when fieldErrors.containsKey('newPassword'):
+      case ValidationFailure(
+            code: ApiErrorCodes.validationError,
+            :final fieldErrors,
+          )
+          when fieldErrors.containsKey('newPassword'):
         _passwordError = l10n.authPasswordRulesHint;
       default:
         _formError = failure.localizedMessage(l10n);
@@ -131,7 +150,11 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           ),
           AuthFormError(_formError),
           const SizedBox(height: AppSpacing.xl),
-          AppButton(label: l10n.authResetPasswordSubmit, isLoading: _isSubmitting, onPressed: _submit),
+          AppButton(
+            label: l10n.authResetPasswordSubmit,
+            isLoading: _isSubmitting,
+            onPressed: _submit,
+          ),
         ],
       ),
     );

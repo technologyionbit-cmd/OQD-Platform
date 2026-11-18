@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
+import 'package:aqd_ionbit/core/config/feature_flags.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
@@ -195,7 +196,7 @@ class _ConsultationDetailsBodyState extends ConsumerState<_ConsultationDetailsBo
                     onPressed: () => context.push(RoutePaths.consultationRoomFor(widget.routeBase, consultation.id)),
                   ),
                   const SizedBox(height: AppSpacing.sm),
-                ] else if (consultation.type == ConsultationType.written && canMessage) ...[
+                ] else if (consultation.type == ConsultationType.written && canMessage && ref.watch(previewFeaturesProvider)) ...[
                   AppButton(
                     label: l10n.chatOpenAction,
                     icon: Icons.chat_bubble_outline,

@@ -19,28 +19,18 @@ class AppColors {
   // This is what ColorScheme.primary maps to, not the navy above.
   static const primary = Color(0xFF0078C0);
   static const primaryDark = Color(0xFF005E96);
-  static const cyanAccent = Color(0xFF00A9C0);
 
   // Gold/amber — ratings, "Pro"/"most popular" badges, demo-data callouts.
   static const secondary = Color(0xFFC98A0E);
   static const secondaryBackground = Color(0xFFFCF0C0);
-  static const amberLight = Color(0xFFE0B34D);
-
-  // NDA/lock and similar category-icon accent seen in the template gallery.
-  static const purpleAccent = Color(0xFF7C4DFF);
-
-  // "Book a lawyer" service-tile gradient — a distinct violet from
-  // purpleAccent above (different reference sample).
-  static const violet = Color(0xFF6A3FBF);
-  static const violetLight = Color(0xFF9A6BE0);
 
   static const background = Color(0xFFF7F8FA);
   static const surface = Color(0xFFFFFFFF);
   static const surfaceVariant = Color(0xFFEEF1F4);
 
   static const textPrimary = Color(0xFF0F1B2B);
-  static const textSecondary = Color(0xFF6B7280);
-  static const textDisabled = Color(0xFFA1A7AE);
+  static const textSecondary = Color(0xFF5B6472);
+  static const textDisabled = Color(0xFF8A919B);
   static const onPrimary = Color(0xFFFFFFFF);
 
   static const border = Color(0xFFE1E4E8);
@@ -49,11 +39,11 @@ class AppColors {
   // Status — matches the badge colors used for contract/document/booking
   // states (completed/pending-signature/draft) and analysis-risk alerts.
   static const success = Color(0xFF188C4E);
-  static const successBackground = Color(0xFFC8F0D4);
+  static const successBackground = Color(0xFFE6F5EC);
   static const warning = secondary;
-  static const warningBackground = secondaryBackground;
+  static const warningBackground = Color(0xFFFBF1DC);
   static const error = Color(0xFFD64545);
-  static const errorBackground = Color(0xFFFCD8D8);
+  static const errorBackground = Color(0xFFFBE7E7);
   static const info = primary;
   static const infoBackground = Color(0xFFE1F0FB);
   static const neutral = Color(0xFF6B7280);
@@ -64,4 +54,6 @@ class AppColors {
   static const surfaceDark = Color(0xFF152238);
   static const textPrimaryDark = Color(0xFFF2F3F4);
   static const textSecondaryDark = Color(0xFF9AA1A9);
+  static const borderDark = Color(0xFF263650);
+  static const surfaceVariantDark = Color(0xFF1B2A44);
 }

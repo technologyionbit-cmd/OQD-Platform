@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:aqd_ionbit/core/config/feature_flags.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
@@ -310,7 +311,8 @@ class _VideoCallBodyState extends ConsumerState<_VideoCallBody> {
                 onPressed: () => ref.read(sessionControllerProvider(_sessionArg).notifier).reportConnectionLost(),
               ),
             if (sessionState != SessionState.ended) ...[
-              IconButton(icon: const Icon(Icons.chat_bubble_outline), tooltip: l10n.videoCallChatAction, onPressed: _openChat),
+              if (ref.watch(previewFeaturesProvider))
+                IconButton(icon: const Icon(Icons.chat_bubble_outline), tooltip: l10n.videoCallChatAction, onPressed: _openChat),
               IconButton(icon: const Icon(Icons.info_outline), tooltip: l10n.chatViewDetails, onPressed: _openDetails),
             ],
           ],

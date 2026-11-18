@@ -39,6 +39,7 @@ dependencies:
   image_picker: ^1.1.2
   url_launcher: ^6.3.2
   file_picker: ^13.1.0
+  local_auth: ^3.0.2
 
 dev_dependencies:
   flutter_test:
@@ -58,3 +59,20 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+  assets:
+    - assets/icons/
+    - assets/images/
+
+  # IBM Plex Sans Arabic (SIL OFL). Only the weights the type scale uses are
+  # bundled; Thin/ExtraLight/Light stay in assets/fonts/ unregistered.
+  fonts:
+    - family: IBMPlexSansArabic
+      fonts:
+        - asset: assets/fonts/IBMPlexSansArabic-Regular.ttf
+        - asset: assets/fonts/IBMPlexSansArabic-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/IBMPlexSansArabic-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/IBMPlexSansArabic-Bold.ttf
+          weight: 700

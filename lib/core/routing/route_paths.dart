@@ -4,6 +4,11 @@ class RoutePaths {
   static const splash = '/splash';
   static const onboarding = '/onboarding';
   static const login = '/login';
+  static const welcome = '/welcome';
+  static const biometricLogin = '/biometric-login';
+
+  /// Popup shown to guests who open something that needs an account.
+  static const loginRequired = '/login-required';
   static const register = '/register';
   static const forgotPassword = '/forgot-password';
   static const otpVerification = '/otp-verification';

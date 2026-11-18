@@ -31,7 +31,8 @@ class OtpVerificationScreen extends ConsumerStatefulWidget {
   static const resendCooldown = Duration(seconds: 60);
 
   @override
-  ConsumerState<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
+  ConsumerState<OtpVerificationScreen> createState() =>
+      _OtpVerificationScreenState();
 }
 
 class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
@@ -80,13 +81,18 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       _isSubmitting = true;
       _error = null;
     });
-    final result = await ref.read(authRepositoryProvider).verifyPasswordResetCode(phone: widget.phone, code: code);
+    final result = await ref
+        .read(authRepositoryProvider)
+        .verifyPasswordResetCode(phone: widget.phone, code: code);
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
     switch (result) {
       case Success():
-        context.pushReplacement(RoutePaths.resetPassword, extra: (phone: widget.phone, code: code));
+        context.pushReplacement(
+          RoutePaths.resetPassword,
+          extra: (phone: widget.phone, code: code),
+        );
       case ResultFailure(:final failure):
         setState(() => _error = _messageFor(failure, l10n));
     }
@@ -100,14 +106,18 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       _isResending = true;
       _error = null;
     });
-    final result = await ref.read(authRepositoryProvider).requestPasswordReset(phone: widget.phone);
+    final result = await ref
+        .read(authRepositoryProvider)
+        .requestPasswordReset(phone: widget.phone);
     if (!mounted) return;
     setState(() => _isResending = false);
 
     switch (result) {
       case Success():
         setState(() => _startCooldown(OtpVerificationScreen.resendCooldown));
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.authCodeResent)));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.authCodeResent)));
       case ResultFailure(failure: RateLimitedFailure(:final retryAfter?)):
         // The server knows the real wait; the countdown shows it.
         setState(() => _startCooldown(retryAfter));
@@ -117,10 +127,12 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   }
 
   /// A malformed code (plain 422) reads the same as a wrong one.
-  String _messageFor(Failure failure, AppLocalizations l10n) => switch (failure) {
-    ValidationFailure(code: ApiErrorCodes.validationError) => l10n.authOtpInvalidCode,
-    _ => failure.localizedMessage(l10n),
-  };
+  String _messageFor(Failure failure, AppLocalizations l10n) =>
+      switch (failure) {
+        ValidationFailure(code: ApiErrorCodes.validationError) =>
+          l10n.authOtpInvalidCode,
+        _ => failure.localizedMessage(l10n),
+      };
 
   String _countdownLabel() {
     final minutes = (_secondsRemaining ~/ 60).toString().padLeft(2, '0');
@@ -139,7 +151,10 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          OtpCodeField(length: _codeLength, onChanged: (value) => setState(() => _code = value)),
+          OtpCodeField(
+            length: _codeLength,
+            onChanged: (value) => setState(() => _code = value),
+          ),
           AuthFormError(_error),
           const SizedBox(height: AppSpacing.xl),
           AppButton(
@@ -149,12 +164,18 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
           Center(
-            child: _secondsRemaining > 0
-                ? Text(
-                    l10n.authOtpResendIn(_countdownLabel()),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-                  )
-                : TextButton(onPressed: _isResending ? null : _resend, child: Text(l10n.authResend)),
+            child:
+                _secondsRemaining > 0
+                    ? Text(
+                      l10n.authOtpResendIn(_countdownLabel()),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    )
+                    : TextButton(
+                      onPressed: _isResending ? null : _resend,
+                      child: Text(l10n.authResend),
+                    ),
           ),
         ],
       ),

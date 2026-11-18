@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart' show DateFormat;
 
+import 'package:aqd_ionbit/core/config/feature_flags.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
@@ -172,7 +173,13 @@ class _ConsultationWaitingBodyState extends ConsumerState<_ConsultationWaitingBo
     setState(() => _isJoining = false);
 
     if (result.valueOrNull?.state == SessionState.active) {
-      context.pushReplacement(RoutePaths.chatRoomFor(widget.routeBase, consultation.id));
+      // The chat has no backend yet; without the preview flag the details
+      // screen is the only honest place to land.
+      context.pushReplacement(
+        ref.read(previewFeaturesProvider)
+            ? RoutePaths.chatRoomFor(widget.routeBase, consultation.id)
+            : RoutePaths.consultationDetailsFor(widget.routeBase, consultation.id),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.consultationRoomJoinFailedMessage)));
     }

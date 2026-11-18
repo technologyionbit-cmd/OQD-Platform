@@ -15,6 +15,9 @@ class AppTheme {
       secondary: AppColors.secondary,
       onSecondary: AppColors.onPrimary,
       onSurface: AppColors.textPrimary,
+      onSurfaceVariant: AppColors.textSecondary,
+      surfaceContainerHighest: AppColors.surfaceVariant,
+      outlineVariant: AppColors.border,
       error: AppColors.error,
     );
 
@@ -34,6 +37,9 @@ class AppTheme {
       onSecondary: AppColors.textPrimary,
       surface: AppColors.surfaceDark,
       onSurface: AppColors.textPrimaryDark,
+      onSurfaceVariant: AppColors.textSecondaryDark,
+      surfaceContainerHighest: AppColors.surfaceVariantDark,
+      outlineVariant: AppColors.borderDark,
       error: AppColors.error,
       onError: AppColors.onPrimary,
     );
@@ -41,10 +47,7 @@ class AppTheme {
     return _build(
       colorScheme: colorScheme,
       scaffoldBackground: AppColors.backgroundDark,
-      textTheme: AppTypography.textTheme(
-        primaryColor: AppColors.textPrimaryDark,
-        secondaryColor: AppColors.textSecondaryDark,
-      ),
+      textTheme: AppTypography.textTheme(primaryColor: AppColors.textPrimaryDark, secondaryColor: AppColors.textSecondaryDark),
       statusColors: AppStatusColors.dark,
     );
   }
@@ -57,6 +60,7 @@ class AppTheme {
   }) {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: AppTypography.fontFamily,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: scaffoldBackground,
       textTheme: textTheme,
@@ -70,15 +74,18 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: colorScheme.surface,
         elevation: 0,
-        shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdRadius, side: BorderSide(color: AppColors.border)),
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.mdRadius, side: BorderSide(color: colorScheme.outlineVariant)),
         margin: EdgeInsets.zero,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
+          elevation: 0,
+          shadowColor: Colors.transparent,
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
-          disabledBackgroundColor: AppColors.textDisabled,
-          minimumSize: const Size.fromHeight(52),
+          disabledBackgroundColor: colorScheme.surfaceContainerHighest,
+          disabledForegroundColor: AppColors.textDisabled,
+          minimumSize: const Size.fromHeight(48),
           shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
           textStyle: textTheme.labelLarge,
         ),
@@ -87,29 +94,24 @@ class AppTheme {
         style: OutlinedButton.styleFrom(
           foregroundColor: colorScheme.primary,
           side: BorderSide(color: colorScheme.primary),
-          minimumSize: const Size.fromHeight(52),
+          minimumSize: const Size.fromHeight(48),
           shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
           textStyle: textTheme.labelLarge,
         ),
       ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: colorScheme.primary, textStyle: textTheme.labelLarge),
-      ),
+      textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(foregroundColor: colorScheme.primary, textStyle: textTheme.labelLarge)),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: colorScheme.surface,
         contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
-        border: const OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide(color: AppColors.border)),
-        enabledBorder: const OutlineInputBorder(
-          borderRadius: AppRadii.mdRadius,
-          borderSide: BorderSide(color: AppColors.border),
-        ),
+        border: OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide(color: colorScheme.outlineVariant)),
+        enabledBorder: OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide(color: colorScheme.outlineVariant)),
         focusedBorder: OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide(color: colorScheme.primary)),
         errorBorder: const OutlineInputBorder(borderRadius: AppRadii.mdRadius, borderSide: BorderSide(color: AppColors.error)),
         labelStyle: textTheme.bodyMedium,
-        hintStyle: textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+        hintStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurfaceVariant),
       ),
-      dividerTheme: const DividerThemeData(color: AppColors.divider, thickness: 1, space: 1),
+      dividerTheme: DividerThemeData(color: colorScheme.outlineVariant, thickness: 1, space: 1),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colorScheme.surface,
         indicatorColor: Colors.transparent,
@@ -117,11 +119,11 @@ class AppTheme {
         height: 64,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         iconTheme: WidgetStateProperty.resolveWith(
-          (states) => IconThemeData(color: states.contains(WidgetState.selected) ? colorScheme.primary : AppColors.textSecondary),
+          (states) => IconThemeData(color: states.contains(WidgetState.selected) ? colorScheme.primary : colorScheme.onSurfaceVariant),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (states) => textTheme.labelSmall?.copyWith(
-            color: states.contains(WidgetState.selected) ? colorScheme.primary : AppColors.textSecondary,
+            color: states.contains(WidgetState.selected) ? colorScheme.primary : colorScheme.onSurfaceVariant,
             fontWeight: states.contains(WidgetState.selected) ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
@@ -131,9 +133,9 @@ class AppTheme {
         indicatorColor: Colors.transparent,
         elevation: 0,
         selectedIconTheme: IconThemeData(color: colorScheme.primary),
-        unselectedIconTheme: const IconThemeData(color: AppColors.textSecondary),
+        unselectedIconTheme: IconThemeData(color: colorScheme.onSurfaceVariant),
         selectedLabelTextStyle: textTheme.labelSmall?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.w700),
-        unselectedLabelTextStyle: textTheme.labelSmall?.copyWith(color: AppColors.textSecondary),
+        unselectedLabelTextStyle: textTheme.labelSmall?.copyWith(color: colorScheme.onSurfaceVariant),
       ),
       extensions: [statusColors],
     );

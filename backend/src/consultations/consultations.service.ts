@@ -23,6 +23,9 @@ const ALLOWED_TRANSITIONS: Record<ConsultationStatus, ConsultationStatus[]> = {
   failed: [],
 };
 
+/** Longest single availability slot a lawyer may publish. */
+export const MAX_SLOT_DURATION_MS = 8 * 60 * 60 * 1000;
+
 @Injectable()
 export class ConsultationsService {
   constructor(
@@ -43,7 +46,9 @@ export class ConsultationsService {
     if (!exists) throw notFound('Lawyer not found.');
 
     return this.prisma.availabilitySlot.findMany({
-      where: { lawyerProfileId },
+      // Slots that already started are not bookable and only grow the
+      // response forever (PERF-01).
+      where: { lawyerProfileId, startAt: { gte: new Date() } },
       // `consultation` (the reverse 1:1) is included so callers can link a
       // booked slot back to the consultation it belongs to — mirrors the
       // frontend `AvailabilitySlot.consultationId` field.
@@ -58,6 +63,21 @@ export class ConsultationsService {
     const end = new Date(dto.end);
     if (!(start < end)) {
       throw badRequest('Slot start must be before end.');
+    }
+    if (start.getTime() <= Date.now()) {
+      throw badRequest('Slot start must be in the future.');
+    }
+    if (end.getTime() - start.getTime() > MAX_SLOT_DURATION_MS) {
+      throw badRequest('A slot cannot be longer than 8 hours.');
+    }
+    // The DB exclusion constraint only guards *booked* overlaps, so reject
+    // overlap with this lawyer's other slots here.
+    const overlapping = await this.prisma.availabilitySlot.findFirst({
+      where: { lawyerProfileId: profile.id, startAt: { lt: end }, endAt: { gt: start } },
+      select: { id: true },
+    });
+    if (overlapping) {
+      throw conflict('This slot overlaps one you already published.');
     }
     return this.prisma.availabilitySlot.create({
       data: { lawyerProfileId: profile.id, startAt: start, endAt: end },
@@ -106,6 +126,9 @@ export class ConsultationsService {
     });
     if (!slot) {
       throw notFound('Slot not found.');
+    }
+    if (slot.startAt.getTime() <= Date.now()) {
+      throw badRequest('This slot is in the past.');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -232,6 +255,9 @@ export class ConsultationsService {
     });
     if (!newSlot) {
       throw notFound('Slot not found.');
+    }
+    if (newSlot.startAt.getTime() <= Date.now()) {
+      throw badRequest('This slot is in the past.');
     }
 
     return this.prisma.$transaction(async (tx) => {

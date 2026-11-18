@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:aqd_ionbit/core/config/feature_flags.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/widgets/app_bottom_sheet.dart';
@@ -15,8 +17,9 @@ class _Faq {
 }
 
 /// Account → Help & Support — static FAQ list + a mock "contact support"
-/// form (no real ticketing backend, just a success confirmation).
-class HelpSupportScreen extends StatelessWidget {
+/// form. There is no ticketing backend, so the form (which only shows a
+/// success confirmation) is available in preview builds only.
+class HelpSupportScreen extends ConsumerWidget {
   const HelpSupportScreen({super.key});
 
   List<_Faq> _faqs(AppLocalizations l10n) => [
@@ -55,7 +58,7 @@ class HelpSupportScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final faqs = _faqs(l10n);
 
@@ -78,8 +81,10 @@ class HelpSupportScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.xl),
-            AppButton(label: l10n.helpContactUs, icon: Icons.support_agent_outlined, onPressed: () => _contactSupport(context)),
+            if (ref.watch(previewFeaturesProvider)) ...[
+              const SizedBox(height: AppSpacing.xl),
+              AppButton(label: l10n.helpContactUs, icon: Icons.support_agent_outlined, onPressed: () => _contactSupport(context)),
+            ],
           ],
         ),
       ),

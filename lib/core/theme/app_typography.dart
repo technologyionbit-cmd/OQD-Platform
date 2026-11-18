@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class AppTypography {
   const AppTypography._();
 
-  static const String? fontFamily = null;
+  static const String fontFamily = 'IBMPlexSansArabic';
 
   static TextTheme textTheme({required Color primaryColor, required Color secondaryColor}) {
     return TextTheme(
@@ -31,6 +31,6 @@ class AppTypography {
   }
 
   static TextStyle _style(double size, FontWeight weight, Color color) {
-    return TextStyle(fontSize: size, fontWeight: weight, color: color, height: 1.4);
+    return TextStyle(fontFamily: fontFamily, fontSize: size, fontWeight: weight, color: color, height: 1.4);
   }
 }

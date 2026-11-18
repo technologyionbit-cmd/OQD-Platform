@@ -1,3 +1,4 @@
+import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_session.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
@@ -49,12 +50,18 @@ class AuthWire {
   }
 
   static AuthUser user(Map<String, dynamic> userJson) {
+    final role = UserRoleWire.tryFromWire(userJson['role'] as String);
+    if (role == null) {
+      // A valid account this app has no shell for (e.g. `admin`). A typed
+      // failure with its own message — not a crash and not a generic error.
+      throw const ForbiddenFailure(code: ApiErrorCodes.unsupportedRole);
+    }
     return AuthUser(
       id: userJson['id'] as String,
       fullName: userJson['fullName'] as String,
       email: userJson['email'] as String,
       phone: userJson['phone'] as String?,
-      role: UserRoleWire.fromWire(userJson['role'] as String),
+      role: role,
       phoneVerified: userJson['phoneVerified'] as bool,
     );
   }

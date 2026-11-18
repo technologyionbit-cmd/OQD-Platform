@@ -28,14 +28,14 @@ import { LawyersService } from './lawyers.service';
 import { VERIFICATION_MAX_FILE_BYTES, VERIFICATION_MAX_FILES } from './verification-files';
 
 /**
- * Marketplace search/browse (verified lawyers only), plus the signed-in
+ * Marketplace search/browse (verified lawyers only) is public so visitors can
+ * look before signing up; everything else needs a session. Also the signed-in
  * lawyer's own profile and verification submission under /v1/lawyers/me.
  * Admins review submissions under /v1/admin.
  */
 @ApiTags('lawyers')
 @ApiBearerAuth(BEARER_AUTH)
 @Controller('lawyers')
-@UseGuards(JwtAuthGuard)
 export class LawyersController {
   constructor(
     private readonly lawyers: LawyersService,
@@ -43,23 +43,27 @@ export class LawyersController {
   ) {}
 
   @Get()
+  @ApiOperation({ summary: 'Browse verified lawyers (public)' })
   findAll(@Query() query: QueryLawyersDto) {
     return this.lawyers.findAll(query);
   }
 
   // The "me" routes are declared before ':id' so "me" is never parsed as an id.
   @Get('me')
+  @UseGuards(JwtAuthGuard)
   findMine(@CurrentUser() user: AuthenticatedUser) {
     return this.lawyers.findMine(user).then((data) => ({ data }));
   }
 
   @Patch('me')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: "Update the signed-in lawyer's profile and prices" })
   updateMine(@CurrentUser() user: AuthenticatedUser, @Body() dto: UpdateMyProfileDto) {
     return this.lawyers.updateMine(user, dto).then((data) => ({ data }));
   }
 
   @Post('me/verification')
+  @UseGuards(JwtAuthGuard)
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
     summary: 'Send verification documents',
@@ -81,11 +85,13 @@ export class LawyersController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'A verified lawyer profile (public)' })
   findById(@Param('id', ParseUUIDPipe) id: string) {
     return this.lawyers.findById(id).then((data) => ({ data }));
   }
 
   @Get(':id/reviews')
+  @UseGuards(JwtAuthGuard)
   findReviews(@Param('id', ParseUUIDPipe) id: string, @Query() query: QueryReviewsDto) {
     return this.lawyers.findReviews(id, query);
   }

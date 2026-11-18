@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:aqd_ionbit/app.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
+import 'package:aqd_ionbit/core/config/feature_flags.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
@@ -59,6 +60,7 @@ Future<RoleTestHarness> pumpAuthenticatedApp(
   required AuthUser user,
   Size? size,
   Locale locale = const Locale('ar'),
+  bool? previewFeatures,
 }) async {
   if (size != null) {
     tester.view.physicalSize = size;
@@ -94,6 +96,7 @@ Future<RoleTestHarness> pumpAuthenticatedApp(
       notificationsRemoteDataSourceProvider.overrideWithValue(NotificationsMockDataSource()),
       tokenManagerProvider.overrideWithValue(tokenManager),
       localeControllerProvider.overrideWith(() => FixedLocaleController(locale)),
+      if (previewFeatures != null) previewFeaturesProvider.overrideWithValue(previewFeatures),
     ],
   );
   addTearDown(container.dispose);

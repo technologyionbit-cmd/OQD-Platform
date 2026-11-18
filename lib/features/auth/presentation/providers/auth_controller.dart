@@ -34,7 +34,9 @@ class AuthController extends AsyncNotifier<AuthUser?> {
   FutureOr<AuthUser?> build() async {
     ref.watch(authRepositoryProvider);
     ref.read(tokenRefresherProvider).register(_repository.refreshSession);
-    ref.read(sessionExpiredNotifierProvider).registerHandler(_handleSessionExpired);
+    ref
+        .read(sessionExpiredNotifierProvider)
+        .registerHandler(_handleSessionExpired);
 
     final result = await _repository.restoreSession();
     return switch (result) {
@@ -43,29 +45,27 @@ class AuthController extends AsyncNotifier<AuthUser?> {
     };
   }
 
-  Future<Result<AuthUser>> login({required String phone, required String password}) async {
+  Future<Result<AuthUser>> login({
+    required String phone,
+    required String password,
+  }) async {
     final result = await _repository.login(phone: phone, password: password);
-    return result.fold(
-      Result.failure,
-      (data) {
-        state = AsyncData(data.user);
-        return Result.success(data.user);
-      },
-    );
+    return result.fold(Result.failure, (data) {
+      state = AsyncData(data.user);
+      return Result.success(data.user);
+    });
   }
 
   Future<Result<AuthUser>> register(RegisterRequest request) async {
     final result = await _repository.register(request);
-    return result.fold(
-      Result.failure,
-      (data) {
-        // Set before the user so the router's first look at the new
-        // session already routes to the code screen.
-        if (!data.user.phoneVerified) ref.read(phoneVerificationPromptProvider.notifier).show();
-        state = AsyncData(data.user);
-        return Result.success(data.user);
-      },
-    );
+    return result.fold(Result.failure, (data) {
+      // Set before the user so the router's first look at the new
+      // session already routes to the code screen.
+      if (!data.user.phoneVerified)
+        ref.read(phoneVerificationPromptProvider.notifier).show();
+      state = AsyncData(data.user);
+      return Result.success(data.user);
+    });
   }
 
   /// On success the router leaves the verify screen by itself, because
@@ -79,7 +79,8 @@ class AuthController extends AsyncNotifier<AuthUser?> {
     return result;
   }
 
-  Future<Result<void>> resendPhoneVerification() => _repository.resendPhoneVerification();
+  Future<Result<void>> resendPhoneVerification() =>
+      _repository.resendPhoneVerification();
 
   Future<void> logout() async {
     await _repository.logout();
@@ -87,8 +88,14 @@ class AuthController extends AsyncNotifier<AuthUser?> {
     state = const AsyncData(null);
   }
 
-  Future<Result<AuthUser>> updateProfile({required String fullName, required String email}) async {
-    final result = await _repository.updateProfile(fullName: fullName, email: email);
+  Future<Result<AuthUser>> updateProfile({
+    required String fullName,
+    required String email,
+  }) async {
+    final result = await _repository.updateProfile(
+      fullName: fullName,
+      email: email,
+    );
     result.fold((failure) {}, (user) => state = AsyncData(user));
     return result;
   }
@@ -105,4 +112,7 @@ class AuthController extends AsyncNotifier<AuthUser?> {
 /// Automatic retry is off: a failed session restore waits on the splash
 /// screen for the user to retry, instead of silently looping in the
 /// background while the UI shows a spinner.
-final authControllerProvider = AsyncNotifierProvider<AuthController, AuthUser?>(AuthController.new, retry: (_, _) => null);
+final authControllerProvider = AsyncNotifierProvider<AuthController, AuthUser?>(
+  AuthController.new,
+  retry: (_, _) => null,
+);

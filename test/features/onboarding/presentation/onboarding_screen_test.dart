@@ -9,6 +9,9 @@ import 'package:aqd_ionbit/app.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
+import 'package:aqd_ionbit/features/auth/presentation/screens/welcome_screen.dart';
 import '../../../support/test_doubles.dart';
 
 void main() {
@@ -26,6 +29,7 @@ void main() {
         overrides: [
           appPreferencesProvider.overrideWithValue(preferences),
           tokenManagerProvider.overrideWithValue(tokenManager),
+          lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource()),
           if (deviceLocales != null) deviceLocalesProvider.overrideWithValue(deviceLocales),
         ],
         child: const AqdApp(),
@@ -37,9 +41,8 @@ void main() {
   const slide1 = 'مساعدك القانوني في جيبك';
   const slide2 = 'عقود ذكية بدقائق';
   const slide3 = 'تواصل مباشرة مع محامين موثوقين';
-  const loginTitle = 'تسجيل الدخول';
 
-  testWidgets('walks through the slides and "Get started" lands on login', (tester) async {
+  testWidgets('walks through the slides and "Get started" lands on the welcome page', (tester) async {
     await pumpFirstLaunch(tester);
     expect(find.text(slide1), findsOneWidget);
 
@@ -54,11 +57,11 @@ void main() {
     await tester.tap(find.text('ابدأ'));
     await tester.pumpAndSettle();
 
-    expect(find.text(loginTitle), findsOneWidget);
+    expect(find.byType(WelcomeScreen), findsOneWidget);
     expect(preferences.hasSeenOnboarding, isTrue);
   });
 
-  testWidgets('Skip lands on login and is hidden on the last slide', (tester) async {
+  testWidgets('Skip lands on the welcome page and is hidden on the last slide', (tester) async {
     await pumpFirstLaunch(tester);
     await tester.tap(find.text('التالي'));
     await tester.pumpAndSettle();
@@ -70,7 +73,7 @@ void main() {
 
     await tester.tap(find.text('ابدأ'));
     await tester.pumpAndSettle();
-    expect(find.text(loginTitle), findsOneWidget);
+    expect(find.byType(WelcomeScreen), findsOneWidget);
   });
 
   testWidgets('Skip from the first slide completes onboarding', (tester) async {
@@ -79,7 +82,7 @@ void main() {
     await tester.tap(find.text('تخطي'));
     await tester.pumpAndSettle();
 
-    expect(find.text(loginTitle), findsOneWidget);
+    expect(find.byType(WelcomeScreen), findsOneWidget);
     expect(preferences.hasSeenOnboarding, isTrue);
   });
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:aqd_ionbit/core/config/feature_flags.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_colors.dart';
@@ -14,8 +15,10 @@ import 'package:aqd_ionbit/features/consultations/domain/entities/consultation_s
 import 'package:aqd_ionbit/features/consultations/presentation/providers/consultations_controller.dart';
 import 'package:aqd_ionbit/features/contracts/domain/entities/contract_status.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contracts_controller.dart';
+import 'package:aqd_ionbit/features/documents/domain/entities/document.dart';
 import 'package:aqd_ionbit/features/documents/presentation/providers/documents_controller.dart';
 import 'package:aqd_ionbit/features/notifications/presentation/providers/notifications_controller.dart';
+import 'package:aqd_ionbit/features/team/domain/entities/team_member.dart';
 import 'package:aqd_ionbit/features/team/presentation/providers/team_controller.dart';
 
 class CompanyHomeScreen extends ConsumerWidget {
@@ -27,8 +30,11 @@ class CompanyHomeScreen extends ConsumerWidget {
     final user = ref.watch(authControllerProvider).value;
     final unreadCount = ref.watch(unreadNotificationsCountProvider);
     final contracts = ref.watch(contractsControllerProvider).value ?? const [];
-    final documents = ref.watch(documentsControllerProvider).value ?? const [];
-    final team = ref.watch(teamControllerProvider).value ?? const [];
+    // Documents and team have no backend yet: in release their cards (and
+    // the made-up counts) are not shown.
+    final showPreview = ref.watch(previewFeaturesProvider);
+    final documents = showPreview ? ref.watch(documentsControllerProvider).value ?? const <Document>[] : const <Document>[];
+    final team = showPreview ? ref.watch(teamControllerProvider).value ?? const <TeamMember>[] : const <TeamMember>[];
     final consultations = ref.watch(consultationsControllerProvider).value ?? const [];
     final activeConsultations = consultations.where((c) => c.status == ConsultationStatus.confirmed).length;
 
@@ -66,18 +72,20 @@ class CompanyHomeScreen extends ConsumerWidget {
                       value: '${contracts.length}',
                       onTap: () => context.go(RoutePaths.companyContracts),
                     ),
-                    _SummaryCard(
-                      icon: Icons.folder_outlined,
-                      label: l10n.navDocuments,
-                      value: '${documents.length}',
-                      onTap: () => context.go(RoutePaths.companyDocuments),
-                    ),
-                    _SummaryCard(
-                      icon: Icons.groups_outlined,
-                      label: l10n.navTeam,
-                      value: '${team.length}',
-                      onTap: () => context.push(RoutePaths.companyTeam),
-                    ),
+                    if (showPreview) ...[
+                      _SummaryCard(
+                        icon: Icons.folder_outlined,
+                        label: l10n.navDocuments,
+                        value: '${documents.length}',
+                        onTap: () => context.go(RoutePaths.companyDocuments),
+                      ),
+                      _SummaryCard(
+                        icon: Icons.groups_outlined,
+                        label: l10n.navTeam,
+                        value: '${team.length}',
+                        onTap: () => context.push(RoutePaths.companyTeam),
+                      ),
+                    ],
                     _SummaryCard(
                       icon: Icons.event_note_outlined,
                       label: l10n.companyActiveConsultations,
@@ -103,7 +111,8 @@ class CompanyHomeScreen extends ConsumerWidget {
                       onTap: () => context.push(RoutePaths.companyContractsNew),
                     ),
                     _QuickAction(icon: Icons.gavel_outlined, label: l10n.serviceFindLawyer, onTap: () => context.go(RoutePaths.companyLawyers)),
-                    _QuickAction(icon: Icons.person_add_outlined, label: l10n.teamAddMemberAction, onTap: () => context.push(RoutePaths.companyTeam)),
+                    if (showPreview)
+                      _QuickAction(icon: Icons.person_add_outlined, label: l10n.teamAddMemberAction, onTap: () => context.push(RoutePaths.companyTeam)),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),

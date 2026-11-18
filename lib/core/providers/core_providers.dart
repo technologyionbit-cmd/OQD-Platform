@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:aqd_ionbit/core/config/app_config.dart';
 import 'package:aqd_ionbit/core/network/auth_session_ports.dart';
 import 'package:aqd_ionbit/core/network/dio_client.dart';
+import 'package:aqd_ionbit/core/security/biometric_service.dart';
 import 'package:aqd_ionbit/core/security/secure_storage_service.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
@@ -38,6 +39,8 @@ final appPreferencesProvider = Provider<AppPreferences>((ref) {
 });
 
 final secureStorageServiceProvider = Provider<SecureStorageService>((ref) => SecureStorageService());
+
+final biometricServiceProvider = Provider<BiometricService>((ref) => BiometricService(ref.watch(secureStorageServiceProvider)));
 
 final tokenManagerProvider = Provider<TokenManager>((ref) => TokenManager(ref.watch(secureStorageServiceProvider)));
 

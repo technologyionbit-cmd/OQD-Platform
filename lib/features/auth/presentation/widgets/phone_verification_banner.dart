@@ -24,7 +24,12 @@ class PhoneVerificationBanner extends ConsumerWidget {
     return Material(
       color: colors.background,
       child: Padding(
-        padding: const EdgeInsetsDirectional.fromSTEB(AppSpacing.md, AppSpacing.xs, AppSpacing.xs, AppSpacing.xs),
+        padding: const EdgeInsetsDirectional.fromSTEB(
+          AppSpacing.md,
+          AppSpacing.xs,
+          AppSpacing.xs,
+          AppSpacing.xs,
+        ),
         child: Row(
           children: [
             Icon(Icons.sms_outlined, size: 20, color: colors.foreground),
@@ -32,12 +37,16 @@ class PhoneVerificationBanner extends ConsumerWidget {
             Expanded(
               child: Text(
                 l10n.phoneVerificationBannerMessage,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: colors.foreground),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: colors.foreground),
               ),
             ),
             TextButton(
               // The router sees the prompt and opens the code screen.
-              onPressed: () => ref.read(phoneVerificationPromptProvider.notifier).show(),
+              onPressed:
+                  () =>
+                      ref.read(phoneVerificationPromptProvider.notifier).show(),
               child: Text(l10n.phoneVerificationBannerAction),
             ),
           ],

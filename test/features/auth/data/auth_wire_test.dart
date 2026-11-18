@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/features/auth/data/datasources/auth_wire.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
@@ -80,11 +81,16 @@ void main() {
       expect(result.tokens.refreshToken, 'refresh');
     });
 
-    test('user() throws on an unknown role rather than defaulting', () {
+    test('user() rejects a role the app has no shell for (admin) with a typed failure, never a default', () {
       expect(
         () => AuthWire.user({'id': 'u1', 'fullName': 'X', 'email': 'x@test.com', 'role': 'admin', 'phoneVerified': false}),
-        throwsArgumentError,
+        throwsA(isA<ForbiddenFailure>().having((f) => f.code, 'code', ApiErrorCodes.unsupportedRole)),
       );
+    });
+
+    test('tryFromWire returns null for an unknown role and the role for a known one', () {
+      expect(UserRoleWire.tryFromWire('admin'), isNull);
+      expect(UserRoleWire.tryFromWire(' lawyer '), UserRole.lawyer);
     });
 
     test('user() reads phoneVerified and fails loudly when it is missing', () {

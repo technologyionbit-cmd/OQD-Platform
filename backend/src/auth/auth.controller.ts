@@ -54,6 +54,10 @@ import { LoginAttemptsGuard } from './guards/login-attempts.guard';
 
 /** Tight limits for the credential-guessing surface (docs/backend/14-security.md). */
 const STRICT_THROTTLE = { default: { limit: 8, ttl: 60_000 } };
+/** Refresh runs on every app start and every expired access token, so it is
+ * limited more gently than credential endpoints but tighter than the global
+ * 120/min (SEC-04). */
+const REFRESH_THROTTLE = { default: { limit: 30, ttl: 60_000 } };
 
 @ApiTags('auth')
 @ApiTooManyRequestsResponse({ type: ApiErrorResponseDto })
@@ -115,6 +119,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @Throttle(REFRESH_THROTTLE)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Rotate the session',

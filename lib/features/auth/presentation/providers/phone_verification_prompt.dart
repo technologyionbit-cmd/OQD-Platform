@@ -18,4 +18,7 @@ class PhoneVerificationPrompt extends Notifier<bool> {
   void dismiss() => state = false;
 }
 
-final phoneVerificationPromptProvider = NotifierProvider<PhoneVerificationPrompt, bool>(PhoneVerificationPrompt.new);
+final phoneVerificationPromptProvider =
+    NotifierProvider<PhoneVerificationPrompt, bool>(
+      PhoneVerificationPrompt.new,
+    );

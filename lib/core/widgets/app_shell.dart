@@ -10,7 +10,7 @@ import 'package:aqd_ionbit/core/utils/responsive.dart';
 /// desktop widths it switches to a side `NavigationRail` instead of
 /// squeezing a bottom bar across a wide screen.
 class AppShell extends StatelessWidget {
-  const AppShell({super.key, required this.navigationShell, required this.destinations, this.banner});
+  const AppShell({super.key, required this.navigationShell, required this.destinations, this.banner, this.canSelect});
 
   final StatefulNavigationShell navigationShell;
   final List<NavigationDestination> destinations;
@@ -19,6 +19,10 @@ class AppShell extends StatelessWidget {
   /// Sits at the bottom, above the navigation bar, so it never competes
   /// with the screens' own app bars for the status-bar inset.
   final Widget? banner;
+
+  /// Return false to veto a tab switch (e.g. a guest opening a tab that
+  /// needs an account); the callback is expected to explain why.
+  final bool Function(int index)? canSelect;
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +33,7 @@ class AppShell extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (banner case final banner?) banner,
-            NavigationBar(
-              selectedIndex: navigationShell.currentIndex,
-              onDestinationSelected: _goBranch,
-              destinations: destinations,
-            ),
+            NavigationBar(selectedIndex: navigationShell.currentIndex, onDestinationSelected: _goBranch, destinations: destinations),
           ],
         ),
       );
@@ -52,20 +52,14 @@ class AppShell extends StatelessWidget {
             ],
           ),
           const VerticalDivider(width: 1),
-          Expanded(
-            child: Column(
-              children: [
-                Expanded(child: navigationShell),
-                if (banner case final banner?) SafeArea(top: false, child: banner),
-              ],
-            ),
-          ),
+          Expanded(child: Column(children: [Expanded(child: navigationShell), if (banner case final banner?) SafeArea(top: false, child: banner)])),
         ],
       ),
     );
   }
 
   void _goBranch(int index) {
+    if (canSelect != null && !canSelect!(index)) return;
     navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex);
   }
 }

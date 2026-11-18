@@ -5,6 +5,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:aqd_ionbit/app.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
+import '../../../support/open_login.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
@@ -44,11 +47,13 @@ void main() {
       overrides: [
         appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
         authRepositoryProvider.overrideWithValue(repository),
+        lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource()),
       ],
     );
     addTearDown(container.dispose);
     await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const AqdApp()));
     await tester.pumpAndSettle();
+    await openLoginFromGuestHome(tester);
   }
 
   Future<void> openForgotPassword(WidgetTester tester) async {
@@ -72,9 +77,7 @@ void main() {
   }
 
   Future<void> openResetPassword(WidgetTester tester) async {
-    when(
-      () => repository.verifyPasswordResetCode(phone: _phone, code: '123456'),
-    ).thenAnswer((_) async => const Result.success(null));
+    when(() => repository.verifyPasswordResetCode(phone: _phone, code: '123456')).thenAnswer((_) async => const Result.success(null));
     await openForgotPassword(tester);
     await sendPhone(tester, _phone);
     await enterCode(tester, '123456');
@@ -93,7 +96,7 @@ void main() {
     await openForgotPassword(tester);
     expect(find.byType(TextField), findsOneWidget);
 
-    await sendPhone(tester, 'user@aqd.test');
+    await sendPhone(tester, '0501234567');
     expect(find.text('أدخل رقم موبايل أردني صحيح، مثل 0791234567'), findsOneWidget);
 
     await sendPhone(tester, '065000000');
@@ -113,9 +116,9 @@ void main() {
   });
 
   testWidgets('too many requests says how long to wait and stays on the form', (tester) async {
-    when(() => repository.requestPasswordReset(phone: any(named: 'phone'))).thenAnswer(
-      (_) async => const Result.failure(RateLimitedFailure(retryAfter: Duration(seconds: 40))),
-    );
+    when(
+      () => repository.requestPasswordReset(phone: any(named: 'phone')),
+    ).thenAnswer((_) async => const Result.failure(RateLimitedFailure(retryAfter: Duration(seconds: 40))));
     await openForgotPassword(tester);
 
     await sendPhone(tester, _phone);
@@ -128,18 +131,16 @@ void main() {
     await openForgotPassword(tester);
     await sendPhone(tester, _phone);
 
-    when(() => repository.verifyPasswordResetCode(phone: _phone, code: '111111')).thenAnswer(
-      (_) async => const Result.failure(
-        ValidationFailure(message: 'Invalid or expired code.', code: ApiErrorCodes.invalidVerificationCode),
-      ),
-    );
+    when(
+      () => repository.verifyPasswordResetCode(phone: _phone, code: '111111'),
+    ).thenAnswer((_) async => const Result.failure(ValidationFailure(message: 'Invalid or expired code.', code: ApiErrorCodes.invalidVerificationCode)));
     await enterCode(tester, '111111');
     expect(find.text('رمز التحقق غير صحيح'), findsOneWidget);
     expect(find.text('Invalid or expired code.'), findsNothing);
 
-    when(() => repository.verifyPasswordResetCode(phone: _phone, code: '222222')).thenAnswer(
-      (_) async => const Result.failure(ValidationFailure(code: ApiErrorCodes.verificationCodeLocked)),
-    );
+    when(
+      () => repository.verifyPasswordResetCode(phone: _phone, code: '222222'),
+    ).thenAnswer((_) async => const Result.failure(ValidationFailure(code: ApiErrorCodes.verificationCodeLocked)));
     await enterCode(tester, '222222');
     expect(find.text('محاولات خاطئة كثيرة، اطلب رمزًا جديدًا'), findsOneWidget);
     expect(find.byType(OtpVerificationScreen), findsOneWidget);
@@ -151,9 +152,9 @@ void main() {
     expect(find.text('إعادة الإرسال بعد 01:00'), findsOneWidget);
 
     await tester.pump(const Duration(seconds: 61));
-    when(() => repository.requestPasswordReset(phone: any(named: 'phone'))).thenAnswer(
-      (_) async => const Result.failure(RateLimitedFailure(retryAfter: Duration(seconds: 90))),
-    );
+    when(
+      () => repository.requestPasswordReset(phone: any(named: 'phone')),
+    ).thenAnswer((_) async => const Result.failure(RateLimitedFailure(retryAfter: Duration(seconds: 90))));
     await tester.tap(find.text('إعادة الإرسال'));
     await tester.pump();
 
@@ -164,9 +165,7 @@ void main() {
 
   testWidgets('a right code leads to a new password, then back to login', (tester) async {
     await openResetPassword(tester);
-    when(
-      () => repository.resetPassword(phone: _phone, code: '123456', newPassword: 'NewPass123'),
-    ).thenAnswer((_) async => const Result.success(null));
+    when(() => repository.resetPassword(phone: _phone, code: '123456', newPassword: 'NewPass123')).thenAnswer((_) async => const Result.success(null));
 
     await submitPasswords(tester, 'NewPass123');
     expect(find.text('تم تغيير كلمة المرور!'), findsOneWidget);
@@ -185,26 +184,14 @@ void main() {
     await submitPasswords(tester, 'NewPass123', 'NewPass124');
     expect(find.text('كلمتا المرور غير متطابقتين'), findsOneWidget);
 
-    verifyNever(
-      () => repository.resetPassword(
-        phone: any(named: 'phone'),
-        code: any(named: 'code'),
-        newPassword: any(named: 'newPassword'),
-      ),
-    );
+    verifyNever(() => repository.resetPassword(phone: any(named: 'phone'), code: any(named: 'code'), newPassword: any(named: 'newPassword')));
   });
 
   testWidgets('a code that expired before saving asks for a new one', (tester) async {
     await openResetPassword(tester);
     when(
-      () => repository.resetPassword(
-        phone: any(named: 'phone'),
-        code: any(named: 'code'),
-        newPassword: any(named: 'newPassword'),
-      ),
-    ).thenAnswer(
-      (_) async => const Result.failure(ValidationFailure(code: ApiErrorCodes.invalidVerificationCode)),
-    );
+      () => repository.resetPassword(phone: any(named: 'phone'), code: any(named: 'code'), newPassword: any(named: 'newPassword')),
+    ).thenAnswer((_) async => const Result.failure(ValidationFailure(code: ApiErrorCodes.invalidVerificationCode)));
 
     await submitPasswords(tester, 'NewPass123');
 

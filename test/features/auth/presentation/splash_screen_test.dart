@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:aqd_ionbit/core/widgets/app_logo.dart';
 import 'package:aqd_ionbit/app.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
@@ -22,10 +23,7 @@ void main() {
     final prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
-          authRepositoryProvider.overrideWithValue(repository),
-        ],
+        overrides: [appPreferencesProvider.overrideWithValue(AppPreferences(prefs)), authRepositoryProvider.overrideWithValue(repository)],
         child: const AqdApp(),
       ),
     );
@@ -40,7 +38,7 @@ void main() {
     await pumpApp(tester);
     await tester.pump();
 
-    expect(find.text('عقد'), findsOneWidget);
+    expect(find.byType(AppLogo), findsOneWidget);
     expect(find.text('منصتك القانونية الذكية'), findsOneWidget);
     expect(find.text('إعادة المحاولة'), findsNothing);
 

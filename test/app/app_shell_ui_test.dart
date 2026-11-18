@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:aqd_ionbit/features/auth/presentation/screens/welcome_screen.dart';
 
 import 'package:aqd_ionbit/features/auth/presentation/screens/login_screen.dart';
 import 'package:aqd_ionbit/features/company/presentation/screens/company_home_screen.dart';
@@ -61,7 +62,7 @@ void main() {
     expect(find.text('تسجيل الخروج'), findsOneWidget);
   });
 
-  testWidgets('logout requires confirmation and returns to the login screen once confirmed', (tester) async {
+  testWidgets('logout requires confirmation and returns to the welcome page once confirmed', (tester) async {
     await pumpAuthenticatedApp(tester, user: testClient);
 
     await tester.tap(find.text('حسابي'));
@@ -82,7 +83,9 @@ void main() {
     await tester.tap(find.text('تسجيل الخروج').last);
     await tester.pumpAndSettle();
 
-    expect(find.byType(LoginScreen), findsOneWidget);
+    // Signing out lands on the guest home, never on a sign-in popup.
+    expect(find.byType(WelcomeScreen), findsOneWidget);
+    expect(find.byType(LoginScreen), findsNothing);
   });
 
   group('responsive shell chrome', () {

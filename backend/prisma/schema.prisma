@@ -250,7 +250,7 @@ model LawyerRegistrationDetail {
 model RefreshToken {
   id               String    @id @default(uuid()) @db.Uuid
   userId           String    @map("user_id") @db.Uuid
-  refreshTokenHash String    @map("refresh_token_hash")
+  refreshTokenHash String    @unique @map("refresh_token_hash")
   deviceLabel      String?   @map("device_label")
   ipAddress        String?   @map("ip_address") @db.Inet
   createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz

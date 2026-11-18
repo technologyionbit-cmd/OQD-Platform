@@ -1,3 +1,4 @@
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,14 +10,18 @@ import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/login_screen.dart';
+import 'package:aqd_ionbit/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:aqd_ionbit/features/company/presentation/screens/company_home_screen.dart';
 import 'package:aqd_ionbit/features/home/presentation/screens/client_home_screen.dart';
 import 'package:aqd_ionbit/features/lawyer_dashboard/presentation/screens/lawyer_dashboard_screen.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
 
 import '../support/role_test_harness.dart';
 
 void main() {
-  testWidgets('unauthenticated cannot open a role route and is redirected to login', (tester) async {
+  Future<ProviderContainer> pumpGuestApp(WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({'prefs.onboarding_seen': true});
     final prefs = await SharedPreferences.getInstance();
     final tokenManager = MockTokenManager();
@@ -27,18 +32,44 @@ void main() {
       overrides: [
         appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
         tokenManagerProvider.overrideWithValue(tokenManager),
+        // Keep the guest home's lawyer list off the network.
+        lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource()),
       ],
     );
     addTearDown(container.dispose);
 
     await tester.pumpWidget(UncontrolledProviderScope(container: container, child: const AqdApp()));
     await tester.pumpAndSettle();
+    return container;
+  }
 
-    container.read(routerProvider).go(RoutePaths.clientHome);
-    await tester.pumpAndSettle();
+  group('signed out (onboarding seen)', () {
+    testWidgets('lands on the welcome page after loading, never on the home', (tester) async {
+      await pumpGuestApp(tester);
 
-    expect(find.byType(LoginScreen), findsOneWidget);
-    expect(find.byType(ClientHomeScreen), findsNothing);
+      expect(find.byType(WelcomeScreen), findsOneWidget);
+      expect(find.byType(ClientHomeScreen), findsNothing);
+    });
+
+    testWidgets('cannot open the lawyers list or any other app route without an account', (tester) async {
+      final container = await pumpGuestApp(tester);
+
+      for (final route in [RoutePaths.clientHome, RoutePaths.clientLawyers, RoutePaths.clientContractsNew, RoutePaths.lawyerDashboard]) {
+        container.read(routerProvider).go(route);
+        await tester.pumpAndSettle();
+        expect(find.byType(WelcomeScreen), findsOneWidget, reason: route);
+      }
+      expect(find.byType(LawyerDashboardScreen), findsNothing);
+    });
+
+    testWidgets('the welcome page opens the login page', (tester) async {
+      await pumpGuestApp(tester);
+
+      GoRouter.of(tester.element(find.byType(WelcomeScreen))).go(RoutePaths.login);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LoginScreen), findsOneWidget);
+    });
   });
 
   group('authenticated client', () {

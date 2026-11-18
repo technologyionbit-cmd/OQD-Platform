@@ -392,6 +392,24 @@ abstract class AppLocalizations {
   /// **'8 أحرف على الأقل، وتحتوي على حرف ورقم'**
   String get authPasswordRulesHint;
 
+  /// No description provided for @authPasswordStrengthWeak.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضعيفة'**
+  String get authPasswordStrengthWeak;
+
+  /// No description provided for @authPasswordStrengthGood.
+  ///
+  /// In ar, this message translates to:
+  /// **'جيدة'**
+  String get authPasswordStrengthGood;
+
+  /// No description provided for @authPasswordStrengthStrong.
+  ///
+  /// In ar, this message translates to:
+  /// **'قوية'**
+  String get authPasswordStrengthStrong;
+
   /// No description provided for @authVerifyPhoneTitle.
   ///
   /// In ar, this message translates to:
@@ -643,6 +661,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{minutes, plural, =1{محاولات كثيرة، حاول مجددًا بعد دقيقة} =2{محاولات كثيرة، حاول مجددًا بعد دقيقتين} few{محاولات كثيرة، حاول مجددًا بعد {minutes} دقائق} other{محاولات كثيرة، حاول مجددًا بعد {minutes} دقيقة}}'**
   String errorTooManyAttemptsRetryIn(int minutes);
+
+  /// No description provided for @errorUnsupportedRole.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذا الحساب مخصص للإدارة ولا يمكن استخدامه في التطبيق.'**
+  String get errorUnsupportedRole;
 
   /// No description provided for @errorAccountInactive.
   ///
@@ -4213,6 +4237,108 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'قيد الإجراء — بانتظار المستندات'**
   String get govProcedureStatusInProgress;
+
+  /// No description provided for @clientHomeGuestTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجّل دخولك للاستفادة من كل الخدمات'**
+  String get clientHomeGuestTitle;
+
+  /// No description provided for @clientHomeGuestSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'احجز محامياً، أنشئ عقودك، وتابع استشاراتك ومستنداتك من مكان واحد.'**
+  String get clientHomeGuestSubtitle;
+
+  /// No description provided for @loginRequiredTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تسجيل الدخول مطلوب'**
+  String get loginRequiredTitle;
+
+  /// No description provided for @loginRequiredMessage.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجّل دخولك أو أنشئ حساباً للاستفادة من هذه الخدمة.'**
+  String get loginRequiredMessage;
+
+  /// No description provided for @loginRequiredLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'لاحقاً'**
+  String get loginRequiredLater;
+
+  /// No description provided for @authBiometricLogin.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدخول بالبصمة'**
+  String get authBiometricLogin;
+
+  /// No description provided for @authBiometricReason.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحقق من هويتك لتسجيل الدخول'**
+  String get authBiometricReason;
+
+  /// No description provided for @authBiometricEnableToggle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل الدخول بالبصمة على هذا الجهاز'**
+  String get authBiometricEnableToggle;
+
+  /// No description provided for @authBiometricNotSetUp.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يتم تفعيل الدخول بالبصمة بعد. سجّل دخولك بكلمة المرور وفعّل الخيار ليظهر هنا.'**
+  String get authBiometricNotSetUp;
+
+  /// No description provided for @authBiometricUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'البصمة غير متوفرة أو غير مفعّلة على هذا الجهاز.'**
+  String get authBiometricUnavailable;
+
+  /// No description provided for @authBiometricFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم يتم التحقق من البصمة. حاول مرة أخرى.'**
+  String get authBiometricFailed;
+
+  /// No description provided for @authBiometricRetry.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحاولة مرة أخرى'**
+  String get authBiometricRetry;
+
+  /// No description provided for @authBiometricExpired.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتهت صلاحية بيانات الدخول المحفوظة. سجّل دخولك بكلمة المرور من جديد.'**
+  String get authBiometricExpired;
+
+  /// No description provided for @authWelcomeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أهلاً بك'**
+  String get authWelcomeTitle;
+
+  /// No description provided for @commonShow.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض'**
+  String get commonShow;
+
+  /// No description provided for @commonHide.
+  ///
+  /// In ar, this message translates to:
+  /// **'إخفاء'**
+  String get commonHide;
+
+  /// No description provided for @authCreateAccountShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'إنشاء حساب'**
+  String get authCreateAccountShort;
 }
 
 class _AppLocalizationsDelegate

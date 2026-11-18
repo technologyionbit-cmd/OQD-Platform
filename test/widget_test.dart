@@ -6,6 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:aqd_ionbit/app.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
+import 'package:aqd_ionbit/features/auth/presentation/screens/welcome_screen.dart';
 import 'support/test_doubles.dart';
 
 Future<void> _pumpApp(WidgetTester tester, {required Map<String, Object> initialPrefs}) async {
@@ -25,6 +28,7 @@ Future<void> _pumpApp(WidgetTester tester, {required Map<String, Object> initial
       overrides: [
         appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
         tokenManagerProvider.overrideWithValue(tokenManager),
+        lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource()),
       ],
       child: const AqdApp(),
     ),
@@ -40,10 +44,10 @@ void main() {
     expect(find.text('تسجيل الدخول'), findsNothing);
   });
 
-  testWidgets('unauthenticated launch after onboarding lands on the login screen', (tester) async {
+  testWidgets('unauthenticated launch after onboarding lands on the welcome page', (tester) async {
     await _pumpApp(tester, initialPrefs: {'prefs.onboarding_seen': true});
 
-    expect(find.text('تسجيل الدخول'), findsOneWidget);
-    expect(find.text('أهلاً بعودتك! سجل دخولك للمتابعة'), findsOneWidget);
+    expect(find.byType(WelcomeScreen), findsOneWidget);
+    expect(find.text('أهلاً بعودتك! سجل دخولك للمتابعة'), findsNothing);
   });
 }

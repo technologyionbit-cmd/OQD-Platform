@@ -153,9 +153,11 @@ export class LawyersService {
 
     const exists = await this.prisma.lawyerProfile.findUnique({
       where: { id: lawyerProfileId },
-      select: { id: true },
+      select: { id: true, verificationStatus: true },
     });
-    if (!exists) {
+    // Same gate as `findById`: reviews of an unverified (or unknown) lawyer
+    // answer exactly like a missing lawyer, so ids cannot be probed.
+    if (!exists || exists.verificationStatus !== 'verified') {
       throw notFound('Lawyer not found.');
     }
 
@@ -172,7 +174,6 @@ export class LawyersService {
     return {
       data: rows.map((row) => ({
         id: row.id,
-        reviewerUserId: row.reviewerUserId,
         rating: row.rating,
         comment: row.comment,
         createdAt: row.createdAt,

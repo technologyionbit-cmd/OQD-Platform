@@ -84,10 +84,16 @@ export class TokenService {
 
     const rawNext = this.generateRawRefreshToken();
     const next = await this.prisma.$transaction(async (tx) => {
-      await tx.refreshToken.update({
-        where: { id: existing.id },
+      // Conditional revoke: of two concurrent refreshes presenting the same
+      // token, exactly one flips `revokedAt` from null; the loser sees
+      // count 0 and is treated as a replay (below), not given a second child.
+      const claimed = await tx.refreshToken.updateMany({
+        where: { id: existing.id, revokedAt: null },
         data: { revokedAt: new Date(), lastUsedAt: new Date() },
       });
+      if (claimed.count !== 1) {
+        return null;
+      }
       return tx.refreshToken.create({
         data: {
           userId: existing.userId,
@@ -98,6 +104,14 @@ export class TokenService {
         },
       });
     });
+
+    if (!next) {
+      this.logger.warn(
+        `Concurrent refresh of one token for user ${existing.userId} — revoking all sessions`,
+      );
+      await this.revokeAllForUser(existing.userId);
+      throw unauthorized('Session expired. Please sign in again.');
+    }
 
     return this.buildTokens(
       existing.userId,

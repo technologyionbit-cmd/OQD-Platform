@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { RateLimitedException } from '../errors/rate-limited.exception';
 import { HttpExceptionFilter } from './http-exception.filter';
 
@@ -91,5 +92,34 @@ describe('HttpExceptionFilter', () => {
         code: 'SERVER_ERROR',
       },
     });
+  });
+});
+
+describe('HttpExceptionFilter Prisma errors', () => {
+  it('maps a unique-constraint violation (P2002) to a 409, not a 500', () => {
+    const { host, status, json } = createMockHost();
+    const error = new Prisma.PrismaClientKnownRequestError(
+      'Unique constraint failed',
+      { code: 'P2002', clientVersion: 'test' },
+    );
+
+    new HttpExceptionFilter().catch(error, host);
+
+    expect(status).toHaveBeenCalledWith(409);
+    expect(json).toHaveBeenCalledWith({
+      error: { message: 'This record already exists.', code: 'CONFLICT' },
+    });
+  });
+
+  it('keeps other Prisma errors as an opaque 500', () => {
+    const { host, status } = createMockHost();
+    const error = new Prisma.PrismaClientKnownRequestError('Record not found', {
+      code: 'P2025',
+      clientVersion: 'test',
+    });
+
+    new HttpExceptionFilter().catch(error, host);
+
+    expect(status).toHaveBeenCalledWith(500);
   });
 });

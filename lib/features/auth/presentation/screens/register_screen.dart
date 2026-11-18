@@ -12,51 +12,20 @@ import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/theme/app_spacing.dart';
 import 'package:aqd_ionbit/core/utils/jordan_mobile.dart';
 import 'package:aqd_ionbit/core/utils/validators.dart';
-import 'package:aqd_ionbit/core/widgets/app_button.dart';
-import 'package:aqd_ionbit/core/widgets/app_chip.dart';
-import 'package:aqd_ionbit/core/widgets/app_dropdown.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
+import 'package:aqd_ionbit/core/widgets/phone_field.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
-import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/password_rules.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
-import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/sanad_auth_page.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/sanad_button.dart';
+import 'package:aqd_ionbit/core/theme/app_colors.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/password_strength_meter.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/terms_consent_field.dart';
 
-/// The 8 backend `LawyerSpecialty` values, paired with their localization
-/// key. Kept here (not imported from the lawyers feature) so auth stays
-/// self-contained — the backend is the authority on the accepted set.
-const _specialties = <String>[
-  'commercial',
-  'personalStatus',
-  'criminal',
-  'labor',
-  'realEstate',
-  'corporate',
-  'intellectualProperty',
-  'general',
-];
-
-String _specialtyLabel(String value, AppLocalizations l10n) => switch (value) {
-  'commercial' => l10n.specialtyCommercial,
-  'personalStatus' => l10n.specialtyPersonalStatus,
-  'criminal' => l10n.specialtyCriminal,
-  'labor' => l10n.specialtyLabor,
-  'realEstate' => l10n.specialtyRealEstate,
-  'corporate' => l10n.specialtyCorporate,
-  'intellectualProperty' => l10n.specialtyIntellectualProperty,
-  _ => l10n.specialtyGeneral,
-};
-
 /// Backend field name -> this form's error key, where they differ.
-const _fieldKeys = {
-  'commercialRegistrationNumber': 'registrationNumber',
-  'barLicenseNumber': 'licenseNumber',
-  'mainSpecialty': 'specialty',
-  'acceptTerms': 'terms',
-  'termsVersion': 'terms',
-};
+const _fieldKeys = {'acceptTerms': 'terms', 'termsVersion': 'terms'};
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -66,14 +35,9 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  UserRole _role = UserRole.client;
-  String? _specialty;
   bool _acceptedTerms = false;
 
   final _fullNameController = TextEditingController();
-  final _companyNameController = TextEditingController();
-  final _licenseNumberController = TextEditingController();
-  final _registrationNumberController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -85,48 +49,34 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   void dispose() {
     _fullNameController.dispose();
-    _companyNameController.dispose();
-    _licenseNumberController.dispose();
-    _registrationNumberController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _selectRole(UserRole role) {
-    setState(() {
-      _role = role;
-      _errors.clear();
-      _formError = null;
-    });
-  }
-
   bool _validate(AppLocalizations l10n) {
     final errors = <String, String?>{};
 
     void requireField(String key, TextEditingController controller) {
-      errors[key] = Validators.isRequired(controller.text) ? null : l10n.validationRequired;
+      errors[key] =
+          Validators.isRequired(controller.text)
+              ? null
+              : l10n.validationRequired;
     }
 
-    switch (_role) {
-      case UserRole.client:
-        requireField('fullName', _fullNameController);
-      case UserRole.company:
-        requireField('companyName', _companyNameController);
-        requireField('registrationNumber', _registrationNumberController);
-      case UserRole.lawyer:
-        requireField('fullName', _fullNameController);
-        requireField('licenseNumber', _licenseNumberController);
-        errors['specialty'] = _specialty == null ? l10n.validationRequired : null;
-    }
+    requireField('fullName', _fullNameController);
 
-    errors['phone'] = Validators.isValidJordanMobile(_phoneController.text) ? null : l10n.validationInvalidJordanMobile;
-    errors['email'] = !Validators.isRequired(_emailController.text)
-        ? l10n.validationRequired
-        : !Validators.isValidEmail(_emailController.text)
-        ? l10n.validationInvalidEmail
-        : null;
+    errors['phone'] =
+        Validators.isValidJordanMobile(_phoneController.text)
+            ? null
+            : l10n.validationInvalidJordanMobile;
+    errors['email'] =
+        !Validators.isRequired(_emailController.text)
+            ? l10n.validationRequired
+            : !Validators.isValidEmail(_emailController.text)
+            ? l10n.validationInvalidEmail
+            : null;
     errors['password'] = newPasswordError(_passwordController.text, l10n);
     errors['terms'] = _acceptedTerms ? null : l10n.validationTermsRequired;
 
@@ -141,40 +91,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   RegisterRequest _buildRequest() {
     // Validated before this runs, so it normalizes.
-    final phone = JordanMobile.normalize(_phoneController.text) ?? _phoneController.text.trim();
+    final phone =
+        JordanMobile.normalize(_phoneController.text) ??
+        _phoneController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
     const termsVersion = AppConfig.termsVersion;
 
-    return switch (_role) {
-      UserRole.client => RegisterRequest.individual(
-        fullName: _fullNameController.text.trim(),
-        phone: phone,
-        email: email,
-        password: password,
-        acceptTerms: _acceptedTerms,
-        termsVersion: termsVersion,
-      ),
-      UserRole.company => RegisterRequest.company(
-        companyName: _companyNameController.text.trim(),
-        commercialRegistrationNumber: _registrationNumberController.text.trim(),
-        email: email,
-        phone: phone,
-        password: password,
-        acceptTerms: _acceptedTerms,
-        termsVersion: termsVersion,
-      ),
-      UserRole.lawyer => RegisterRequest.lawyer(
-        fullName: _fullNameController.text.trim(),
-        barLicenseNumber: _licenseNumberController.text.trim(),
-        mainSpecialty: _specialty!,
-        email: email,
-        phone: phone,
-        password: password,
-        acceptTerms: _acceptedTerms,
-        termsVersion: termsVersion,
-      ),
-    };
+    return RegisterRequest.individual(
+      fullName: _fullNameController.text.trim(),
+      phone: phone,
+      email: email,
+      password: password,
+      acceptTerms: _acceptedTerms,
+      termsVersion: termsVersion,
+    );
   }
 
   Future<void> _submit() async {
@@ -185,7 +116,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_validate(l10n)) return;
 
     setState(() => _isSubmitting = true);
-    final result = await ref.read(authControllerProvider.notifier).register(_buildRequest());
+    final result = await ref
+        .read(authControllerProvider.notifier)
+        .register(_buildRequest());
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
@@ -203,8 +136,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final codeField = switch (failure.code) {
       ApiErrorCodes.emailAlreadyRegistered => 'email',
       ApiErrorCodes.phoneAlreadyRegistered => 'phone',
-      ApiErrorCodes.commercialRegistrationTaken => 'registrationNumber',
-      ApiErrorCodes.barLicenseTaken => 'licenseNumber',
       _ => null,
     };
     if (codeField != null) {
@@ -212,7 +143,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    if (failure case ValidationFailure(code: ApiErrorCodes.validationError, :final fieldErrors) when fieldErrors.isNotEmpty) {
+    if (failure case ValidationFailure(
+      code: ApiErrorCodes.validationError,
+      :final fieldErrors,
+    ) when fieldErrors.isNotEmpty) {
       final visible = _visibleFieldKeys();
       var shownOnAField = false;
       for (final backendField in fieldErrors.keys) {
@@ -227,30 +161,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   Set<String> _visibleFieldKeys() => {
-    ...switch (_role) {
-      UserRole.client => {'fullName'},
-      UserRole.company => {'companyName', 'registrationNumber'},
-      UserRole.lawyer => {'fullName', 'licenseNumber', 'specialty'},
-    },
+    'fullName',
     'phone',
     'email',
     'password',
     'terms',
   };
 
-  String _genericFieldMessage(String key, AppLocalizations l10n) => switch (key) {
-    'email' => l10n.validationInvalidEmail,
-    'phone' => l10n.validationInvalidJordanMobile,
-    'password' => l10n.authPasswordRulesHint,
-    'terms' => l10n.validationTermsRequired,
-    _ => l10n.validationInvalidValue,
-  };
+  String _genericFieldMessage(String key, AppLocalizations l10n) =>
+      switch (key) {
+        'email' => l10n.validationInvalidEmail,
+        'phone' => l10n.validationInvalidJordanMobile,
+        'password' => l10n.authPasswordRulesHint,
+        'terms' => l10n.validationTermsRequired,
+        _ => l10n.validationInvalidValue,
+      };
 
   Future<void> _openLink(String url) async {
     final opened = await ref.read(linkLauncherProvider)(Uri.parse(url));
     if (opened || !mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.errorLinkOpenFailed)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.errorLinkOpenFailed)));
   }
 
   @override
@@ -258,70 +191,54 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final l10n = AppLocalizations.of(context)!;
     final config = ref.watch(appConfigProvider);
 
-    return AuthScaffold(
-      icon: Icons.shield_outlined,
+    return SanadAuthPage(
       title: l10n.authRegisterTitle,
-      subtitle: l10n.authRegisterSubtitle,
       child: AutofillGroup(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: AppChip(
-                    label: l10n.authAccountTypeLawyer,
-                    icon: Icons.gavel_outlined,
-                    selected: _role == UserRole.lawyer,
-                    onTap: () => _selectRole(UserRole.lawyer),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: AppChip(
-                    label: l10n.authAccountTypeCompany,
-                    icon: Icons.apartment_outlined,
-                    selected: _role == UserRole.company,
-                    onTap: () => _selectRole(UserRole.company),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: AppChip(
-                    label: l10n.authAccountTypeIndividual,
-                    icon: Icons.person_outline,
-                    selected: _role == UserRole.client,
-                    onTap: () => _selectRole(UserRole.client),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            ..._fieldsFor(_role, l10n),
+            ..._fields(l10n),
             const SizedBox(height: AppSpacing.sm),
             TermsConsentField(
               value: _acceptedTerms,
               errorText: _errors['terms'],
-              onChanged: (value) => setState(() {
-                _acceptedTerms = value;
-                if (value) _errors['terms'] = null;
-              }),
+              onChanged:
+                  (value) => setState(() {
+                    _acceptedTerms = value;
+                    if (value) _errors['terms'] = null;
+                  }),
               onOpenTerms: () => _openLink(config.termsUrl),
               onOpenPrivacy: () => _openLink(config.privacyUrl),
             ),
             AuthFormError(_formError),
             const SizedBox(height: AppSpacing.lg),
-            AppButton(label: l10n.authRegisterSubmit, isLoading: _isSubmitting, onPressed: _submit),
-            const SizedBox(height: AppSpacing.md),
-            Center(
-              child: Wrap(
-                alignment: WrapAlignment.center,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Text(l10n.authAlreadyHaveAccount, style: Theme.of(context).textTheme.bodyMedium),
-                  TextButton(onPressed: () => context.go(RoutePaths.login), child: Text(l10n.authLoginTitle)),
-                ],
-              ),
+            SanadButton(
+              label: l10n.authRegisterSubmit,
+              isLoading: _isSubmitting,
+              onPressed: _submit,
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: AppSpacing.xs,
+              children: [
+                Text(
+                  l10n.authAlreadyHaveAccount,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                GestureDetector(
+                  onTap: () => context.go(RoutePaths.login),
+                  child: Text(
+                    l10n.authLoginTitle,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.primary,
+                      decoration: TextDecoration.underline,
+                      decorationColor: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -329,76 +246,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     );
   }
 
-  List<Widget> _fieldsFor(UserRole role, AppLocalizations l10n) {
-    final nameField = AppTextField(
-      controller: _fullNameController,
-      label: role == UserRole.lawyer ? l10n.authFullNameTriple : l10n.authFullName,
-      errorText: _errors['fullName'],
-      maxLength: Validators.nameMaxLength,
-      textInputAction: TextInputAction.next,
-      autofillHints: const [AutofillHints.name],
-    );
-
-    final roleFields = switch (role) {
-      UserRole.client => <Widget>[nameField],
-      UserRole.company => <Widget>[
-        AppTextField(
-          controller: _companyNameController,
-          label: l10n.authCompanyName,
-          errorText: _errors['companyName'],
-          maxLength: Validators.companyNameMaxLength,
-          textInputAction: TextInputAction.next,
-        ),
-        const SizedBox(height: AppSpacing.md),
-        AppTextField(
-          controller: _registrationNumberController,
-          label: l10n.authCommercialRegistrationNumber,
-          errorText: _errors['registrationNumber'],
-          maxLength: Validators.registryNumberMaxLength,
-          textInputAction: TextInputAction.next,
-        ),
-      ],
-      UserRole.lawyer => <Widget>[
-        nameField,
-        const SizedBox(height: AppSpacing.md),
-        AppTextField(
-          controller: _licenseNumberController,
-          label: l10n.authBarLicenseNumber,
-          errorText: _errors['licenseNumber'],
-          maxLength: Validators.registryNumberMaxLength,
-          textInputAction: TextInputAction.next,
-        ),
-        const SizedBox(height: AppSpacing.md),
-        AppDropdown<String>(
-          label: l10n.authMainSpecialty,
-          value: _specialty,
-          items: _specialties,
-          itemLabel: (value) => _specialtyLabel(value, l10n),
-          errorText: _errors['specialty'],
-          onChanged: (value) => setState(() {
-            _specialty = value;
-            _errors['specialty'] = null;
-          }),
-        ),
-      ],
-    };
-
+  List<Widget> _fields(AppLocalizations l10n) {
     return [
-      ...roleFields,
-      const SizedBox(height: AppSpacing.md),
       AppTextField(
+        controller: _fullNameController,
+        label: l10n.authFullName,
+        prefixIcon: Icons.person_outline_rounded,
+        errorText: _errors['fullName'],
+        maxLength: Validators.nameMaxLength,
+        textInputAction: TextInputAction.next,
+        autofillHints: const [AutofillHints.name],
+      ),
+      const SizedBox(height: AppSpacing.md),
+      PhoneField(
         controller: _phoneController,
         label: l10n.authPhoneLabel,
-        hintText: l10n.authPhoneHint,
         errorText: _errors['phone'],
-        keyboardType: TextInputType.phone,
         textInputAction: TextInputAction.next,
-        autofillHints: const [AutofillHints.telephoneNumber],
       ),
       const SizedBox(height: AppSpacing.md),
       AppTextField(
         controller: _emailController,
         label: l10n.authEmailLabel,
+        prefixIcon: Icons.mail_outline_rounded,
         errorText: _errors['email'],
         maxLength: Validators.emailMaxLength,
         keyboardType: TextInputType.emailAddress,
@@ -409,13 +279,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       AppTextField(
         controller: _passwordController,
         label: l10n.authPasswordLabel,
+        prefixIcon: Icons.lock_rounded,
         errorText: _errors['password'],
+        textDirection: Directionality.of(context),
+        toggleLabels: (l10n.commonShow, l10n.commonHide),
         helperText: l10n.authPasswordRulesHint,
         obscureText: true,
         textInputAction: TextInputAction.done,
         onSubmitted: (_) => _submit(),
         autofillHints: const [AutofillHints.newPassword],
       ),
+      PasswordStrengthMeter(controller: _passwordController),
     ];
   }
 }

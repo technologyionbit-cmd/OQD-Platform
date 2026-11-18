@@ -3,10 +3,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/sanad_button.dart';
+import 'package:aqd_ionbit/features/auth/presentation/screens/login_screen.dart';
+import 'package:aqd_ionbit/core/routing/route_paths.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:aqd_ionbit/app.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
+import '../../../support/open_login.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
@@ -27,6 +34,12 @@ void main() {
   });
 
   Future<void> pumpLogin(WidgetTester tester) async {
+    // A phone-sized surface: the default 800x600 test surface leaves the
+    // form's button below the fold.
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     SharedPreferences.setMockInitialValues({'prefs.onboarding_seen': true});
     final prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(
@@ -34,23 +47,23 @@ void main() {
         overrides: [
           appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
           authRepositoryProvider.overrideWithValue(repository),
+          lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource()),
         ],
         child: const AqdApp(),
       ),
     );
     await tester.pumpAndSettle();
+    await openLoginFromGuestHome(tester);
   }
 
   void loginAnswers(Future<_LoginResult> Function() answer) {
-    when(
-      () => repository.login(phone: any(named: 'phone'), password: any(named: 'password')),
-    ).thenAnswer((_) => answer());
+    when(() => repository.login(phone: any(named: 'phone'), password: any(named: 'password'))).thenAnswer((_) => answer());
   }
 
   Future<void> submit(WidgetTester tester, {String phone = '0791234567', String password = 'Password123'}) async {
     await tester.enterText(find.byType(TextField).at(0), phone);
     await tester.enterText(find.byType(TextField).at(1), password);
-    await tester.tap(find.text('دخول'));
+    await tester.tap(find.widgetWithText(SanadButton, 'تسجيل الدخول'));
     await tester.pumpAndSettle();
   }
 
@@ -72,10 +85,10 @@ void main() {
     verify(() => repository.login(phone: '+962791234567', password: 'Password123')).called(1);
   });
 
-  testWidgets('refuses an email or a non-Jordanian number before sending', (tester) async {
+  testWidgets('refuses a non-Jordanian number before sending', (tester) async {
     await pumpLogin(tester);
 
-    await submit(tester, phone: 'user@aqd.test');
+    await submit(tester, phone: '0501234567');
 
     expect(find.text('أدخل رقم موبايل أردني صحيح، مثل 0791234567'), findsOneWidget);
     verifyNever(() => repository.login(phone: any(named: 'phone'), password: any(named: 'password')));
@@ -91,11 +104,7 @@ void main() {
   });
 
   testWidgets('an inactive account gets a localized explanation, not the raw server text', (tester) async {
-    loginAnswers(
-      () async => const Result.failure(
-        ForbiddenFailure(message: 'This account is not active.', code: ApiErrorCodes.accountInactive),
-      ),
-    );
+    loginAnswers(() async => const Result.failure(ForbiddenFailure(message: 'This account is not active.', code: ApiErrorCodes.accountInactive)));
     await pumpLogin(tester);
 
     await submit(tester);
@@ -111,7 +120,7 @@ void main() {
 
     await tester.enterText(find.byType(TextField).at(0), '0791234567');
     await tester.enterText(find.byType(TextField).at(1), 'Password123');
-    await tester.tap(find.text('دخول'));
+    await tester.tap(find.widgetWithText(SanadButton, 'تسجيل الدخول'));
     await tester.pump();
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pump();
@@ -123,10 +132,12 @@ void main() {
 
   testWidgets('offers a language switch before sign-in', (tester) async {
     await pumpLogin(tester);
+    GoRouter.of(tester.element(find.byType(LoginScreen))).go(RoutePaths.welcome);
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Sign In'), findsOneWidget);
+    expect(find.text('Login'), findsOneWidget);
   });
 }

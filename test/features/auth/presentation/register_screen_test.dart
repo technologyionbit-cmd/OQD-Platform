@@ -7,13 +7,17 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:aqd_ionbit/app.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_data_source_provider.dart';
+import 'package:aqd_ionbit/features/lawyers/data/datasources/lawyers_mock_data_source.dart';
+import 'package:go_router/go_router.dart';
+import 'package:aqd_ionbit/core/routing/route_paths.dart';
+import 'package:aqd_ionbit/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:aqd_ionbit/core/config/app_config.dart';
 import 'package:aqd_ionbit/core/errors/failure.dart';
 import 'package:aqd_ionbit/core/errors/result.dart';
 import 'package:aqd_ionbit/core/providers/core_providers.dart';
 import 'package:aqd_ionbit/core/security/token_manager.dart';
 import 'package:aqd_ionbit/core/storage/app_preferences.dart';
-import 'package:aqd_ionbit/core/widgets/app_chip.dart';
 import 'package:aqd_ionbit/core/widgets/app_text_field.dart';
 import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
@@ -38,9 +42,7 @@ void main() {
   late List<Uri> openedLinks;
 
   setUpAll(() {
-    registerFallbackValue(
-      const RegisterRequest.individual(fullName: '', phone: '', email: '', password: '', acceptTerms: true, termsVersion: ''),
-    );
+    registerFallbackValue(const RegisterRequest.individual(fullName: '', phone: '', email: '', password: '', acceptTerms: true, termsVersion: ''));
   });
 
   setUp(() {
@@ -62,6 +64,7 @@ void main() {
         overrides: [
           appPreferencesProvider.overrideWithValue(AppPreferences(prefs)),
           authRepositoryProvider.overrideWithValue(repository),
+          lawyersRemoteDataSourceProvider.overrideWithValue(LawyersMockDataSource()),
           appConfigProvider.overrideWithValue(_config),
           linkLauncherProvider.overrideWithValue((url) async {
             openedLinks.add(url);
@@ -72,7 +75,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('إنشاء حساب جديد'));
+    // Create-account lives on the welcome page now, not the login form.
+    GoRouter.of(tester.element(find.byType(WelcomeScreen))).go(RoutePaths.register);
     await tester.pumpAndSettle();
   }
 
@@ -173,33 +177,6 @@ void main() {
     expect(find.textContaining('already registered'), findsNothing);
   });
 
-  testWidgets('a taken commercial registration number is shown on its field', (tester) async {
-    registerAnswers(
-      () async => const Result.failure(
-        ValidationFailure(
-          code: ApiErrorCodes.commercialRegistrationTaken,
-          fieldErrors: {
-            'commercialRegistrationNumber': ['in use'],
-          },
-        ),
-      ),
-    );
-    await pumpRegister(tester);
-    await tester.tap(find.text('شركة'));
-    await tester.pumpAndSettle();
-    await tester.enterText(field('اسم المنشأة / الشركة'), 'Rowad');
-    await tester.enterText(field('رقم السجل التجاري'), 'CR-1');
-    await tester.enterText(field('رقم الهاتف'), '0791234567');
-    await tester.enterText(field('البريد الإلكتروني'), 'co@aqd.test');
-    await tester.enterText(field('كلمة المرور'), 'Password123');
-    await tester.tap(find.byType(Checkbox));
-
-    await submit(tester);
-
-    final registration = tester.widget<TextField>(field('رقم السجل التجاري'));
-    expect(registration.decoration!.errorText, 'رقم السجل التجاري مستخدم في حساب آخر');
-  });
-
   testWidgets('a taken phone number is shown on the phone field', (tester) async {
     registerAnswers(
       () async => const Result.failure(
@@ -286,14 +263,5 @@ void main() {
 
     expect(openedLinks, [Uri.parse(_config.termsUrl), Uri.parse(_config.privacyUrl)]);
     expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
-  });
-
-  testWidgets('announces which account type is selected', (tester) async {
-    final semantics = tester.ensureSemantics();
-    await pumpRegister(tester);
-
-    expect(tester.getSemantics(find.widgetWithText(AppChip, 'فرد')), isSemantics(isSelected: true, isButton: true));
-    expect(tester.getSemantics(find.widgetWithText(AppChip, 'شركة')), isSemantics(isSelected: false, isButton: true));
-    semantics.dispose();
   });
 }

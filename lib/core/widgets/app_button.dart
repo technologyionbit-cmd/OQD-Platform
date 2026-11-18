@@ -23,14 +23,7 @@ enum AppButtonVariant {
 /// Wraps Elevated/Outlined/Text button with a built-in loading state so no
 /// screen hand-rolls "disable + spinner while submitting" itself.
 class AppButton extends StatelessWidget {
-  const AppButton({
-    super.key,
-    required this.label,
-    required this.onPressed,
-    this.variant = AppButtonVariant.primary,
-    this.isLoading = false,
-    this.icon,
-  });
+  const AppButton({super.key, required this.label, required this.onPressed, this.variant = AppButtonVariant.primary, this.isLoading = false, this.icon});
 
   final String label;
   final VoidCallback? onPressed;
@@ -41,23 +34,20 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDisabled = isLoading || onPressed == null;
-    final child = isLoading
-        ? SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(strokeWidth: 2.5, color: _spinnerColor(context)),
-          )
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) ...[Icon(icon, size: 18), const SizedBox(width: 8)],
-              // Flexible + ellipsis so a longer label truncates instead of
-              // overflowing if this button ever ends up in a narrower
-              // context than the full-width usage it has today.
-              Flexible(child: Text(label, overflow: TextOverflow.ellipsis, maxLines: 1)),
-            ],
-          );
+    final child =
+        isLoading
+            ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2.5, color: _spinnerColor(context)))
+            : Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (icon != null) ...[Icon(icon, size: 18), const SizedBox(width: 8)],
+                // Flexible + ellipsis so a longer label truncates instead of
+                // overflowing if this button ever ends up in a narrower
+                // context than the full-width usage it has today.
+                Flexible(child: Text(label, overflow: TextOverflow.ellipsis, maxLines: 1)),
+              ],
+            );
 
     return switch (variant) {
       AppButtonVariant.primary => ElevatedButton(onPressed: isDisabled ? null : onPressed, child: child),
@@ -68,7 +58,7 @@ class AppButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.error,
           side: const BorderSide(color: AppColors.error),
-          minimumSize: const Size.fromHeight(52),
+          minimumSize: const Size.fromHeight(48),
           shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
         ),
         child: child,
@@ -78,8 +68,9 @@ class AppButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.success,
           foregroundColor: AppColors.onPrimary,
-          disabledBackgroundColor: AppColors.textDisabled,
-          minimumSize: const Size.fromHeight(52),
+          disabledBackgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          disabledForegroundColor: AppColors.textDisabled,
+          minimumSize: const Size.fromHeight(48),
           shape: const RoundedRectangleBorder(borderRadius: AppRadii.mdRadius),
         ),
         child: child,

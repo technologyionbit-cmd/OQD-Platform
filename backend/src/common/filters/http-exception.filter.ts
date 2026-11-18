@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import { conflict } from '../errors/api-exceptions';
 import { resolveApiErrorCode } from '../errors/api-error-codes';
 import type { ApiErrorEnvelope } from '../errors/api-error-envelope';
 import { RateLimitedException } from '../errors/rate-limited.exception';
@@ -32,6 +33,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
+    exception = this.translatePrismaError(exception);
+
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -56,6 +59,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
       );
     }
     response.status(status).json(body);
+  }
+
+  /**
+   * A unique-constraint violation (P2002) that reached the filter lost a
+   * race its service pre-check could not see (e.g. two simultaneous
+   * reviews of one consultation). That is a client-visible conflict, not a
+   * server fault. Services that need a specific message catch it themselves
+   * first (see AuthService); this is the safety net for everything else.
+   */
+  private translatePrismaError(exception: unknown): unknown {
+    if (
+      typeof exception === 'object' &&
+      exception !== null &&
+      (exception as { code?: unknown }).code === 'P2002' &&
+      (exception as { clientVersion?: unknown }).clientVersion !== undefined
+    ) {
+      return conflict('This record already exists.');
+    }
+    return exception;
   }
 
   private buildEnvelope(exception: unknown, status: number): ApiErrorEnvelope {

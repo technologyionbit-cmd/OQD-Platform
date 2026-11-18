@@ -10,4 +10,14 @@ extension UserRoleWire on UserRole {
   /// Parses a backend role string. Throws on an unknown value rather than
   /// silently defaulting — an unrecognised role is a contract mismatch.
   static UserRole fromWire(String value) => UserRole.values.byName(value.trim());
+
+  /// Like [fromWire] but returns null for a role this app has no shell for
+  /// (the backend also has `admin`, which is served by the admin API only).
+  static UserRole? tryFromWire(String value) {
+    final trimmed = value.trim();
+    for (final role in UserRole.values) {
+      if (role.name == trimmed) return role;
+    }
+    return null;
+  }
 }
