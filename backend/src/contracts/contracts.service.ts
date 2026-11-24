@@ -8,6 +8,7 @@ import {
   validationFailed,
 } from '../common/errors/api-exceptions';
 import { PrismaService } from '../prisma/prisma.service';
+import { FileStorageService } from '../storage/file-storage.service';
 import type { AuthenticatedUser, RequestContext } from '../auth/auth.types';
 import {
   buildContractContent,
@@ -15,9 +16,8 @@ import {
   partiesOf,
   type FieldValues,
 } from './contract-fields';
+import { ContractTemplateStore } from './contract-template.store';
 import {
-  CONTRACT_TEMPLATES,
-  findTemplate,
   type ContractLocale,
   type ContractTemplateDefinition,
 } from './contract-templates';
@@ -54,11 +54,20 @@ export interface ContractView {
  */
 @Injectable()
 export class ContractsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly templateStore: ContractTemplateStore,
+    private readonly storage: FileStorageService,
+  ) {}
 
-  templates(locale: ContractLocale) {
-    return CONTRACT_TEMPLATES.map((template) => ({
+  async templates(locale: ContractLocale) {
+    const [templates, withPdf] = await Promise.all([
+      this.templateStore.listActive(),
+      this.templateStore.keysWithPdf(),
+    ]);
+    return templates.map((template) => ({
       id: template.key,
+      hasPdf: withPdf.has(template.key),
       version: template.version,
       category: template.category,
       title: template.title[locale],
@@ -73,6 +82,13 @@ export class ContractsService {
         })),
       })),
     }));
+  }
+
+  /** The official PDF staff uploaded for a template (404 if none). */
+  async templatePdf(key: string) {
+    const pdf = await this.templateStore.pdfOf(key);
+    if (!pdf) throw notFound('This template has no PDF.');
+    return { stream: await this.storage.open(pdf.storageKey), fileName: pdf.fileName };
   }
 
   async list(user: AuthenticatedUser, query: ListContractsQueryDto) {
@@ -100,7 +116,15 @@ export class ContractsService {
     dto: CreateContractDto,
   ): Promise<ContractView> {
     this.assertMayWrite(user);
-    const template = findTemplate(dto.templateId)!;
+    const template = await this.templateStore.find(dto.templateId, {
+      activeOnly: true,
+    });
+    if (!template) {
+      throw validationFailed(
+        { templateId: ['Unknown or unavailable template.'] },
+        'Unknown or unavailable template.',
+      );
+    }
     const locale = dto.locale ?? 'ar';
     const values = this.checked(template, dto.fieldValues, false);
 
@@ -127,7 +151,7 @@ export class ContractsService {
   ): Promise<ContractView> {
     this.assertMayWrite(user);
     const contract = await this.owned(user, id);
-    const template = this.templateOf(contract);
+    const template = await this.templateOf(contract);
     const values = this.checked(template, dto.fieldValues, false);
     const locale = dto.locale ?? (contract.locale as ContractLocale);
 
@@ -161,7 +185,7 @@ export class ContractsService {
   ): Promise<ContractView> {
     this.assertMayWrite(user);
     const contract = await this.owned(user, id);
-    const template = this.templateOf(contract);
+    const template = await this.templateOf(contract);
     const locale = requestedLocale ?? (contract.locale as ContractLocale);
     const values = this.checked(
       template,
@@ -231,9 +255,13 @@ export class ContractsService {
     return contract;
   }
 
-  private templateOf(contract: Contract): ContractTemplateDefinition {
-    // Keys are never removed from the catalog while contracts use them.
-    return findTemplate(contract.templateKey)!;
+  private async templateOf(
+    contract: Contract,
+  ): Promise<ContractTemplateDefinition> {
+    // Templates are switched off, never deleted, while contracts use them.
+    const template = await this.templateStore.find(contract.templateKey);
+    if (!template) throw notFound('The contract template no longer exists.');
+    return template;
   }
 
   private checked(

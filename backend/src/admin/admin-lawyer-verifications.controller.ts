@@ -1,6 +1,5 @@
 import {
   Body,
-  Controller,
   Get,
   HttpCode,
   HttpStatus,
@@ -8,33 +7,22 @@ import {
   ParseUUIDPipe,
   Post,
   StreamableFile,
-  UseGuards,
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
   ApiConflictResponse,
-  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiOperation,
-  ApiTags,
 } from '@nestjs/swagger';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiErrorResponseDto } from '../common/openapi/api-error.dto';
-import { BEARER_AUTH } from '../common/openapi/setup-openapi';
 import { RejectVerificationDto } from '../lawyers/dto/update-my-profile.dto';
 import { LawyerVerificationService } from '../lawyers/lawyer-verification.service';
-import { AdminGuard } from './admin.guard';
+import { AuditAction, AuditNoter } from './audit/audit.decorators';
+import type { AuditNoteFn } from './audit/audit.types';
+import { AdminController } from './common/admin-controller.decorator';
 
-@ApiTags('admin')
-@ApiBearerAuth(BEARER_AUTH)
-@ApiForbiddenResponse({
-  type: ApiErrorResponseDto,
-  description: 'The caller is not an admin.',
-})
-@Controller('admin/lawyer-verifications')
-@UseGuards(JwtAuthGuard, AdminGuard)
+@AdminController('lawyer-verifications', 'lawyers')
 export class AdminLawyerVerificationsController {
   constructor(private readonly verification: LawyerVerificationService) {}
 
@@ -62,6 +50,7 @@ export class AdminLawyerVerificationsController {
   }
 
   @Post(':lawyerProfileId/approve')
+  @AuditAction('lawyerVerification.approve')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
     description: 'Verified; the lawyer is notified and becomes bookable.',
@@ -73,11 +62,14 @@ export class AdminLawyerVerificationsController {
   async approve(
     @CurrentUser() admin: AuthenticatedUser,
     @Param('lawyerProfileId', ParseUUIDPipe) lawyerProfileId: string,
+    @AuditNoter() note: AuditNoteFn,
   ): Promise<void> {
+    note({ entityType: 'lawyerProfile', entityId: lawyerProfileId });
     await this.verification.approve(admin, lawyerProfileId);
   }
 
   @Post(':lawyerProfileId/reject')
+  @AuditAction('lawyerVerification.reject')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiNoContentResponse({
     description: 'Rejected; the lawyer is notified with the reason.',
@@ -90,7 +82,9 @@ export class AdminLawyerVerificationsController {
     @CurrentUser() admin: AuthenticatedUser,
     @Param('lawyerProfileId', ParseUUIDPipe) lawyerProfileId: string,
     @Body() dto: RejectVerificationDto,
+    @AuditNoter() note: AuditNoteFn,
   ): Promise<void> {
+    note({ entityType: 'lawyerProfile', entityId: lawyerProfileId });
     await this.verification.reject(admin, lawyerProfileId, dto.reason);
   }
 }

@@ -19,6 +19,7 @@ extension NotificationTypeX on NotificationType {
       NotificationType.consultationRescheduled => Icons.update_outlined,
       NotificationType.lawyerVerificationApproved => Icons.verified_outlined,
       NotificationType.lawyerVerificationRejected => Icons.gpp_bad_outlined,
+      NotificationType.adminMessage => Icons.campaign_outlined,
     };
   }
 
@@ -32,6 +33,7 @@ extension NotificationTypeX on NotificationType {
       NotificationType.consultationRescheduled => AppStatusTone.warning,
       NotificationType.lawyerVerificationApproved => AppStatusTone.success,
       NotificationType.lawyerVerificationRejected => AppStatusTone.error,
+      NotificationType.adminMessage => AppStatusTone.info,
     };
   }
 }
@@ -49,6 +51,7 @@ extension AppNotificationText on AppNotification {
       NotificationType.consultationRescheduled => l10n.notificationConsultationRescheduledTitle,
       NotificationType.lawyerVerificationApproved => l10n.notificationVerificationApprovedTitle,
       NotificationType.lawyerVerificationRejected => l10n.notificationVerificationRejectedTitle,
+      NotificationType.adminMessage => _localized(l10n, 'title'),
     };
   }
 
@@ -63,6 +66,15 @@ extension AppNotificationText on AppNotification {
       NotificationType.consultationRescheduled => l10n.notificationConsultationRescheduledBody(name),
       NotificationType.lawyerVerificationApproved => l10n.notificationVerificationApprovedBody,
       NotificationType.lawyerVerificationRejected => l10n.notificationVerificationRejectedBody(params['reason'] ?? ''),
+      NotificationType.adminMessage => _localized(l10n, 'body'),
     };
+  }
+
+  /// Staff messages carry both languages; show the reader's, or the other
+  /// one if the reader's is missing.
+  String _localized(AppLocalizations l10n, String field) {
+    final mine = l10n.localeName == 'ar' ? 'Ar' : 'En';
+    final other = mine == 'Ar' ? 'En' : 'Ar';
+    return params['$field$mine'] ?? params['$field$other'] ?? '';
   }
 }

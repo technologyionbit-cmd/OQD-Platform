@@ -164,9 +164,11 @@ export class AuthService {
     dto: LoginDto,
     ctx: RequestContext,
   ): Promise<{ user: AuthUserView; tokens: AuthTokens }> {
-    const user = await this.prisma.user.findUnique({
+    const found = await this.prisma.user.findUnique({
       where: { phone: dto.phone },
     });
+    // An account an admin removed answers exactly like an unknown number.
+    const user = found && !found.deletedAt ? found : null;
 
     // Same bcrypt work whether or not the account exists (timing-safe).
     const ok = await this.passwords.verifyOrBurn(
@@ -445,7 +447,7 @@ export class AuthService {
   /** The caller's account, or 401 when it is gone or no longer active. */
   private async activeUser(userId: string): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user || user.status !== 'active') {
+    if (!user || user.deletedAt || user.status !== 'active') {
       throw unauthorized('Session expired. Please sign in again.');
     }
     return user;

@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ContractTemplate {
 
- String get id; ContractCategory get category; String get title; List<ContractField> get fields;
+ String get id; ContractCategory get category; String get title; List<ContractField> get fields;/// Staff uploaded an official PDF for this template; the app offers it.
+ bool get hasPdf;
 /// Create a copy of ContractTemplate
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +26,16 @@ $ContractTemplateCopyWith<ContractTemplate> get copyWith => _$ContractTemplateCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ContractTemplate&&(identical(other.id, id) || other.id == id)&&(identical(other.category, category) || other.category == category)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.fields, fields));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ContractTemplate&&(identical(other.id, id) || other.id == id)&&(identical(other.category, category) || other.category == category)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other.fields, fields)&&(identical(other.hasPdf, hasPdf) || other.hasPdf == hasPdf));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,category,title,const DeepCollectionEquality().hash(fields));
+int get hashCode => Object.hash(runtimeType,id,category,title,const DeepCollectionEquality().hash(fields),hasPdf);
 
 @override
 String toString() {
-  return 'ContractTemplate(id: $id, category: $category, title: $title, fields: $fields)';
+  return 'ContractTemplate(id: $id, category: $category, title: $title, fields: $fields, hasPdf: $hasPdf)';
 }
 
 
@@ -45,7 +46,7 @@ abstract mixin class $ContractTemplateCopyWith<$Res>  {
   factory $ContractTemplateCopyWith(ContractTemplate value, $Res Function(ContractTemplate) _then) = _$ContractTemplateCopyWithImpl;
 @useResult
 $Res call({
- String id, ContractCategory category, String title, List<ContractField> fields
+ String id, ContractCategory category, String title, List<ContractField> fields, bool hasPdf
 });
 
 
@@ -62,13 +63,14 @@ class _$ContractTemplateCopyWithImpl<$Res>
 
 /// Create a copy of ContractTemplate
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? category = null,Object? title = null,Object? fields = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? category = null,Object? title = null,Object? fields = null,Object? hasPdf = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as ContractCategory,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,fields: null == fields ? _self.fields : fields // ignore: cast_nullable_to_non_nullable
-as List<ContractField>,
+as List<ContractField>,hasPdf: null == hasPdf ? _self.hasPdf : hasPdf // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -153,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  ContractCategory category,  String title,  List<ContractField> fields)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  ContractCategory category,  String title,  List<ContractField> fields,  bool hasPdf)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ContractTemplate() when $default != null:
-return $default(_that.id,_that.category,_that.title,_that.fields);case _:
+return $default(_that.id,_that.category,_that.title,_that.fields,_that.hasPdf);case _:
   return orElse();
 
 }
@@ -174,10 +176,10 @@ return $default(_that.id,_that.category,_that.title,_that.fields);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  ContractCategory category,  String title,  List<ContractField> fields)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  ContractCategory category,  String title,  List<ContractField> fields,  bool hasPdf)  $default,) {final _that = this;
 switch (_that) {
 case _ContractTemplate():
-return $default(_that.id,_that.category,_that.title,_that.fields);case _:
+return $default(_that.id,_that.category,_that.title,_that.fields,_that.hasPdf);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -194,10 +196,10 @@ return $default(_that.id,_that.category,_that.title,_that.fields);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  ContractCategory category,  String title,  List<ContractField> fields)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  ContractCategory category,  String title,  List<ContractField> fields,  bool hasPdf)?  $default,) {final _that = this;
 switch (_that) {
 case _ContractTemplate() when $default != null:
-return $default(_that.id,_that.category,_that.title,_that.fields);case _:
+return $default(_that.id,_that.category,_that.title,_that.fields,_that.hasPdf);case _:
   return null;
 
 }
@@ -209,7 +211,7 @@ return $default(_that.id,_that.category,_that.title,_that.fields);case _:
 
 
 class _ContractTemplate implements ContractTemplate {
-  const _ContractTemplate({required this.id, required this.category, required this.title, required final  List<ContractField> fields}): _fields = fields;
+  const _ContractTemplate({required this.id, required this.category, required this.title, required final  List<ContractField> fields, this.hasPdf = false}): _fields = fields;
   
 
 @override final  String id;
@@ -222,6 +224,8 @@ class _ContractTemplate implements ContractTemplate {
   return EqualUnmodifiableListView(_fields);
 }
 
+/// Staff uploaded an official PDF for this template; the app offers it.
+@override@JsonKey() final  bool hasPdf;
 
 /// Create a copy of ContractTemplate
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +237,16 @@ _$ContractTemplateCopyWith<_ContractTemplate> get copyWith => __$ContractTemplat
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ContractTemplate&&(identical(other.id, id) || other.id == id)&&(identical(other.category, category) || other.category == category)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._fields, _fields));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ContractTemplate&&(identical(other.id, id) || other.id == id)&&(identical(other.category, category) || other.category == category)&&(identical(other.title, title) || other.title == title)&&const DeepCollectionEquality().equals(other._fields, _fields)&&(identical(other.hasPdf, hasPdf) || other.hasPdf == hasPdf));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,id,category,title,const DeepCollectionEquality().hash(_fields));
+int get hashCode => Object.hash(runtimeType,id,category,title,const DeepCollectionEquality().hash(_fields),hasPdf);
 
 @override
 String toString() {
-  return 'ContractTemplate(id: $id, category: $category, title: $title, fields: $fields)';
+  return 'ContractTemplate(id: $id, category: $category, title: $title, fields: $fields, hasPdf: $hasPdf)';
 }
 
 
@@ -253,7 +257,7 @@ abstract mixin class _$ContractTemplateCopyWith<$Res> implements $ContractTempla
   factory _$ContractTemplateCopyWith(_ContractTemplate value, $Res Function(_ContractTemplate) _then) = __$ContractTemplateCopyWithImpl;
 @override @useResult
 $Res call({
- String id, ContractCategory category, String title, List<ContractField> fields
+ String id, ContractCategory category, String title, List<ContractField> fields, bool hasPdf
 });
 
 
@@ -270,13 +274,14 @@ class __$ContractTemplateCopyWithImpl<$Res>
 
 /// Create a copy of ContractTemplate
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? category = null,Object? title = null,Object? fields = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? category = null,Object? title = null,Object? fields = null,Object? hasPdf = null,}) {
   return _then(_ContractTemplate(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as ContractCategory,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,fields: null == fields ? _self._fields : fields // ignore: cast_nullable_to_non_nullable
-as List<ContractField>,
+as List<ContractField>,hasPdf: null == hasPdf ? _self.hasPdf : hasPdf // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

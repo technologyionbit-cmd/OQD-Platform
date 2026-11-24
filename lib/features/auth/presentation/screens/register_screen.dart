@@ -17,6 +17,7 @@ import 'package:aqd_ionbit/core/widgets/phone_field.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/presentation/password_rules.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/biometric_lock.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/sanad_auth_page.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/sanad_button.dart';
@@ -116,9 +117,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_validate(l10n)) return;
 
     setState(() => _isSubmitting = true);
+    final request = _buildRequest();
     final result = await ref
         .read(authControllerProvider.notifier)
-        .register(_buildRequest());
+        .register(request);
+    // Before the mounted check: sign-up success makes the router leave this
+    // screen. The offer waits for the phone-code screen to finish.
+    if (result is Success) {
+      await offerBiometricAfterLogin(ref, phone: request.phone, password: request.password);
+    }
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 

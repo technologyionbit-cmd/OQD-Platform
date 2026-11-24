@@ -13,4 +13,8 @@ enum NotificationType {
   lawyerVerificationApproved,
   /// An admin rejected it; `params['reason']` says why.
   lawyerVerificationRejected,
+
+  /// A message written by staff in the admin app. The text comes with the
+  /// notification: `params` holds `titleAr`, `titleEn`, `bodyAr`, `bodyEn`.
+  adminMessage,
 }

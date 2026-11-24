@@ -1,0 +1,587 @@
+{
+  "@@locale": "ar",
+  "appName": "لوحة تحكم عقد",
+  "adminPanel": "لوحة الإدارة",
+  "navDashboard": "لوحة المؤشرات",
+  "navUsers": "المستخدمون",
+  "navLawyerVerifications": "توثيق المحامين",
+  "navLawyers": "المحامون",
+  "navCompanies": "الشركات",
+  "navConsultations": "الاستشارات",
+  "navContracts": "العقود",
+  "navGovProcedures": "المعاملات الحكومية",
+  "navNotifications": "الإشعارات",
+  "navAudit": "سجل التدقيق",
+  "navSettings": "الإعدادات",
+  "breadcrumbHome": "الرئيسية",
+  "comingSoonTitle": "هذه الوحدة قيد التنفيذ",
+  "comingSoonBody": "بتنضاف بمرحلة لاحقة من خطة اللوحة.",
+  "signInTitle": "تسجيل دخول الأدمن",
+  "signInSubtitle": "استخدم رقم جوالك وكلمة المرور المسجّلين في عقد.",
+  "phoneLabel": "رقم الجوال",
+  "phoneHint": "07XXXXXXXX",
+  "passwordLabel": "كلمة المرور",
+  "signInAction": "تسجيل الدخول",
+  "signOut": "تسجيل الخروج",
+  "fieldRequired": "هذا الحقل مطلوب",
+  "phoneInvalid": "أدخل رقم جوال أردني صحيح",
+  "signInFailed": "رقم الجوال أو كلمة المرور غير صحيحة.",
+  "accountInactive": "هذا الحساب غير مفعّل.",
+  "accessDeniedTitle": "ما إلك صلاحية دخول اللوحة",
+  "accessDeniedBody": "هذا الحساب مش حساب أدمن. اللوحة مخصصة لفريق الإدارة فقط. إذا بتعتقد إنه في خطأ، تواصل مع مسؤول النظام.",
+  "backToSignIn": "العودة لتسجيل الدخول",
+  "sessionExpiredNotice": "انتهت الجلسة. سجّل دخولك من جديد.",
+  "restoringSession": "جاري استعادة الجلسة...",
+  "errorNetwork": "ما في اتصال بالسيرفر. تأكد من الإنترنت وجرّب مرة ثانية.",
+  "errorTimeout": "الطلب أخذ وقت طويل. جرّب مرة ثانية.",
+  "errorUnauthorized": "انتهت الجلسة. سجّل دخولك من جديد.",
+  "errorForbidden": "ما إلك صلاحية لهذا الإجراء.",
+  "errorNotFound": "العنصر غير موجود.",
+  "errorValidation": "في بيانات غير صحيحة. راجع الحقول.",
+  "errorConflict": "الإجراء ما بيتوافق مع الحالة الحالية.",
+  "errorTooManyRequests": "محاولات كثيرة. استنى شوي وجرّب.",
+  "errorServer": "صار خطأ بالسيرفر. جرّب لاحقاً.",
+  "errorUnknown": "صار خطأ غير متوقع.",
+  "retry": "إعادة المحاولة",
+  "cancel": "إلغاء",
+  "confirm": "تأكيد",
+  "loading": "جاري التحميل...",
+  "emptyTitle": "ما في بيانات",
+  "emptyBody": "ما في نتائج تطابق الفلاتر الحالية.",
+  "search": "بحث",
+  "clearFilters": "مسح الفلاتر",
+  "rowsPerPage": "عدد الصفوف",
+  "pageOfTotal": "صفحة {page} من {pages}",
+  "@pageOfTotal": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "pages": {
+        "type": "int"
+      }
+    }
+  },
+  "totalRows": "المجموع: {total}",
+  "@totalRows": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "selectedCount": "تم تحديد {count}",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearSelection": "إلغاء التحديد",
+  "previousPage": "الصفحة السابقة",
+  "nextPage": "الصفحة التالية",
+  "typeToConfirm": "اكتب \"{word}\" للتأكيد",
+  "@typeToConfirm": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "collapseSidebar": "طي القائمة",
+  "expandSidebar": "فتح القائمة",
+  "openMenu": "القائمة",
+  "language": "اللغة",
+  "switchToEnglish": "English",
+  "switchToArabic": "العربية",
+  "breadcrumbDetails": "التفاصيل",
+  "close": "إغلاق",
+  "yes": "نعم",
+  "no": "لا",
+  "filterAll": "الكل",
+  "filterRole": "الدور",
+  "filterStatus": "الحالة",
+  "filterDeleted": "الحسابات المحذوفة",
+  "deletedHide": "إخفاء",
+  "deletedOnly": "المحذوفة فقط",
+  "deletedInclude": "إظهار الكل",
+  "dateFrom": "من تاريخ",
+  "dateTo": "إلى تاريخ",
+  "clearDates": "مسح التاريخ",
+  "roleClient": "عميل",
+  "roleLawyer": "محامي",
+  "roleCompany": "شركة",
+  "roleAdmin": "أدمن",
+  "statusActive": "نشط",
+  "statusSuspended": "معلّق",
+  "statusBanned": "محظور",
+  "statusPendingDeletion": "بانتظار الحذف",
+  "statusRemoved": "محذوف",
+  "verUnverified": "غير موثّق",
+  "verPending": "قيد المراجعة",
+  "verVerified": "موثّق",
+  "verRejected": "مرفوض",
+  "usersSubtitle": "إدارة حسابات العملاء والمحامين والشركات.",
+  "searchUsersHint": "ابحث بالاسم أو الإيميل أو الجوال",
+  "colName": "الاسم",
+  "colEmail": "الإيميل",
+  "colPhone": "الجوال",
+  "colRole": "الدور",
+  "colStatus": "الحالة",
+  "colLastLogin": "آخر دخول",
+  "colCreated": "تاريخ التسجيل",
+  "never": "ما سجّل دخول",
+  "exportCsv": "تصدير CSV",
+  "exportConfirmTitle": "تصدير بيانات شخصية",
+  "exportConfirmBody": "الملف فيه أسماء وإيميلات وأرقام جوال حسب الفلاتر الحالية. التصدير بينسجّل بسجل التدقيق باسمك.",
+  "exportDone": "تم تنزيل الملف",
+  "bulkSuspend": "تعليق المحدد",
+  "bulkActivate": "تفعيل المحدد",
+  "bulkRevoke": "إنهاء جلسات المحدد",
+  "bulkSuspendBody": "بدك تعلّق {count} حساب؟ رح ينسجّل خروجهم من كل الأجهزة.",
+  "@bulkSuspendBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkActivateBody": "بدك تفعّل {count} حساب؟",
+  "@bulkActivateBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkRevokeBody": "بدك تنهي كل جلسات {count} حساب؟",
+  "@bulkRevokeBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkResult": "تم: {ok}، تم تخطّي: {skipped}",
+  "@bulkResult": {
+    "placeholders": {
+      "ok": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "actionDone": "تم تنفيذ الإجراء",
+  "reasonLabel": "السبب",
+  "reasonTooShort": "اكتب سبباً من 3 أحرف على الأقل",
+  "suspendAction": "تعليق الحساب",
+  "activateAction": "تفعيل الحساب",
+  "revokeAction": "إنهاء كل الجلسات",
+  "resetPasswordAction": "إرسال رمز إعادة تعيين كلمة المرور",
+  "deleteAction": "حذف الحساب",
+  "restoreAction": "استرجاع الحساب",
+  "suspendTitle": "تعليق الحساب؟",
+  "suspendBody": "رح ينسجّل خروجه من كل الأجهزة وما بقدر يسجّل دخول لحد ما تفعّله. السبب بينحفظ بسجل التدقيق.",
+  "activateTitle": "تفعيل الحساب؟",
+  "activateBody": "بيقدر يسجّل دخول من جديد.",
+  "revokeTitle": "إنهاء كل الجلسات؟",
+  "revokeBody": "رح ينسجّل خروجه من كل الأجهزة، وبيقدر يرجع يسجّل دخول.",
+  "resetTitle": "إرسال رمز إعادة التعيين؟",
+  "resetBody": "رح يوصله رمز SMS ويتسجّل خروجه من كل الأجهزة. إنت ما بتشوف ولا بتحدد كلمة المرور.",
+  "deleteTitle": "حذف الحساب؟",
+  "deleteBody": "الحساب بيتوقف عن العمل، لكن بياناته بتضل محفوظة ويمكن استرجاعه.",
+  "deleteConfirmWord": "حذف",
+  "restoreTitle": "استرجاع الحساب؟",
+  "restoreBody": "بيرجع الحساب يشتغل بحالته السابقة.",
+  "sectionAccount": "الحساب",
+  "sectionActivity": "النشاط",
+  "sectionSessions": "الجلسات النشطة",
+  "sectionRelated": "السجلات المرتبطة",
+  "sectionActions": "الإجراءات",
+  "fieldPhoneVerified": "الجوال موثّق",
+  "fieldTerms": "الشروط المقبولة",
+  "fieldSuspendedBy": "علّقه",
+  "fieldSuspendReason": "سبب التعليق",
+  "fieldSuspendedAt": "تاريخ التعليق",
+  "fieldDeletedAt": "تاريخ الحذف",
+  "fieldLawyerStatus": "حالة توثيق المحامي",
+  "fieldRating": "التقييم",
+  "fieldConsultations": "الاستشارات",
+  "fieldContracts": "العقود",
+  "fieldOrganizations": "الشركات المملوكة",
+  "noSessions": "ما في جلسات نشطة",
+  "sessionDevice": "الجهاز",
+  "sessionLastUsed": "آخر استخدام",
+  "adminProtected": "حسابات الأدمن بتتدار من الإعدادات، وما بتتعدّل من هون.",
+  "backToList": "العودة للقائمة",
+  "auditSubtitle": "كل إجراء للأدمن: مين، شو، ومتى.",
+  "auditSearchHint": "ابحث بالإجراء أو المسار أو اسم المنفّذ",
+  "colAction": "الإجراء",
+  "colActor": "المنفّذ",
+  "colEntity": "العنصر",
+  "colWhen": "الوقت",
+  "colOutcome": "النتيجة",
+  "colIp": "عنوان IP",
+  "outcomeSuccess": "نجح",
+  "outcomeFailure": "فشل",
+  "filterOutcome": "النتيجة",
+  "filterEntityType": "نوع العنصر",
+  "filterAction": "الإجراء (مثال: user.)",
+  "auditDetailTitle": "تفاصيل السجل",
+  "auditBefore": "قبل",
+  "auditAfter": "بعد",
+  "auditRequest": "الطلب",
+  "auditMeta": "تفاصيل إضافية",
+  "auditNothing": "لا يوجد",
+  "lawyersSubtitle": "كل ملفات المحامين وحالة التوثيق لكل واحد.",
+  "searchLawyersHint": "ابحث بالاسم أو رقم الترخيص أو الإيميل أو الموبايل",
+  "colVerification": "التوثيق",
+  "colBarLicense": "رقم الترخيص",
+  "colExperience": "الخبرة",
+  "colRating": "التقييم",
+  "colConsultations": "الاستشارات",
+  "colSpecialties": "التخصصات",
+  "yearsValue": "{count} سنة",
+  "@yearsValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spCommercial": "تجاري",
+  "spPersonalStatus": "أحوال شخصية",
+  "spCriminal": "جنائي",
+  "spLabor": "عمل",
+  "spRealEstate": "عقاري",
+  "spCorporate": "شركات",
+  "spIntellectualProperty": "ملكية فكرية",
+  "spGeneral": "عام",
+  "verifSubtitle": "راجع المستندات اللي قدمها المحامون، الأقدم أولاً.",
+  "verifEmptyTitle": "ما في شي للمراجعة",
+  "verifEmptyBody": "ما في محامي ناطر التوثيق.",
+  "verifSubmitted": "قُدّم {date}",
+  "@verifSubmitted": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "verifDocuments": "المستندات المرفوعة",
+  "verifNoDocuments": "ما في مستندات مرفقة.",
+  "verifApprove": "قبول",
+  "verifReject": "رفض",
+  "verifApproveTitle": "قبول هذا المحامي؟",
+  "verifApproveBody": "{name} رح يصير موثقاً وقابلاً للحجز، وبوصله إشعار.",
+  "@verifApproveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "verifRejectTitle": "رفض هذا المحامي؟",
+  "verifRejectBody": "{name} رح يعرف السبب وبقدر يقدم من جديد.",
+  "@verifRejectBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "verifApprovedDone": "تم قبول المحامي",
+  "verifRejectedDone": "تم رفض المحامي",
+  "companiesSubtitle": "الشركات المسجلة وحالة توثيقها.",
+  "searchCompaniesHint": "ابحث باسم الشركة أو رقم التسجيل أو المالك",
+  "colCompany": "الشركة",
+  "colRegistration": "رقم التسجيل",
+  "colOwner": "المالك",
+  "colMembers": "الأعضاء",
+  "companyApproveTitle": "توثيق هذه الشركة؟",
+  "companyApproveBody": "{name} رح تصير موثقة.",
+  "@companyApproveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "companyRejectTitle": "رفض هذه الشركة؟",
+  "companyRejectBody": "{name} رح تُرفض، والسبب بنحفظ بسجل التدقيق.",
+  "@companyRejectBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "companyApprovedDone": "تم توثيق الشركة",
+  "companyRejectedDone": "تم رفض الشركة",
+  "consultationsSubtitle": "كل الحجوزات على المنصة (للعرض فقط).",
+  "searchConsultationsHint": "ابحث باسم العميل أو المحامي",
+  "contractsSubtitle": "تفاصيل العقود فقط؛ النص يبقى خاص بصاحبه.",
+  "searchContractsHint": "ابحث بالعنوان أو المالك",
+  "notificationsSubtitle": "اللي أرسلته المنصة للمستخدمين (للعرض فقط).",
+  "searchNotificationsHint": "ابحث باسم المستلم أو إيميله",
+  "govSubtitle": "كتالوج المعاملات وكم مستخدم بدأ كل وحدة.",
+  "colClient": "العميل",
+  "colLawyer": "المحامي",
+  "colType": "النوع",
+  "colScheduled": "الموعد",
+  "colPrice": "السعر",
+  "colTitle": "العنوان",
+  "colCategory": "الفئة",
+  "colSignatures": "التواقيع",
+  "colUpdated": "آخر تعديل",
+  "colRecipient": "المستلم",
+  "colRead": "مقروء",
+  "colSent": "أُرسل",
+  "colProcedure": "المعاملة",
+  "colAccess": "طريقة الوصول",
+  "colDuration": "المدة",
+  "colDocuments": "المستندات",
+  "colSteps": "الخطوات",
+  "colStarted": "بدأها",
+  "filterType": "النوع",
+  "filterCategory": "الفئة",
+  "filterRead": "حالة القراءة",
+  "readYes": "مقروء",
+  "readNo": "غير مقروء",
+  "ctypeVideo": "فيديو",
+  "ctypeVoice": "صوت",
+  "ctypeWritten": "مكتوب",
+  "ctCancelled": "ملغى",
+  "catEmployment": "عمل",
+  "catSale": "بيع",
+  "catRental": "إيجار",
+  "catPartnership": "شراكة",
+  "catNda": "عدم إفصاح",
+  "catServiceAgreement": "اتفاقية خدمات",
+  "catOther": "أخرى",
+  "ntConsultationRequested": "طلب استشارة",
+  "ntConsultationAccepted": "قبول استشارة",
+  "ntConsultationRejected": "رفض استشارة",
+  "ntConsultationCancelled": "إلغاء استشارة",
+  "ntConsultationCompleted": "اكتمال استشارة",
+  "ntConsultationRescheduled": "إعادة جدولة استشارة",
+  "ntLawyerVerificationApproved": "قبول التوثيق",
+  "ntLawyerVerificationRejected": "رفض التوثيق",
+  "gpCompanyRegistration": "تسجيل شركة",
+  "gpPropertyRegistration": "تسجيل عقار",
+  "gpContractNotarization": "توثيق عقد",
+  "gpLawsuitFiling": "رفع دعوى",
+  "accessDirectLink": "رابط مباشر",
+  "accessGuide": "دليل",
+  "settingsAccount": "حسابك",
+  "settingsPreferences": "التفضيلات",
+  "settingsSystem": "النظام",
+  "settingsApi": "عنوان الـ API",
+  "settingsLanguageArabic": "العربية",
+  "save": "حفظ",
+  "edit": "تعديل",
+  "langArabicShort": "عربي",
+  "langEnglishShort": "إنجليزي",
+  "consDetailTitle": "الاستشارة",
+  "consCancelTitle": "إلغاء هذه الاستشارة؟",
+  "consCancelBody": "رح يوصل إشعار للعميل والمحامي وبنفضّي الموعد. السبب بنحفظه بسجل التدقيق.",
+  "consCancel": "إلغاء الاستشارة",
+  "consCompleteTitle": "تعليمها كمكتملة؟",
+  "consCompleteBody": "استخدمها لاستشارة صارت بس ما انسكرت. رح يوصل إشعار للطرفين.",
+  "consComplete": "تعليم كمكتملة",
+  "consCancelledDone": "تم إلغاء الاستشارة",
+  "consCompletedDone": "تم تعليم الاستشارة كمكتملة",
+  "consNotes": "ملاحظات",
+  "consCancelReason": "سبب الإلغاء",
+  "consRoom": "غرفة الاتصال",
+  "consRoomNone": "الغرفة ما انفتحت أبداً.",
+  "consReconnects": "إعادة الاتصال",
+  "contractDetailTitle": "العقد",
+  "contractCancelTitle": "إلغاء هذا العقد؟",
+  "contractCancelBody": "بس العقود غير الموقعة بتنلغي. السبب بنحفظه بسجل التدقيق.",
+  "contractCancel": "إلغاء العقد",
+  "contractCancelledDone": "تم إلغاء العقد",
+  "contractTemplate": "القالب",
+  "contractParties": "الأطراف",
+  "contractNoSignatures": "لسه ما انوقّع.",
+  "govSaved": "تم حفظ المعاملة. التطبيق بيعرضها هلأ.",
+  "govAddDocument": "إضافة مستند",
+  "govAddStep": "إضافة خطوة",
+  "govStepDescription": "الوصف",
+  "navContractTemplates": "قوالب العقود",
+  "templatesSubtitle": "أنواع العقود اللي بقدر المستخدم يبدأ منها بالتطبيق.",
+  "templateNew": "قالب جديد",
+  "templateEdit": "تعديل القالب",
+  "templateKey": "المفتاح",
+  "templateKeyHelp": "حرف صغير بالبداية ثم حروف وأرقام (2-40). ما بيتغيّر لاحقاً.",
+  "templateVersion": "الإصدار",
+  "templateVersionNote": "الإصدار {version}. بيزيد لما يتغيّر العنوان أو الفئة أو الحقول.",
+  "@templateVersionNote": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "templateFields": "الحقول",
+  "templateAddField": "إضافة حقل",
+  "templateFieldId": "معرّف الحقل",
+  "templateFieldIdHelp": "حروف وأرقام، يبدأ بحرف.",
+  "templateFieldLabel": "الاسم",
+  "templateRequired": "مطلوب",
+  "templateOptionValue": "القيمة المخزّنة",
+  "templateAddOption": "إضافة خيار",
+  "templatePartyNote": "كل قالب لازم فيه الحقلين partyA و partyB (الطرفين).",
+  "templateActive": "فعّال",
+  "templateActiveHelp": "القالب غير الفعّال بيختفي من التطبيق، والعقود الموجودة بتضل شغالة.",
+  "templateInactive": "غير فعّال",
+  "templateSaved": "تم حفظ القالب",
+  "ftText": "نص قصير",
+  "ftMultiline": "نص طويل",
+  "ftNumber": "رقم",
+  "ftDate": "تاريخ",
+  "ftDropdown": "قائمة اختيار",
+  "ftPhone": "هاتف",
+  "ftEmail": "إيميل",
+  "ftCurrency": "مبلغ",
+  "ntAdminMessage": "رسالة من الإدارة",
+  "notifSendTitle": "إرسال رسالة",
+  "notifAudienceAll": "الجميع",
+  "notifAudienceRole": "دور محدد",
+  "notifAudienceUser": "مستخدم واحد",
+  "notifPickUser": "اختار مستخدم أولاً",
+  "notifConfirmTitle": "إرسال هذه الرسالة؟",
+  "notifConfirmBody": "رح تنرسل إلى: {audience}. ما بتنرجع.",
+  "@notifConfirmBody": {
+    "placeholders": {
+      "audience": {
+        "type": "String"
+      }
+    }
+  },
+  "notifSend": "إرسال",
+  "notifSent": "انرسلت إلى {count}",
+  "@notifSent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notifBody": "الرسالة",
+  "lawDetailTitle": "المحامي",
+  "lawBio": "النبذة",
+  "lawPricing": "الأسعار",
+  "lawPickSpecialty": "اختار تخصص واحد على الأقل",
+  "lawSaved": "انحفظ الملف. التطبيق بيعرضه هلأ.",
+  "lawOpenAccount": "فتح الحساب",
+  "lawReviews": "التقييمات",
+  "lawNoReviews": "ما في تقييمات بعد.",
+  "lawRemoveReview": "حذف التقييم",
+  "lawRemoveReviewTitle": "حذف هالتقييم؟",
+  "lawRemoveReviewBody": "بنعيد حساب تقييم المحامي بدونه. السبب بنحفظه بسجل التدقيق.",
+  "lawReviewRemoved": "تم حذف التقييم",
+  "lawRevoke": "سحب التوثيق",
+  "lawRevokeTitle": "سحب التوثيق؟",
+  "lawRevokeBody": "المحامي ما رح يضل قابل للحجز وبوصله إشعار بالسبب.",
+  "lawRevoked": "تم سحب التوثيق",
+  "pdfTitle": "ملف PDF رسمي",
+  "pdfHelp": "اختياري. المستخدم بنزّل هالملف من التطبيق. إذا ما في ملف، التطبيق بولّد PDF من البيانات.",
+  "pdfNone": "ما في ملف مرفوع",
+  "pdfUpload": "رفع PDF",
+  "pdfReplace": "استبدال",
+  "pdfRemove": "حذف",
+  "pdfRemoveTitle": "حذف الـ PDF؟",
+  "pdfRemoveBody": "التطبيق بيرجع يولّد PDF من البيانات.",
+  "pdfUploaded": "تم رفع الـ PDF",
+  "pdfRemoved": "تم حذف الـ PDF",
+  "colPdf": "PDF",
+  "navAdmins": "المشرفون",
+  "adminsSubtitle": "حسابات الإدارة الثانية وإيش بقدر كل واحد يسوي. بس الأدمن بصلاحية كاملة بشوف هالصفحة.",
+  "adminAdd": "إضافة مشرف",
+  "adminEditAccess": "تعديل الصلاحيات",
+  "adminAccessFull": "صلاحية كاملة",
+  "adminAccessCount": "{count} صلاحيات",
+  "@adminAccessCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminFullAccessToggle": "صلاحية كاملة",
+  "adminFullAccessHelp": "كل شي، بما فيه إضافة وإدارة المشرفين الثانيين.",
+  "adminPermissions": "الصلاحيات",
+  "permNone": "بدون",
+  "permView": "عرض",
+  "permManage": "إدارة",
+  "modLawyers": "المحامون والتوثيق",
+  "colPermissions": "الصلاحيات",
+  "adminPassword": "كلمة سر مؤقتة",
+  "adminPasswordHelp": "8 أحرف على الأقل مع حرف ورقم.",
+  "adminPhoneHelp": "موبايل أردني مثل 0791234567. بسجّل فيه دخول.",
+  "adminSetPassword": "تعيين كلمة سر",
+  "adminSetPasswordBody": "بنسجّل خروجه من كل مكان وبستخدم هالكلمة بالمرة الجاية.",
+  "adminPasswordDone": "تم تغيير كلمة السر",
+  "adminCreated": "تمت إضافة المشرف",
+  "adminAccessSaved": "انحفظت الصلاحيات. بتنطبق على أول عملية بعملها.",
+  "adminDeactivate": "إيقاف",
+  "adminActivate": "تشغيل",
+  "adminDeactivateTitle": "إيقاف هالمشرف؟",
+  "adminDeactivateBody": "{name} رح ينسجّل خروجه وما بقدر يدخل لحد ما ترجّعه.",
+  "@adminDeactivateBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "adminDeactivated": "تم إيقاف المشرف",
+  "adminActivated": "تم تشغيل المشرف",
+  "adminYou": "أنت",
+  "dashSubtitle": "لمحة عن المنصة هلأ.",
+  "kpiUsers": "المستخدمون",
+  "kpiNewUsers": "جدد هالأسبوع",
+  "kpiSuspended": "حسابات موقوفة",
+  "kpiPendingLawyers": "محامون بانتظار المراجعة",
+  "kpiUpcoming": "استشارات قادمة",
+  "kpiContracts": "العقود",
+  "kpiOrganizations": "الشركات",
+  "kpiOrgsPending": "{count} بانتظار التوثيق",
+  "@kpiOrgsPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chartSignups": "حسابات جديدة، آخر 30 يوم",
+  "chartConsultations": "استشارات محجوزة، آخر 30 يوم",
+  "secUsersByRole": "المستخدمون حسب الدور",
+  "secConsultationsByStatus": "الاستشارات حسب الحالة",
+  "secContractsByStatus": "العقود حسب الحالة",
+  "secRecentActivity": "آخر نشاط للإدارة",
+  "noActivity": "ما في نشاط إداري بعد.",
+  "csPendingApproval": "بانتظار الموافقة",
+  "csConfirmed": "مؤكدة",
+  "csCompleted": "مكتملة",
+  "csCancelled": "ملغاة",
+  "csDeclined": "مرفوضة",
+  "csMissed": "فائتة",
+  "csFailed": "فاشلة",
+  "ctDraft": "مسودة",
+  "ctPendingSignature": "بانتظار التوقيع",
+  "ctSigned": "موقّع",
+  "ctCompleted": "مكتمل",
+  "verifPendingCount": "{count} بالانتظار",
+  "@verifPendingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

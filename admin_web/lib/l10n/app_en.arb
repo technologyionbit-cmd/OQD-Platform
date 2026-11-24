@@ -1,0 +1,587 @@
+{
+  "@@locale": "en",
+  "appName": "Aqd Admin",
+  "adminPanel": "Admin panel",
+  "navDashboard": "Dashboard",
+  "navUsers": "Users",
+  "navLawyerVerifications": "Lawyer verification",
+  "navLawyers": "Lawyers",
+  "navCompanies": "Companies",
+  "navConsultations": "Consultations",
+  "navContracts": "Contracts",
+  "navGovProcedures": "Government procedures",
+  "navNotifications": "Notifications",
+  "navAudit": "Audit log",
+  "navSettings": "Settings",
+  "breadcrumbHome": "Home",
+  "comingSoonTitle": "This module is in progress",
+  "comingSoonBody": "It is added in a later phase of the admin plan.",
+  "signInTitle": "Admin sign-in",
+  "signInSubtitle": "Use the phone number and password registered in Aqd.",
+  "phoneLabel": "Mobile number",
+  "phoneHint": "07XXXXXXXX",
+  "passwordLabel": "Password",
+  "signInAction": "Sign in",
+  "signOut": "Sign out",
+  "fieldRequired": "This field is required",
+  "phoneInvalid": "Enter a valid Jordanian mobile number",
+  "signInFailed": "Wrong mobile number or password.",
+  "accountInactive": "This account is not active.",
+  "accessDeniedTitle": "You do not have access to this panel",
+  "accessDeniedBody": "This account is not an admin account. The panel is for the admin team only. If you think this is a mistake, contact a system administrator.",
+  "backToSignIn": "Back to sign-in",
+  "sessionExpiredNotice": "Your session ended. Please sign in again.",
+  "restoringSession": "Restoring your session...",
+  "errorNetwork": "Cannot reach the server. Check your connection and try again.",
+  "errorTimeout": "The request took too long. Try again.",
+  "errorUnauthorized": "Your session ended. Please sign in again.",
+  "errorForbidden": "You do not have permission for this action.",
+  "errorNotFound": "Not found.",
+  "errorValidation": "Some data is invalid. Check the fields.",
+  "errorConflict": "This action does not fit the current state.",
+  "errorTooManyRequests": "Too many attempts. Wait a moment and try again.",
+  "errorServer": "Something went wrong on the server. Try again later.",
+  "errorUnknown": "An unexpected error occurred.",
+  "retry": "Try again",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "loading": "Loading...",
+  "emptyTitle": "No data",
+  "emptyBody": "Nothing matches the current filters.",
+  "search": "Search",
+  "clearFilters": "Clear filters",
+  "rowsPerPage": "Rows per page",
+  "pageOfTotal": "Page {page} of {pages}",
+  "@pageOfTotal": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "pages": {
+        "type": "int"
+      }
+    }
+  },
+  "totalRows": "Total: {total}",
+  "@totalRows": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "selectedCount": "{count} selected",
+  "@selectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearSelection": "Clear selection",
+  "previousPage": "Previous page",
+  "nextPage": "Next page",
+  "typeToConfirm": "Type \"{word}\" to confirm",
+  "@typeToConfirm": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "collapseSidebar": "Collapse menu",
+  "expandSidebar": "Expand menu",
+  "openMenu": "Menu",
+  "language": "Language",
+  "switchToEnglish": "English",
+  "switchToArabic": "العربية",
+  "breadcrumbDetails": "Details",
+  "close": "Close",
+  "yes": "Yes",
+  "no": "No",
+  "filterAll": "All",
+  "filterRole": "Role",
+  "filterStatus": "Status",
+  "filterDeleted": "Removed accounts",
+  "deletedHide": "Hide",
+  "deletedOnly": "Only removed",
+  "deletedInclude": "Show all",
+  "dateFrom": "From",
+  "dateTo": "To",
+  "clearDates": "Clear date",
+  "roleClient": "Client",
+  "roleLawyer": "Lawyer",
+  "roleCompany": "Company",
+  "roleAdmin": "Admin",
+  "statusActive": "Active",
+  "statusSuspended": "Suspended",
+  "statusBanned": "Banned",
+  "statusPendingDeletion": "Pending deletion",
+  "statusRemoved": "Removed",
+  "verUnverified": "Unverified",
+  "verPending": "Pending",
+  "verVerified": "Verified",
+  "verRejected": "Rejected",
+  "usersSubtitle": "Manage client, lawyer and company accounts.",
+  "searchUsersHint": "Search by name, email or phone",
+  "colName": "Name",
+  "colEmail": "Email",
+  "colPhone": "Mobile",
+  "colRole": "Role",
+  "colStatus": "Status",
+  "colLastLogin": "Last sign-in",
+  "colCreated": "Registered",
+  "never": "Never",
+  "exportCsv": "Export CSV",
+  "exportConfirmTitle": "Export personal data",
+  "exportConfirmBody": "The file holds names, emails and phone numbers matching the current filters. The export is recorded in the audit log under your name.",
+  "exportDone": "File downloaded",
+  "bulkSuspend": "Suspend selected",
+  "bulkActivate": "Reactivate selected",
+  "bulkRevoke": "Sign out selected",
+  "bulkSuspendBody": "Suspend {count} accounts? They are signed out everywhere.",
+  "@bulkSuspendBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkActivateBody": "Reactivate {count} accounts?",
+  "@bulkActivateBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkRevokeBody": "End every session of {count} accounts?",
+  "@bulkRevokeBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkResult": "Done: {ok}, skipped: {skipped}",
+  "@bulkResult": {
+    "placeholders": {
+      "ok": {
+        "type": "int"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "actionDone": "Done",
+  "reasonLabel": "Reason",
+  "reasonTooShort": "Give a reason of at least 3 characters",
+  "suspendAction": "Suspend account",
+  "activateAction": "Reactivate account",
+  "revokeAction": "Sign out everywhere",
+  "resetPasswordAction": "Send password-reset code",
+  "deleteAction": "Remove account",
+  "restoreAction": "Restore account",
+  "suspendTitle": "Suspend this account?",
+  "suspendBody": "They are signed out everywhere and cannot sign in until reactivated. The reason is kept in the audit log.",
+  "activateTitle": "Reactivate this account?",
+  "activateBody": "They can sign in again.",
+  "revokeTitle": "Sign out everywhere?",
+  "revokeBody": "They are signed out of every device and can sign in again.",
+  "resetTitle": "Send a reset code?",
+  "resetBody": "A code is texted to them and they are signed out everywhere. You never see or set their password.",
+  "deleteTitle": "Remove this account?",
+  "deleteBody": "The account stops working but its data is kept and it can be restored.",
+  "deleteConfirmWord": "DELETE",
+  "restoreTitle": "Restore this account?",
+  "restoreBody": "The account works again.",
+  "sectionAccount": "Account",
+  "sectionActivity": "Activity",
+  "sectionSessions": "Active sessions",
+  "sectionRelated": "Related records",
+  "sectionActions": "Actions",
+  "fieldPhoneVerified": "Phone verified",
+  "fieldTerms": "Terms accepted",
+  "fieldSuspendedBy": "Suspended by",
+  "fieldSuspendReason": "Suspension reason",
+  "fieldSuspendedAt": "Suspended on",
+  "fieldDeletedAt": "Removed on",
+  "fieldLawyerStatus": "Lawyer verification",
+  "fieldRating": "Rating",
+  "fieldConsultations": "Consultations",
+  "fieldContracts": "Contracts",
+  "fieldOrganizations": "Owned companies",
+  "noSessions": "No active sessions",
+  "sessionDevice": "Device",
+  "sessionLastUsed": "Last used",
+  "adminProtected": "Admin accounts are managed from Settings, not here.",
+  "backToList": "Back to the list",
+  "auditSubtitle": "Every admin action: who, what and when.",
+  "auditSearchHint": "Search action, path or actor",
+  "colAction": "Action",
+  "colActor": "Actor",
+  "colEntity": "Entity",
+  "colWhen": "When",
+  "colOutcome": "Outcome",
+  "colIp": "IP address",
+  "outcomeSuccess": "Succeeded",
+  "outcomeFailure": "Failed",
+  "filterOutcome": "Outcome",
+  "filterEntityType": "Entity type",
+  "filterAction": "Action (e.g. user.)",
+  "auditDetailTitle": "Audit entry",
+  "auditBefore": "Before",
+  "auditAfter": "After",
+  "auditRequest": "Request",
+  "auditMeta": "Extra details",
+  "auditNothing": "Nothing recorded",
+  "lawyersSubtitle": "Every lawyer profile and its verification state.",
+  "searchLawyersHint": "Search by name, license number, email or phone",
+  "colVerification": "Verification",
+  "colBarLicense": "Bar license",
+  "colExperience": "Experience",
+  "colRating": "Rating",
+  "colConsultations": "Consultations",
+  "colSpecialties": "Specialties",
+  "yearsValue": "{count} yrs",
+  "@yearsValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "spCommercial": "Commercial",
+  "spPersonalStatus": "Personal status",
+  "spCriminal": "Criminal",
+  "spLabor": "Labor",
+  "spRealEstate": "Real estate",
+  "spCorporate": "Corporate",
+  "spIntellectualProperty": "Intellectual property",
+  "spGeneral": "General",
+  "verifSubtitle": "Review the documents lawyers submitted, oldest first.",
+  "verifEmptyTitle": "Nothing to review",
+  "verifEmptyBody": "No lawyer is waiting for verification.",
+  "verifSubmitted": "Submitted {date}",
+  "@verifSubmitted": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "verifDocuments": "Submitted documents",
+  "verifNoDocuments": "No documents attached.",
+  "verifApprove": "Approve",
+  "verifReject": "Reject",
+  "verifApproveTitle": "Approve this lawyer?",
+  "verifApproveBody": "{name} becomes verified and bookable, and is notified.",
+  "@verifApproveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "verifRejectTitle": "Reject this lawyer?",
+  "verifRejectBody": "{name} is told the reason and can submit again.",
+  "@verifRejectBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "verifApprovedDone": "Lawyer approved",
+  "verifRejectedDone": "Lawyer rejected",
+  "companiesSubtitle": "Registered companies and their verification.",
+  "searchCompaniesHint": "Search by company, registration number or owner",
+  "colCompany": "Company",
+  "colRegistration": "Registration no.",
+  "colOwner": "Owner",
+  "colMembers": "Members",
+  "companyApproveTitle": "Verify this company?",
+  "companyApproveBody": "{name} will be marked as verified.",
+  "@companyApproveBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "companyRejectTitle": "Reject this company?",
+  "companyRejectBody": "{name} will be marked as rejected. The reason is kept in the audit log.",
+  "@companyRejectBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "companyApprovedDone": "Company verified",
+  "companyRejectedDone": "Company rejected",
+  "consultationsSubtitle": "Every booking on the platform (read only).",
+  "searchConsultationsHint": "Search by client or lawyer name",
+  "contractsSubtitle": "Contract details only; the text stays private to its owner.",
+  "searchContractsHint": "Search by title or owner",
+  "notificationsSubtitle": "What the platform sent to users (read only).",
+  "searchNotificationsHint": "Search by recipient name or email",
+  "govSubtitle": "The procedure catalog and how many users started each.",
+  "colClient": "Client",
+  "colLawyer": "Lawyer",
+  "colType": "Type",
+  "colScheduled": "Scheduled",
+  "colPrice": "Price",
+  "colTitle": "Title",
+  "colCategory": "Category",
+  "colSignatures": "Signatures",
+  "colUpdated": "Updated",
+  "colRecipient": "Recipient",
+  "colRead": "Read",
+  "colSent": "Sent",
+  "colProcedure": "Procedure",
+  "colAccess": "Access",
+  "colDuration": "Duration",
+  "colDocuments": "Documents",
+  "colSteps": "Steps",
+  "colStarted": "Started by",
+  "filterType": "Type",
+  "filterCategory": "Category",
+  "filterRead": "Read state",
+  "readYes": "Read",
+  "readNo": "Unread",
+  "ctypeVideo": "Video",
+  "ctypeVoice": "Voice",
+  "ctypeWritten": "Written",
+  "ctCancelled": "Cancelled",
+  "catEmployment": "Employment",
+  "catSale": "Sale",
+  "catRental": "Rental",
+  "catPartnership": "Partnership",
+  "catNda": "NDA",
+  "catServiceAgreement": "Service agreement",
+  "catOther": "Other",
+  "ntConsultationRequested": "Consultation requested",
+  "ntConsultationAccepted": "Consultation accepted",
+  "ntConsultationRejected": "Consultation rejected",
+  "ntConsultationCancelled": "Consultation cancelled",
+  "ntConsultationCompleted": "Consultation completed",
+  "ntConsultationRescheduled": "Consultation rescheduled",
+  "ntLawyerVerificationApproved": "Verification approved",
+  "ntLawyerVerificationRejected": "Verification rejected",
+  "gpCompanyRegistration": "Company registration",
+  "gpPropertyRegistration": "Property registration",
+  "gpContractNotarization": "Contract notarization",
+  "gpLawsuitFiling": "Lawsuit filing",
+  "accessDirectLink": "Direct link",
+  "accessGuide": "Guide",
+  "settingsAccount": "Your account",
+  "settingsPreferences": "Preferences",
+  "settingsSystem": "System",
+  "settingsApi": "API address",
+  "settingsLanguageArabic": "العربية",
+  "save": "Save",
+  "edit": "Edit",
+  "langArabicShort": "AR",
+  "langEnglishShort": "EN",
+  "consDetailTitle": "Consultation",
+  "consCancelTitle": "Cancel this consultation?",
+  "consCancelBody": "The client and the lawyer are notified and the time slot is freed. The reason is kept in the audit log.",
+  "consCancel": "Cancel consultation",
+  "consCompleteTitle": "Mark as completed?",
+  "consCompleteBody": "Use this for a consultation that took place but was never closed. Both people are notified.",
+  "consComplete": "Mark completed",
+  "consCancelledDone": "Consultation cancelled",
+  "consCompletedDone": "Consultation marked completed",
+  "consNotes": "Notes",
+  "consCancelReason": "Cancellation reason",
+  "consRoom": "Call room",
+  "consRoomNone": "The room was never opened.",
+  "consReconnects": "Reconnects",
+  "contractDetailTitle": "Contract",
+  "contractCancelTitle": "Cancel this contract?",
+  "contractCancelBody": "Only unsigned contracts can be cancelled. The reason is kept in the audit log.",
+  "contractCancel": "Cancel contract",
+  "contractCancelledDone": "Contract cancelled",
+  "contractTemplate": "Template",
+  "contractParties": "Parties",
+  "contractNoSignatures": "Not signed yet.",
+  "govSaved": "Procedure saved. The app shows it now.",
+  "govAddDocument": "Add document",
+  "govAddStep": "Add step",
+  "govStepDescription": "Description",
+  "navContractTemplates": "Contract templates",
+  "templatesSubtitle": "The contract types people can start from in the app.",
+  "templateNew": "New template",
+  "templateEdit": "Edit template",
+  "templateKey": "Key",
+  "templateKeyHelp": "Lowercase letter first, then letters and digits (2-40). Cannot change later.",
+  "templateVersion": "Version",
+  "templateVersionNote": "Version {version}. It goes up when the title, category or fields change.",
+  "@templateVersionNote": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "templateFields": "Fields",
+  "templateAddField": "Add field",
+  "templateFieldId": "Field id",
+  "templateFieldIdHelp": "Letters and digits, starting with a letter.",
+  "templateFieldLabel": "Label",
+  "templateRequired": "Required",
+  "templateOptionValue": "Stored value",
+  "templateAddOption": "Add option",
+  "templatePartyNote": "Every template needs the fields partyA and partyB (the two parties).",
+  "templateActive": "Active",
+  "templateActiveHelp": "Inactive templates are hidden in the app; existing contracts keep working.",
+  "templateInactive": "Inactive",
+  "templateSaved": "Template saved",
+  "ftText": "Short text",
+  "ftMultiline": "Long text",
+  "ftNumber": "Number",
+  "ftDate": "Date",
+  "ftDropdown": "Dropdown",
+  "ftPhone": "Phone",
+  "ftEmail": "Email",
+  "ftCurrency": "Amount",
+  "ntAdminMessage": "Message from admin",
+  "notifSendTitle": "Send a message",
+  "notifAudienceAll": "Everyone",
+  "notifAudienceRole": "One role",
+  "notifAudienceUser": "One user",
+  "notifPickUser": "Pick a user first",
+  "notifConfirmTitle": "Send this message?",
+  "notifConfirmBody": "It goes to: {audience}. It cannot be taken back.",
+  "@notifConfirmBody": {
+    "placeholders": {
+      "audience": {
+        "type": "String"
+      }
+    }
+  },
+  "notifSend": "Send",
+  "notifSent": "Sent to {count}",
+  "@notifSent": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notifBody": "Message",
+  "lawDetailTitle": "Lawyer",
+  "lawBio": "Bio",
+  "lawPricing": "Prices",
+  "lawPickSpecialty": "Pick at least one area of law",
+  "lawSaved": "Profile saved. The app shows it now.",
+  "lawOpenAccount": "Open account",
+  "lawReviews": "Reviews",
+  "lawNoReviews": "No reviews yet.",
+  "lawRemoveReview": "Remove review",
+  "lawRemoveReviewTitle": "Remove this review?",
+  "lawRemoveReviewBody": "The lawyer's rating is recalculated without it. The reason is kept in the audit log.",
+  "lawReviewRemoved": "Review removed",
+  "lawRevoke": "Revoke verification",
+  "lawRevokeTitle": "Revoke verification?",
+  "lawRevokeBody": "The lawyer stops being bookable and is told the reason.",
+  "lawRevoked": "Verification revoked",
+  "pdfTitle": "Official PDF",
+  "pdfHelp": "Optional. Users download this file in the app. With none, the app builds a PDF from the data.",
+  "pdfNone": "No file uploaded",
+  "pdfUpload": "Upload PDF",
+  "pdfReplace": "Replace",
+  "pdfRemove": "Remove",
+  "pdfRemoveTitle": "Remove the PDF?",
+  "pdfRemoveBody": "The app goes back to building a PDF from the data.",
+  "pdfUploaded": "PDF uploaded",
+  "pdfRemoved": "PDF removed",
+  "colPdf": "PDF",
+  "navAdmins": "Admins",
+  "adminsSubtitle": "Other staff accounts and what each may do. Only full-access admins see this page.",
+  "adminAdd": "Add admin",
+  "adminEditAccess": "Edit access",
+  "adminAccessFull": "Full access",
+  "adminAccessCount": "{count} permissions",
+  "@adminAccessCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminFullAccessToggle": "Full access",
+  "adminFullAccessHelp": "Everything, including adding and managing other admins.",
+  "adminPermissions": "Permissions",
+  "permNone": "None",
+  "permView": "View",
+  "permManage": "Manage",
+  "modLawyers": "Lawyers and verification",
+  "colPermissions": "Permissions",
+  "adminPassword": "Temporary password",
+  "adminPasswordHelp": "At least 8 characters with a letter and a number.",
+  "adminPhoneHelp": "Jordanian mobile, e.g. 0791234567. They sign in with it.",
+  "adminSetPassword": "Set password",
+  "adminSetPasswordBody": "They are signed out everywhere and use this password next time.",
+  "adminPasswordDone": "Password changed",
+  "adminCreated": "Admin created",
+  "adminAccessSaved": "Access saved. It applies on their next action.",
+  "adminDeactivate": "Switch off",
+  "adminActivate": "Switch on",
+  "adminDeactivateTitle": "Switch this admin off?",
+  "adminDeactivateBody": "{name} is signed out and cannot sign in until switched back on.",
+  "@adminDeactivateBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "adminDeactivated": "Admin switched off",
+  "adminActivated": "Admin switched on",
+  "adminYou": "you",
+  "dashSubtitle": "A snapshot of the platform right now.",
+  "kpiUsers": "Users",
+  "kpiNewUsers": "New this week",
+  "kpiSuspended": "Suspended accounts",
+  "kpiPendingLawyers": "Lawyers awaiting review",
+  "kpiUpcoming": "Upcoming consultations",
+  "kpiContracts": "Contracts",
+  "kpiOrganizations": "Companies",
+  "kpiOrgsPending": "{count} awaiting verification",
+  "@kpiOrgsPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chartSignups": "New accounts, last 30 days",
+  "chartConsultations": "Consultations booked, last 30 days",
+  "secUsersByRole": "Users by role",
+  "secConsultationsByStatus": "Consultations by status",
+  "secContractsByStatus": "Contracts by status",
+  "secRecentActivity": "Recent admin activity",
+  "noActivity": "No admin activity yet.",
+  "csPendingApproval": "Awaiting approval",
+  "csConfirmed": "Confirmed",
+  "csCompleted": "Completed",
+  "csCancelled": "Cancelled",
+  "csDeclined": "Declined",
+  "csMissed": "Missed",
+  "csFailed": "Failed",
+  "ctDraft": "Draft",
+  "ctPendingSignature": "Awaiting signature",
+  "ctSigned": "Signed",
+  "ctCompleted": "Completed",
+  "verifPendingCount": "{count} waiting",
+  "@verifPendingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

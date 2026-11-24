@@ -1,8 +1,16 @@
 import { Type } from 'class-transformer';
-import { IsIn, IsInt, IsObject, IsOptional, Max, Min } from 'class-validator';
+import {
+  IsIn,
+  IsInt,
+  IsObject,
+  IsOptional,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import {
   CONTRACT_LOCALES,
-  CONTRACT_TEMPLATE_KEYS,
   type ContractLocale,
 } from '../contract-templates';
 
@@ -30,7 +38,8 @@ export class ListContractsQueryDto {
 
 /** Field values are checked against the template in the service. */
 export class CreateContractDto {
-  @IsIn(CONTRACT_TEMPLATE_KEYS)
+  @IsString()
+  @MaxLength(60)
   templateId!: string;
 
   @IsObject()

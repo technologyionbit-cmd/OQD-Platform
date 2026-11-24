@@ -9,6 +9,7 @@ import 'package:aqd_ionbit/features/auth/data/repositories/auth_repository_impl.
 import 'package:aqd_ionbit/features/auth/domain/entities/auth_user.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/register_request.dart';
 import 'package:aqd_ionbit/features/auth/domain/repositories/auth_repository.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/biometric_lock.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/phone_verification_prompt.dart';
 
 /// App-wide session state: `AsyncLoading` while resolving the stored
@@ -39,10 +40,28 @@ class AuthController extends AsyncNotifier<AuthUser?> {
         .registerHandler(_handleSessionExpired);
 
     final result = await _repository.restoreSession();
-    return switch (result) {
-      Success(:final data) => data,
-      ResultFailure(:final failure) => throw failure,
-    };
+    switch (result) {
+      case Success(:final data):
+        // A restored session on a device with biometric sign-in opens
+        // behind the fingerprint / Face ID check.
+        if (data != null && await _biometricSignInEnabled()) {
+          ref.read(biometricLockProvider.notifier).lock();
+        }
+        return data;
+      case ResultFailure(:final failure):
+        throw failure;
+    }
+  }
+
+  /// A Keystore/Keychain hiccup must never block restoring the session, so
+  /// any failure here just means "no lock".
+  Future<bool> _biometricSignInEnabled() async {
+    try {
+      final biometric = ref.read(biometricServiceProvider);
+      return await biometric.hasSavedCredentials() && await biometric.isAvailable();
+    } catch (_) {
+      return false;
+    }
   }
 
   Future<Result<AuthUser>> login({
@@ -51,6 +70,7 @@ class AuthController extends AsyncNotifier<AuthUser?> {
   }) async {
     final result = await _repository.login(phone: phone, password: password);
     return result.fold(Result.failure, (data) {
+      ref.read(biometricLockProvider.notifier).unlock();
       state = AsyncData(data.user);
       return Result.success(data.user);
     });
@@ -61,6 +81,7 @@ class AuthController extends AsyncNotifier<AuthUser?> {
     return result.fold(Result.failure, (data) {
       // Set before the user so the router's first look at the new
       // session already routes to the code screen.
+      ref.read(biometricLockProvider.notifier).unlock();
       if (!data.user.phoneVerified)
         ref.read(phoneVerificationPromptProvider.notifier).show();
       state = AsyncData(data.user);
@@ -84,6 +105,7 @@ class AuthController extends AsyncNotifier<AuthUser?> {
 
   Future<void> logout() async {
     await _repository.logout();
+    ref.read(biometricLockProvider.notifier).unlock();
     ref.read(phoneVerificationPromptProvider.notifier).dismiss();
     state = const AsyncData(null);
   }
@@ -104,6 +126,7 @@ class AuthController extends AsyncNotifier<AuthUser?> {
   /// token — the session is over, so the stored tokens go too.
   Future<void> _handleSessionExpired() async {
     await _repository.clearLocalSession();
+    ref.read(biometricLockProvider.notifier).unlock();
     ref.read(phoneVerificationPromptProvider.notifier).dismiss();
     state = const AsyncData(null);
   }

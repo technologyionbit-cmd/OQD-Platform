@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/auth.types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UpdateGovProcedureProgressDto } from './dto/update-progress.dto';
+import { pdfDownload } from '../storage/official-pdf';
 import { GovProceduresService } from './gov-procedures.service';
 
 /**
@@ -24,6 +33,12 @@ export class GovProceduresController {
   @Get(':id')
   async findById(@Param('id') id: string) {
     return { data: await this.govProcedures.findById(id) };
+  }
+
+  @Get(':id/pdf')
+  async pdf(@Param('id', ParseUUIDPipe) id: string) {
+    const { stream, fileName } = await this.govProcedures.openPdf(id);
+    return pdfDownload(stream, fileName);
   }
 
   @Get(':id/progress')

@@ -16,6 +16,7 @@ import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/core/routing/splash_hold.dart';
 import 'package:aqd_ionbit/features/auth/domain/entities/user_role.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/biometric_lock.dart';
 import 'package:aqd_ionbit/features/auth/presentation/providers/phone_verification_prompt.dart';
 import 'package:aqd_ionbit/features/onboarding/presentation/providers/onboarding_controller.dart';
 
@@ -37,6 +38,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.listen(onboardingControllerProvider, (_, _) => refresh());
   ref.listen(splashHoldProvider, (_, _) => refresh());
   ref.listen(phoneVerificationPromptProvider, (_, _) => refresh());
+  ref.listen(biometricLockProvider, (_, _) => refresh());
   ref.onDispose(refreshNotifier.dispose);
 
   return GoRouter(
@@ -107,6 +109,12 @@ String? _redirect(Ref ref, GoRouterState state) {
       return location == RoutePaths.onboarding ? null : RoutePaths.onboarding;
     }
     return publicAuthRoutes.contains(location) ? null : RoutePaths.welcome;
+  }
+
+  // Restored session on a device with biometric sign-in: nothing opens
+  // until the fingerprint / Face ID check passes.
+  if (ref.read(biometricLockProvider)) {
+    return location == RoutePaths.biometricUnlock ? null : RoutePaths.biometricUnlock;
   }
 
   // Signed in with an unverified phone: the code screen while the prompt

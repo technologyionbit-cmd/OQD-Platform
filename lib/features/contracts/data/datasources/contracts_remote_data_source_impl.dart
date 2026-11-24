@@ -110,6 +110,7 @@ class ContractsRemoteDataSourceImpl implements ContractsRemoteDataSource {
       id: json['id'] as String,
       category: ContractCategory.values.byName(json['category'] as String),
       title: json['title'] as String,
+      hasPdf: json['hasPdf'] == true,
       fields: (json['fields'] as List).cast<Map<String, dynamic>>().map(_parseField).toList(growable: false),
     );
   }

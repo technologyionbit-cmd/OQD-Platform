@@ -17,7 +17,7 @@ import 'package:aqd_ionbit/features/auth/presentation/providers/auth_controller.
 import 'package:aqd_ionbit/features/auth/presentation/widgets/auth_form_error.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/sanad_auth_page.dart';
 import 'package:aqd_ionbit/features/auth/presentation/widgets/sanad_button.dart';
-import 'package:aqd_ionbit/core/providers/core_providers.dart';
+import 'package:aqd_ionbit/features/auth/presentation/providers/biometric_lock.dart';
 
 /// Phone number + password only. The account's role (returned by the backend)
 /// decides which shell the router lands on — there is no role selector,
@@ -38,15 +38,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _passwordError;
   String? _formError;
   bool _isSubmitting = false;
-  bool _biometricAvailable = false;
-  bool _enableBiometric = true;
 
   @override
   void initState() {
     super.initState();
-    ref.read(biometricServiceProvider).isAvailable().then((v) {
-      if (mounted) setState(() => _biometricAvailable = v);
-    });
   }
 
   @override
@@ -82,20 +77,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (phone == null || passwordError != null) return;
 
     setState(() => _isSubmitting = true);
-    final biometric = ref.read(biometricServiceProvider);
     final password = _passwordController.text;
-    final saveBiometric = _biometricAvailable && _enableBiometric;
     final result = await ref
         .read(authControllerProvider.notifier)
         .login(phone: phone, password: password);
     // Runs before the mounted check: a successful login makes the router
     // leave (and dispose) this screen immediately.
     if (result is Success) {
-      if (saveBiometric) {
-        await biometric.saveCredentials(phone: phone, password: password);
-      } else if (_biometricAvailable) {
-        await biometric.clearCredentials();
-      }
+      await offerBiometricAfterLogin(ref, phone: phone, password: password);
     }
     if (!mounted) return;
     setState(() => _isSubmitting = false);
@@ -162,18 +151,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
             ),
-            if (_biometricAvailable)
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                dense: true,
-                value: _enableBiometric,
-                onChanged: (v) => setState(() => _enableBiometric = v ?? false),
-                title: Text(
-                  l10n.authBiometricEnableToggle,
-                  style: textTheme.bodyMedium,
-                ),
-              ),
             AuthFormError(_formError),
             const SizedBox(height: AppSpacing.lg),
             SanadButton(

@@ -17,5 +17,8 @@ abstract class ContractTemplate with _$ContractTemplate {
     required ContractCategory category,
     required String title,
     required List<ContractField> fields,
+
+    /// Staff uploaded an official PDF for this template; the app offers it.
+    @Default(false) bool hasPdf,
   }) = _ContractTemplate;
 }

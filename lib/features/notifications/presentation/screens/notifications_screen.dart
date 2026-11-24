@@ -46,7 +46,9 @@ class NotificationsScreen extends ConsumerWidget {
         UserRole.lawyer => RoutePaths.lawyerConsultationDetails(id),
         UserRole.company => RoutePaths.companyConsultationDetails(id),
       },
-      NotificationType.lawyerVerificationApproved || NotificationType.lawyerVerificationRejected => null,
+      NotificationType.lawyerVerificationApproved ||
+      NotificationType.lawyerVerificationRejected ||
+      NotificationType.adminMessage => null,
     };
   }
 
@@ -66,6 +68,8 @@ class NotificationsScreen extends ConsumerWidget {
       unawaited(context.push(route));
       return;
     }
+    // A staff message has nothing to open; reading it is the whole action.
+    if (notification.type == NotificationType.adminMessage) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(AppLocalizations.of(context)!.notificationUnavailableForRole)),
     );

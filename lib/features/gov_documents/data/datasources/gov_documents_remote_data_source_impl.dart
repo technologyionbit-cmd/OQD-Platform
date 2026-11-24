@@ -74,6 +74,7 @@ class GovDocumentsRemoteDataSourceImpl implements GovDocumentsRemoteDataSource {
       type: _parseType(row['type'] as String),
       durationLabel: _localized(row['durationLabel'], locale),
       accessType: GovProcedureAccessType.values.byName(row['accessType'] as String),
+      hasPdf: row['hasPdf'] == true,
       requiredDocuments: requiredDocuments
           .map((doc) => GovRequiredDocument(id: doc['id'] as String, title: _localized(doc['title'], locale)))
           .toList(growable: false),

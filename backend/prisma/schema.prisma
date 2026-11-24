@@ -213,6 +213,17 @@ model User {
   createdAt        DateTime   @default(now()) @map("created_at") @db.Timestamptz
   updatedAt        DateTime   @updatedAt @map("updated_at") @db.Timestamptz
   deletedAt        DateTime?  @map("deleted_at") @db.Timestamptz
+  /// Set when an admin suspends the account (status becomes `suspended`);
+  /// cleared on reactivation. `suspendedById` is the admin, kept as a plain
+  /// id so the history survives that admin's account being removed.
+  suspendedAt      DateTime?  @map("suspended_at") @db.Timestamptz
+  suspendedReason  String?    @map("suspended_reason")
+  suspendedById    String?    @map("suspended_by_id") @db.Uuid
+  /// Admin accounts only. Full access sees and does everything and can manage
+  /// other admins; otherwise `adminPermissions` lists what is allowed, as
+  /// `<module>.view` / `<module>.manage` (see src/admin/permissions).
+  adminFullAccess  Boolean    @default(false) @map("admin_full_access")
+  adminPermissions String[]   @default([]) @map("admin_permissions")
 
   lawyerRegistrationDetail LawyerRegistrationDetail?
   refreshTokens            RefreshToken[]
@@ -227,8 +238,11 @@ model User {
   contracts                Contract[]
   contractSignatures       ContractSignature[]
   notifications            Notification[]
+  auditLogs                AuditLog[]
 
   @@index([role])
+  @@index([status])
+  @@index([createdAt])
   @@map("users")
 }
 
@@ -380,6 +394,9 @@ model GovProcedure {
   type          GovProcedureType       @unique
   durationLabel Json                   @map("duration_label")
   accessType    GovProcedureAccessType @map("access_type")
+  /// An official PDF staff uploaded for this procedure, if any.
+  pdfStorageKey String?                @map("pdf_storage_key")
+  pdfFileName   String?                @map("pdf_file_name")
   createdAt     DateTime               @default(now()) @map("created_at") @db.Timestamptz
   updatedAt     DateTime               @updatedAt @map("updated_at") @db.Timestamptz
 
@@ -716,6 +733,30 @@ model Contract {
   @@map("contracts")
 }
 
+/// A contract template the app offers. Seeded from the built-in catalog
+/// (src/contracts/contract-templates.ts) the first time the API starts, then
+/// managed from the admin app. `version` goes up whenever the title or fields
+/// change; a contract keeps the version it was made from.
+model ContractTemplate {
+  id        String           @id @default(uuid()) @db.Uuid
+  key       String           @unique
+  version   Int              @default(1)
+  category  ContractCategory
+  /// { ar, en }
+  title     Json
+  /// Array of field definitions (see ContractFieldDefinition).
+  fields    Json
+  isActive  Boolean          @default(true) @map("is_active")
+  /// An official PDF staff uploaded for this template (private disk, see
+  /// FileStorageService). The app offers it for download when present.
+  pdfStorageKey String?        @map("pdf_storage_key")
+  pdfFileName   String?        @map("pdf_file_name")
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("contract_templates")
+}
+
 /// Evidence of one account signing one contract: when, and from which IP
 /// and client. One row per signer; append-only.
 model ContractSignature {
@@ -749,6 +790,8 @@ enum NotificationType {
   consultationRescheduled
   lawyerVerificationApproved
   lawyerVerificationRejected
+  /** Sent by staff from the admin app. params: titleAr, titleEn, bodyAr, bodyEn. */
+  adminMessage
 }
 
 /// One event for one account. Written only by the server, in the same
@@ -768,4 +811,38 @@ model Notification {
 
   @@index([userId, createdAt])
   @@map("notifications")
+}
+
+// -----------------------------------------------------------------------------
+// 9. Admin audit trail
+// -----------------------------------------------------------------------------
+
+/// One row per admin write (and per admin sign-in). Written by the admin
+/// audit interceptor; never updated or deleted by the API. `actorUserId`
+/// goes null if the admin account is ever hard-deleted, the row stays.
+/// `before`/`after` hold the changed entity's state with secrets removed.
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  actorUserId String?  @map("actor_user_id") @db.Uuid
+  /// Stable dotted name, e.g. `lawyerVerification.approve`.
+  action      String
+  entityType  String?  @map("entity_type")
+  entityId    String?  @map("entity_id")
+  method      String
+  path        String
+  statusCode  Int      @map("status_code")
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+  before      Json?
+  after       Json?
+  /// Sanitized request body and anything else worth keeping.
+  meta        Json?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
 }

@@ -58,7 +58,9 @@ export class TokenService {
     const hash = this.hashRefreshToken(rawRefresh);
     const existing = await this.prisma.refreshToken.findFirst({
       where: { refreshTokenHash: hash },
-      include: { user: { select: { role: true, status: true } } },
+      include: {
+        user: { select: { role: true, status: true, deletedAt: true } },
+      },
     });
 
     if (!existing) {
@@ -78,7 +80,7 @@ export class TokenService {
       throw unauthorized('Session expired. Please sign in again.');
     }
 
-    if (existing.user.status !== 'active') {
+    if (existing.user.status !== 'active' || existing.user.deletedAt) {
       throw unauthorized('Session expired. Please sign in again.');
     }
 

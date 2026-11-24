@@ -6,6 +6,7 @@ class RoutePaths {
   static const login = '/login';
   static const welcome = '/welcome';
   static const biometricLogin = '/biometric-login';
+  static const biometricUnlock = '/biometric-unlock';
 
   /// Popup shown to guests who open something that needs an account.
   static const loginRequired = '/login-required';

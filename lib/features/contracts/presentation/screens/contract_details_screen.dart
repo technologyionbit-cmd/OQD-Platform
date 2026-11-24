@@ -23,6 +23,7 @@ import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_by
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_draft_controller.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contract_templates_provider.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/providers/contracts_controller.dart';
+import 'package:aqd_ionbit/features/contracts/presentation/utils/contract_pdf_actions.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_category_x.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_signature_sheet.dart';
 import 'package:aqd_ionbit/features/contracts/presentation/widgets/contract_status_x.dart';
@@ -123,6 +124,7 @@ class ContractDetailsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final contractState = ref.watch(contractByIdProvider(contractId));
+    final templates = ref.watch(contractTemplatesProvider).value ?? const [];
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.contractDetailsTitle)),
@@ -175,6 +177,24 @@ class ContractDetailsScreen extends ConsumerWidget {
                 variant: AppButtonVariant.outlined,
                 onPressed: () => _copyContent(context, contract),
               ),
+              if (contract.generatedContent.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.sm),
+                AppButton(
+                  label: l10n.pdfDownload,
+                  icon: Icons.picture_as_pdf_outlined,
+                  variant: AppButtonVariant.outlined,
+                  onPressed: () => downloadContractPdf(context, ref, contract),
+                ),
+              ],
+              if (templates.any((t) => t.id == contract.templateId && t.hasPdf)) ...[
+                const SizedBox(height: AppSpacing.sm),
+                AppButton(
+                  label: l10n.pdfOfficialForm,
+                  icon: Icons.description_outlined,
+                  variant: AppButtonVariant.outlined,
+                  onPressed: () => downloadOfficialContractPdf(context, ref, templateId: contract.templateId, title: contract.title),
+                ),
+              ],
               if (contract.status == ContractStatus.pendingSignature) ...[
                 const SizedBox(height: AppSpacing.sm),
                 AppButton(

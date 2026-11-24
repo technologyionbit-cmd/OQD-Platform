@@ -1,23 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { badRequest, notFound } from '../common/errors/api-exceptions';
 import { PrismaService } from '../prisma/prisma.service';
+import { FileStorageService } from '../storage/file-storage.service';
 import type { UpdateGovProcedureProgressDto } from './dto/update-progress.dto';
 
 /** Sort order shared by requiredDocuments/steps includes across every query. */
 const CHILD_ORDER = { sortOrder: 'asc' as const };
 
+/** What the app sees: whether a PDF exists, never where it is stored. */
+function withPdfFlag<T extends { pdfStorageKey: string | null; pdfFileName: string | null }>(
+  row: T,
+) {
+  const { pdfStorageKey, pdfFileName, ...rest } = row;
+  return { ...rest, hasPdf: pdfStorageKey !== null };
+}
+
 @Injectable()
 export class GovProceduresService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly storage: FileStorageService,
+  ) {}
 
   async findAll() {
-    return this.prisma.govProcedure.findMany({
+    const rows = await this.prisma.govProcedure.findMany({
       include: {
         requiredDocuments: { orderBy: CHILD_ORDER },
         steps: { orderBy: CHILD_ORDER },
       },
       orderBy: { type: 'asc' },
     });
+    return rows.map(withPdfFlag);
   }
 
   async findById(id: string) {
@@ -31,7 +44,20 @@ export class GovProceduresService {
     if (!procedure) {
       throw notFound('Government procedure not found.');
     }
-    return procedure;
+    return withPdfFlag(procedure);
+  }
+
+  /** The official PDF staff uploaded for a procedure (404 if none). */
+  async openPdf(id: string) {
+    const row = await this.prisma.govProcedure.findUnique({
+      where: { id },
+      select: { pdfStorageKey: true, pdfFileName: true },
+    });
+    if (!row?.pdfStorageKey) throw notFound('This procedure has no PDF.');
+    return {
+      stream: await this.storage.open(row.pdfStorageKey),
+      fileName: row.pdfFileName ?? 'procedure.pdf',
+    };
   }
 
   async getProgress(userId: string, procedureId: string) {

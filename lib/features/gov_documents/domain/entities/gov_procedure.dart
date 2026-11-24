@@ -35,6 +35,7 @@ class GovProcedure {
     required this.accessType,
     required this.requiredDocuments,
     required this.steps,
+    this.hasPdf = false,
   });
 
   /// Backend row id — needed to address `/v1/gov-procedures/{id}/progress`.
@@ -45,6 +46,9 @@ class GovProcedure {
   final GovProcedureAccessType accessType;
   final List<GovRequiredDocument> requiredDocuments;
   final List<GovProcedureStep> steps;
+
+  /// Staff uploaded an official PDF for this procedure; the app offers it.
+  final bool hasPdf;
 }
 
 /// Per-procedure progress — which required documents the user has marked

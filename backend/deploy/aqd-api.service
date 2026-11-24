@@ -1,0 +1,22 @@
+[Unit]
+Description=Aqd API (NestJS)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=aqd
+Group=aqd
+WorkingDirectory=/opt/aqd/backend
+EnvironmentFile=/opt/aqd/backend/.env
+ExecStart=/usr/bin/node dist/src/main.js
+Restart=always
+RestartSec=5
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/var/lib/aqd/uploads
+
+[Install]
+WantedBy=multi-user.target

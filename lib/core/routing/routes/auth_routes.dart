@@ -5,6 +5,7 @@ import 'package:aqd_ionbit/features/auth/presentation/widgets/login_required_dia
 
 import 'package:aqd_ionbit/core/routing/route_paths.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/biometric_login_screen.dart';
+import 'package:aqd_ionbit/features/auth/presentation/screens/biometric_unlock_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:aqd_ionbit/features/auth/presentation/screens/login_screen.dart';
 import 'package:aqd_ionbit/features/onboarding/presentation/screens/onboarding_screen.dart';
@@ -37,6 +38,7 @@ final authRoutes = [
   GoRoute(path: RoutePaths.onboarding, builder: (context, state) => const OnboardingScreen()),
   GoRoute(path: RoutePaths.welcome, builder: (context, state) => const WelcomeScreen()),
   GoRoute(path: RoutePaths.biometricLogin, builder: (context, state) => const BiometricLoginScreen()),
+  GoRoute(path: RoutePaths.biometricUnlock, builder: (context, state) => const BiometricUnlockScreen()),
   GoRoute(path: RoutePaths.login, builder: (context, state) => const LoginScreen()),
   GoRoute(path: RoutePaths.register, builder: (context, state) => const RegisterScreen()),
   GoRoute(path: RoutePaths.forgotPassword, builder: (context, state) => const ForgotPasswordScreen()),

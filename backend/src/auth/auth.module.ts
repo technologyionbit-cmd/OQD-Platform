@@ -45,6 +45,12 @@ import { TokenService } from './services/token.service';
   // TokenService must be exported too — importing modules re-declare
   // JwtAuthGuard as their own provider and it resolves TokenService from
   // here via the module import.
-  exports: [JwtAuthGuard, PhoneVerifiedGuard, TokenService],
+  exports: [
+    JwtAuthGuard,
+    PhoneVerifiedGuard,
+    TokenService,
+    AuthService,
+    PasswordService,
+  ],
 })
 export class AuthModule {}

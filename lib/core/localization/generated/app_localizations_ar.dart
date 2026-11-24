@@ -2221,6 +2221,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get subscriptionBackHome => 'العودة للرئيسية';
 
   @override
+  String get pdfDownload => 'تحميل PDF';
+
+  @override
+  String get pdfOfficialForm => 'النموذج الرسمي (PDF)';
+
+  @override
+  String get pdfDuration => 'المدة';
+
+  @override
+  String get pdfFooter => 'أُعدّ عبر عقد';
+
+  @override
+  String get pdfFailed => 'تعذّر تجهيز ملف PDF. حاول مرة ثانية.';
+
+  @override
   String get govDocumentsTitle => 'المستندات الحكومية';
 
   @override
@@ -2326,6 +2341,25 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get authBiometricExpired =>
       'انتهت صلاحية بيانات الدخول المحفوظة. سجّل دخولك بكلمة المرور من جديد.';
+
+  @override
+  String get authBiometricOfferTitle => 'سجّل دخولك أسرع';
+
+  @override
+  String get authBiometricOfferBody =>
+      'استخدم البصمة أو Face ID لفتح عقد بدون كتابة كلمة المرور.';
+
+  @override
+  String get authBiometricOfferEnable => 'تفعيل';
+
+  @override
+  String get authBiometricOfferLater => 'لاحقاً';
+
+  @override
+  String get authBiometricUnlockTitle => 'افتح عقد';
+
+  @override
+  String get authBiometricUsePassword => 'استخدم كلمة المرور';
 
   @override
   String get authWelcomeTitle => 'أهلاً بك';

@@ -5,6 +5,7 @@ import 'package:aqd_ionbit/core/routing/app_router.dart';
 import 'package:aqd_ionbit/core/localization/generated/app_localizations.dart';
 import 'package:aqd_ionbit/core/localization/locale_controller.dart';
 import 'package:aqd_ionbit/core/theme/app_theme.dart';
+import 'package:aqd_ionbit/features/auth/presentation/widgets/biometric_offer_host.dart';
 
 class AqdApp extends ConsumerWidget {
   const AqdApp({super.key});
@@ -23,6 +24,7 @@ class AqdApp extends ConsumerWidget {
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       routerConfig: router,
+      builder: (context, child) => BiometricOfferHost(navigatorKey: router.routerDelegate.navigatorKey, child: child ?? const SizedBox.shrink()),
     );
   }
 }

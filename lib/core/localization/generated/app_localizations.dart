@@ -4124,6 +4124,36 @@ abstract class AppLocalizations {
   /// **'العودة للرئيسية'**
   String get subscriptionBackHome;
 
+  /// No description provided for @pdfDownload.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحميل PDF'**
+  String get pdfDownload;
+
+  /// No description provided for @pdfOfficialForm.
+  ///
+  /// In ar, this message translates to:
+  /// **'النموذج الرسمي (PDF)'**
+  String get pdfOfficialForm;
+
+  /// No description provided for @pdfDuration.
+  ///
+  /// In ar, this message translates to:
+  /// **'المدة'**
+  String get pdfDuration;
+
+  /// No description provided for @pdfFooter.
+  ///
+  /// In ar, this message translates to:
+  /// **'أُعدّ عبر عقد'**
+  String get pdfFooter;
+
+  /// No description provided for @pdfFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تجهيز ملف PDF. حاول مرة ثانية.'**
+  String get pdfFailed;
+
   /// No description provided for @govDocumentsTitle.
   ///
   /// In ar, this message translates to:
@@ -4315,6 +4345,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'انتهت صلاحية بيانات الدخول المحفوظة. سجّل دخولك بكلمة المرور من جديد.'**
   String get authBiometricExpired;
+
+  /// No description provided for @authBiometricOfferTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'سجّل دخولك أسرع'**
+  String get authBiometricOfferTitle;
+
+  /// No description provided for @authBiometricOfferBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'استخدم البصمة أو Face ID لفتح عقد بدون كتابة كلمة المرور.'**
+  String get authBiometricOfferBody;
+
+  /// No description provided for @authBiometricOfferEnable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل'**
+  String get authBiometricOfferEnable;
+
+  /// No description provided for @authBiometricOfferLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'لاحقاً'**
+  String get authBiometricOfferLater;
+
+  /// No description provided for @authBiometricUnlockTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتح عقد'**
+  String get authBiometricUnlockTitle;
+
+  /// No description provided for @authBiometricUsePassword.
+  ///
+  /// In ar, this message translates to:
+  /// **'استخدم كلمة المرور'**
+  String get authBiometricUsePassword;
 
   /// No description provided for @authWelcomeTitle.
   ///

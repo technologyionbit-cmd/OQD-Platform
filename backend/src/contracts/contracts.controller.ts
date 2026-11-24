@@ -28,6 +28,7 @@ import { RequireVerifiedPhone } from '../auth/guards/phone-verified.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiErrorResponseDto } from '../common/openapi/api-error.dto';
 import { BEARER_AUTH } from '../common/openapi/setup-openapi';
+import { pdfDownload } from '../storage/official-pdf';
 import { ContractsService } from './contracts.service';
 import {
   CreateContractDto,
@@ -53,7 +54,19 @@ export class ContractTemplatesController {
       'languages; contracts store the value.',
   })
   list(@Query() query: LocaleQueryDto) {
-    return { data: this.contracts.templates(query.locale ?? 'ar') };
+    return this.contracts
+      .templates(query.locale ?? 'ar')
+      .then((data) => ({ data }));
+  }
+
+  @Get(':key/pdf')
+  @ApiOperation({
+    summary: 'Official PDF of a template',
+    description: 'Only when the template list says `hasPdf`; otherwise 404.',
+  })
+  async pdf(@Param('key') key: string) {
+    const { stream, fileName } = await this.contracts.templatePdf(key);
+    return pdfDownload(stream, fileName);
   }
 }
 

@@ -32,6 +32,8 @@ export class LawyersService {
       // docs/backend/09-lawyers-marketplace.md §3 item 4 — unverified
       // lawyers are excluded from public search by default.
       verificationStatus: 'verified' as const,
+      // Suspended or removed accounts are not bookable.
+      user: { status: 'active' as const, deletedAt: null },
       ...(query.query
         ? { fullName: { contains: query.query, mode: 'insensitive' as const } }
         : {}),
@@ -62,9 +64,14 @@ export class LawyersService {
   async findById(id: string) {
     const row = await this.prisma.lawyerProfile.findUnique({
       where: { id },
-      include: PROFILE_INCLUDE,
+      include: { ...PROFILE_INCLUDE, user: { select: { status: true, deletedAt: true } } },
     });
-    if (!row || row.verificationStatus !== 'verified') {
+    if (
+      !row ||
+      row.verificationStatus !== 'verified' ||
+      row.user.status !== 'active' ||
+      row.user.deletedAt
+    ) {
       throw notFound('Lawyer not found.');
     }
     return this.toView(row);

@@ -15,6 +15,7 @@ import 'package:aqd_ionbit/core/widgets/loading_view.dart';
 import 'package:aqd_ionbit/core/widgets/section_header.dart';
 import 'package:aqd_ionbit/features/gov_documents/domain/entities/gov_procedure.dart';
 import 'package:aqd_ionbit/features/gov_documents/presentation/providers/gov_procedures_provider.dart';
+import 'package:aqd_ionbit/features/gov_documents/presentation/utils/gov_pdf_actions.dart';
 import 'package:aqd_ionbit/features/gov_documents/presentation/widgets/gov_procedure_type_x.dart';
 
 class GovProcedureDetailScreen extends ConsumerWidget {
@@ -151,7 +152,18 @@ class GovProcedureDetailScreen extends ConsumerWidget {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
-          child: AppButton(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppButton(
+                label: l10n.pdfDownload,
+                icon: Icons.picture_as_pdf_outlined,
+                variant: AppButtonVariant.outlined,
+                onPressed: () => downloadProcedurePdf(context, ref, procedure),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              AppButton(
             label: l10n.govStartProcedure,
             onPressed: progress.started
                 ? null
@@ -159,6 +171,8 @@ class GovProcedureDetailScreen extends ConsumerWidget {
                     ref.read(govProceduresProgressControllerProvider.notifier).start(type);
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.govProcedureStartedMessage)));
                   },
+              ),
+            ],
           ),
         ),
       ),

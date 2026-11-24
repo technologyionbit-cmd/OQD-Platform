@@ -2257,6 +2257,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscriptionBackHome => 'Back to Home';
 
   @override
+  String get pdfDownload => 'Download PDF';
+
+  @override
+  String get pdfOfficialForm => 'Official form (PDF)';
+
+  @override
+  String get pdfDuration => 'Duration';
+
+  @override
+  String get pdfFooter => 'Prepared with Aqd';
+
+  @override
+  String get pdfFailed => 'Couldn\'t prepare the PDF. Please try again.';
+
+  @override
   String get govDocumentsTitle => 'Government Documents';
 
   @override
@@ -2365,6 +2380,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authBiometricExpired =>
       'The saved sign-in details are no longer valid. Please sign in with your password again.';
+
+  @override
+  String get authBiometricOfferTitle => 'Sign in faster';
+
+  @override
+  String get authBiometricOfferBody =>
+      'Use your fingerprint or Face ID to open Aqd without typing your password.';
+
+  @override
+  String get authBiometricOfferEnable => 'Enable';
+
+  @override
+  String get authBiometricOfferLater => 'Not now';
+
+  @override
+  String get authBiometricUnlockTitle => 'Unlock Aqd';
+
+  @override
+  String get authBiometricUsePassword => 'Use password instead';
 
   @override
   String get authWelcomeTitle => 'Welcome';
